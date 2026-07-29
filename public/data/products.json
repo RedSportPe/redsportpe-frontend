@@ -1,0 +1,29 @@
+[
+  {
+    "id": "1",
+    "name": "CJCN Jacket",
+    "description": "Sports jacket with hood",
+    "category": "Jackets",
+    "price": 129.90,
+    "imageUrl": "/images/products/cjcn-jacket-black.jpg",
+    "published": true,
+    "featured": true,
+    "variants": [
+      { "sku": "RS-CJCN-H-S-NEG", "gender": "H", "size": "S", "color": "NEG", "totalStock": 12 },
+      { "sku": "RS-CJCN-H-M-NEG", "gender": "H", "size": "M", "color": "NEG", "totalStock": 8 }
+    ]
+  },
+  {
+    "id": "2",
+    "name": "RS Dry-Fit T-Shirt",
+    "description": "Quick-dry training t-shirt",
+    "category": "T-Shirts",
+    "price": 49.90,
+    "imageUrl": "/images/products/dryfit-tshirt-red.jpg",
+    "published": true,
+    "featured": false,
+    "variants": [
+      { "sku": "RS-PDRF-U-M-ROJ", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 25 }
+    ]
+  }
+]
