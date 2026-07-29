@@ -8,6 +8,7 @@
     "imageUrl": "/images/products/cjcn-jacket-black.jpg",
     "published": true,
     "featured": true,
+    "salesCount": 22,
     "variants": [
       { "sku": "RS-CJCN-H-S-NEG", "gender": "H", "size": "S", "color": "NEG", "totalStock": 12 },
       { "sku": "RS-CJCN-H-M-NEG", "gender": "H", "size": "M", "color": "NEG", "totalStock": 8 }
@@ -22,8 +23,68 @@
     "imageUrl": "/images/products/dryfit-tshirt-red.jpg",
     "published": true,
     "featured": false,
+    "salesCount": 35,
     "variants": [
       { "sku": "RS-PDRF-U-M-ROJ", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 25 }
+    ]
+  },
+  {
+    "id": "3",
+    "name": "RS Training Shorts",
+    "description": "Lightweight shorts with side pockets",
+    "category": "Shorts",
+    "price": 59.90,
+    "imageUrl": "/images/products/training-shorts-black.jpg",
+    "published": true,
+    "featured": true,
+    "salesCount": 22,
+    "variants": [
+      { "sku": "RS-SHRT-H-M-NEG", "gender": "H", "size": "M", "color": "NEG", "totalStock": 18 },
+      { "sku": "RS-SHRT-H-L-NEG", "gender": "H", "size": "L", "color": "NEG", "totalStock": 10 }
+    ]
+  },
+  {
+    "id": "4",
+    "name": "RS Performance Leggings",
+    "description": "High-waist compression leggings",
+    "category": "Leggings",
+    "price": 89.90,
+    "imageUrl": "/images/products/leggings-red.jpg",
+    "published": true,
+    "featured": true,
+    "salesCount": 18,
+    "variants": [
+      { "sku": "RS-LEGG-M-S-ROJ", "gender": "M", "size": "S", "color": "ROJ", "totalStock": 15 },
+      { "sku": "RS-LEGG-M-M-NEG", "gender": "M", "size": "M", "color": "NEG", "totalStock": 20 }
+    ]
+  },
+  {
+    "id": "5",
+    "name": "RS Hoodie Classic",
+    "description": "Cotton-blend hoodie with embroidered logo",
+    "category": "Hoodies",
+    "price": 109.90,
+    "imageUrl": "/images/products/hoodie-classic-black.jpg",
+    "published": true,
+    "featured": true,
+    "salesCount": 27,
+    "variants": [
+      { "sku": "RS-HOOD-U-M-NEG", "gender": "U", "size": "M", "color": "NEG", "totalStock": 14 },
+      { "sku": "RS-HOOD-U-L-GRI", "gender": "U", "size": "L", "color": "GRI", "totalStock": 9 }
+    ]
+  },
+  {
+    "id": "6",
+    "name": "RS Running Cap",
+    "description": "Breathable cap with adjustable strap",
+    "category": "Accessories",
+    "price": 34.90,
+    "imageUrl": "/images/products/running-cap-red.jpg",
+    "published": true,
+    "featured": false,
+    "salesCount": 40,
+    "variants": [
+      { "sku": "RS-CAPP-U-M-ROJ", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 30 }
     ]
   }
 ]

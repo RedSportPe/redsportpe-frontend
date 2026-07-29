@@ -1,6 +1,7 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
 import { CatalogRepository } from '../infrastructure/catalog.repository';
 import { Product } from '../domain/product.model';
+import { SortOption, sortProducts } from '../domain/product-sorting';
 
 @Injectable({ providedIn: 'root' })
 export class CatalogStore {
@@ -9,14 +10,22 @@ export class CatalogStore {
   // Private state
   private _products = signal<Product[]>([]);
   private _loading = signal(false);
+  private _sortOption = signal<SortOption>('relevance');
 
   // Public read-only state
-  readonly products = this._products.asReadonly();
   readonly loading = this._loading.asReadonly();
+  readonly sortOption = this._sortOption.asReadonly();
   readonly totalProducts = computed(() => this._products().length);
+
   readonly featuredProducts = computed(() =>
     this._products().filter(p => p.featured)
   );
+
+  /** The catalog view: always sorted by the current option */
+  readonly products = computed(() =>
+    sortProducts(this._products(), this._sortOption())
+  );
+
   loadCatalog(): void {
     this._loading.set(true);
     this.repository.getPublishedProducts().subscribe({
@@ -26,5 +35,9 @@ export class CatalogStore {
       },
       error: () => this._loading.set(false),
     });
+  }
+
+  changeSort(option: SortOption): void {
+    this._sortOption.set(option);
   }
 }

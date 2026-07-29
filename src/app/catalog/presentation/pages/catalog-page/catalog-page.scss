@@ -24,3 +24,31 @@
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 1.5rem;
 }
+.catalog-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.sort-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--rs-text-muted);
+  font-size: 0.9rem;
+
+  select {
+    background: var(--rs-surface);
+    color: var(--rs-text);
+    border: 1px solid var(--rs-border);
+    border-radius: 6px;
+    padding: 0.45rem 0.7rem;
+    font-family: var(--font-body);
+    cursor: pointer;
+
+    &:hover, &:focus { border-color: var(--rs-red); }
+  }
+}

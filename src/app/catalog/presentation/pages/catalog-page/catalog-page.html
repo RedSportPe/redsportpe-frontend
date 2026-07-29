@@ -1,5 +1,18 @@
 <section class="catalog">
-  <h1>Catálogo</h1>
+  <div class="catalog-header">
+    <h1>Catálogo</h1>
+
+    <label class="sort-control">
+      Ordenar por:
+      <select (change)="onSortChange($event)">
+        @for (option of sortOptions; track option[0]) {
+          <option [value]="option[0]" [selected]="option[0] === store.sortOption()">
+            {{ option[1] }}
+          </option>
+        }
+      </select>
+    </label>
+  </div>
 
   @if (store.loading()) {
     <p>Cargando productos...</p>

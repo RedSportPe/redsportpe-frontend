@@ -15,5 +15,6 @@ export interface Product {
   imageUrl: string;
   published: boolean;
   featured: boolean;
+  salesCount: number;
   variants: Variant[];
 }
