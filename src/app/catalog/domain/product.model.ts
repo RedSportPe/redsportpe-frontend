@@ -1,9 +1,9 @@
 export interface Variant {
-  sku: string;              // 'RS-CJCN-H-S-NEG'
-  gender: 'H' | 'M' | 'U';  // SKU values kept as originally defined
+  sku: string;
+  gender: 'H' | 'M' | 'U' | 'NO' | 'NA';
   size: string;
   color: string;
-  totalStock: number;       // sum across warehouses (never the breakdown)
+  totalStock: number;
 }
 
 export interface Product {
