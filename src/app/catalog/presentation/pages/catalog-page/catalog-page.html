@@ -1,10 +1,10 @@
 <section class="catalog">
-  <div class="catalog-header">
-    <h1>Catálogo</h1>
+  <h1>Catálogo</h1>
 
-    <div class="controls">
+  <div class="catalog-body">
+    <aside class="filters">
       <label class="control">
-        Ordenar por:
+        <span>Ordenar por:</span>
         <select (change)="onSortChange($event)">
           @for (option of sortOptions; track option[0]) {
             <option [value]="option[0]" [selected]="option[0] === store.sortOption()">
@@ -15,7 +15,7 @@
       </label>
 
       <label class="control">
-        Filtrar por:
+        <span>Filtrar por:</span>
         <select (change)="onCategoryChange($event)">
           <option value="all" [selected]="store.categoryFilter() === 'all'">Todos</option>
           @for (category of store.categories(); track category) {
@@ -27,7 +27,7 @@
       </label>
 
       <label class="control">
-        Para:
+        <span>Para:</span>
         <select (change)="onGenderChange($event)">
           @for (option of genderOptions; track option[0]) {
             <option [value]="option[0]" [selected]="option[0] === store.genderFilter()">
@@ -36,18 +36,20 @@
           }
         </select>
       </label>
-    </div>
-  </div>
+    </aside>
 
-  @if (store.loading()) {
-    <p>Cargando productos...</p>
-  } @else {
-    <div class="grid">
-      @for (product of store.products(); track product.id) {
-        <app-product-card [product]="product" />
-      } @empty {
-        <p class="no-results">No hay productos que coincidan con los filtros.</p>
+    <div class="results">
+      @if (store.loading()) {
+        <p>Cargando productos...</p>
+      } @else {
+        <div class="grid">
+          @for (product of store.products(); track product.id) {
+            <app-product-card [product]="product" />
+          } @empty {
+            <p class="no-results">No hay productos que coincidan con los filtros.</p>
+          }
+        </div>
       }
     </div>
-  }
+  </div>
 </section>
