@@ -11,4 +11,9 @@ export const CATALOG_ROUTES: Routes = [
     loadComponent: () =>
       import('./presentation/pages/catalog-page/catalog-page').then(m => m.CatalogPage),
   },
+  {
+    path: 'producto/:id',
+    loadComponent: () =>
+      import('./presentation/pages/product-detail-page/product-detail-page').then(m => m.ProductDetailPage),
+  },
 ];

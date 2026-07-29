@@ -3,10 +3,11 @@ import { CurrencyPipe } from '@angular/common';
 import { Product } from '../../../domain/product.model';
 import { isSoldOut, isLowStock, isNew } from '../../../domain/product-badges';
 import { CatalogStore } from '../../../application/catalog.store';
+import {RouterLink} from '@angular/router';
 
 @Component({
   selector: 'app-product-card',
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, RouterLink],
   templateUrl: './product-card.html',
   styleUrl: './product-card.scss',
 })

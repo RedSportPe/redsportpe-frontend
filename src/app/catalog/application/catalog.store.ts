@@ -25,6 +25,10 @@ export class CatalogStore {
   private _sizeFilter = signal<string | 'all'>('all');
   // Favorites (in-memory for now; will persist per account once IAM exists)
   private _favorites = signal<Set<string>>(new Set());
+  private _selectedProduct = signal<Product | undefined>(undefined);
+  private _loadingProduct = signal(false);
+
+
   // Public read-only state
   readonly loading = this._loading.asReadonly();
   readonly sortOption = this._sortOption.asReadonly();
@@ -32,30 +36,25 @@ export class CatalogStore {
   readonly genderFilter = this._genderFilter.asReadonly();
   readonly colorFilter = this._colorFilter.asReadonly();
   readonly sizeFilter = this._sizeFilter.asReadonly();
-
   readonly featuredProducts = computed(() =>
     this._products().filter(p => p.featured)
   );
-
   /** Available categories, derived from the actual products */
   readonly categories = computed(() =>
     [...new Set(this._products().map(p => p.category))].sort()
   );
-
   /** Available colors, derived from the actual products' variants */
   readonly availableColors = computed(() =>
     [...new Set(
       this._products().flatMap(p => p.variants.map(v => v.color))
     )].sort()
   );
-
   /** Available sizes, derived from variants, in business order (8-16, S-XXL) */
   readonly availableSizes = computed(() =>
     sortSizes([...new Set(
       this._products().flatMap(p => p.variants.map(v => v.size))
     )])
   );
-
   /** The catalog view: category → gender → color → size → sort */
   readonly products = computed(() => {
     let result = filterByCategory(this._products(), this._categoryFilter());
@@ -64,10 +63,8 @@ export class CatalogStore {
     result = filterBySize(result, this._sizeFilter());
     return sortProducts(result, this._sortOption());
   });
-
   /** Results counter for the UI */
   readonly resultsCount = computed(() => this.products().length);
-
   /** True when any filter differs from its default */
   readonly hasActiveFilters = computed(() =>
     this._categoryFilter() !== 'all' ||
@@ -75,6 +72,9 @@ export class CatalogStore {
     this._colorFilter() !== 'all' ||
     this._sizeFilter() !== 'all'
   );
+  readonly selectedProduct = this._selectedProduct.asReadonly();
+  readonly loadingProduct = this._loadingProduct.asReadonly();
+
 
   loadCatalog(): void {
     this._loading.set(true);
@@ -122,7 +122,17 @@ export class CatalogStore {
     next.has(productId) ? next.delete(productId) : next.add(productId);
     this._favorites.set(next);
   }
-
+  loadProduct(id: string): void {
+    this._loadingProduct.set(true);
+    this._selectedProduct.set(undefined);
+    this.repository.getProductById(id).subscribe({
+      next: (product) => {
+        this._selectedProduct.set(product);
+        this._loadingProduct.set(false);
+      },
+      error: () => this._loadingProduct.set(false),
+    });
+  }
 
 
 }
