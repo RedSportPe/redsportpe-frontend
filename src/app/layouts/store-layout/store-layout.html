@@ -1,0 +1,22 @@
+<header class="navbar">
+  <a routerLink="/" class="logo">RedSport</a>
+
+  <nav class="nav-links">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</a>
+    <a routerLink="/catalogo" routerLinkActive="active">Catálogo</a>
+    <!-- future: categories -->
+  </nav>
+
+  <div class="nav-actions">
+    <button class="cart-btn" type="button">🛒 <span class="badge">0</span></button>
+    <button class="account-btn" type="button">Mi cuenta</button>
+  </div>
+</header>
+
+<main>
+  <router-outlet />
+</main>
+
+<footer class="footer">
+  <p>RedSport — Viste tu esfuerzo 💪</p>
+</footer>

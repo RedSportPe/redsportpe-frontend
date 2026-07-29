@@ -1,0 +1,26 @@
+.catalog {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+
+    // Red accent underline
+    &::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 4px;
+      background: var(--rs-red);
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.5rem;
+}

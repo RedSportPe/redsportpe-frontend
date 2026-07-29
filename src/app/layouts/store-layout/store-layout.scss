@@ -1,0 +1,74 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  padding: 0.9rem 2rem;
+  background: var(--rs-surface);
+  border-bottom: 2px solid var(--rs-red);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--rs-red);
+}
+
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+
+  a {
+    font-weight: 500;
+    color: var(--rs-text-muted);
+    padding: 0.4rem 0;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+
+    &:hover { color: var(--rs-text); }
+    &.active { color: var(--rs-text); border-color: var(--rs-red); }
+  }
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+
+  button {
+    background: transparent;
+    border: 1px solid var(--rs-border);
+    color: var(--rs-text);
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    transition: border-color 0.2s, background 0.2s;
+
+    &:hover { border-color: var(--rs-red); }
+  }
+
+  .badge {
+    background: var(--rs-red);
+    border-radius: 999px;
+    padding: 0.05rem 0.45rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+}
+
+main {
+  min-height: calc(100vh - 140px);
+}
+
+.footer {
+  padding: 1.5rem 2rem;
+  text-align: center;
+  color: var(--rs-text-muted);
+  background: var(--rs-surface);
+  border-top: 1px solid var(--rs-border);
+  margin-top: 3rem;
+}

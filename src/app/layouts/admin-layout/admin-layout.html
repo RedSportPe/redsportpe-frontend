@@ -1,0 +1,18 @@
+<div class="admin-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">RedSport <span>Panel</span></div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/admin/products" routerLinkActive="active">📦 Productos</a>
+      <a routerLink="/admin/inventory" routerLinkActive="active">🏷️ Inventario</a>
+      <a routerLink="/admin/orders" routerLinkActive="active">🧾 Pedidos</a>
+      <a routerLink="/admin/discounts" routerLinkActive="active">💸 Descuentos</a>
+      <a routerLink="/admin/stores" routerLinkActive="active">🏬 Tiendas</a>
+      <a routerLink="/admin/users" routerLinkActive="active">👥 Usuarios</a>
+    </nav>
+  </aside>
+
+  <main class="admin-content">
+    <router-outlet />
+  </main>
+</div>

@@ -1,0 +1,8 @@
+<article class="card">
+  <img [src]="product().imageUrl" [alt]="product().name" />
+  <div class="card-body">
+    <span class="category">{{ product().category }}</span>
+    <h3>{{ product().name }}</h3>
+    <p class="price">{{ product().price | currency:'PEN':'S/ ' }}</p>
+  </div>
+</article>
