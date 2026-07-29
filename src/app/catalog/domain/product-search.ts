@@ -28,11 +28,23 @@ function editDistance(a: string, b: string): number {
 }
 
 /** A query word matches a text word if it's contained OR is 1 typo away (for words 4+) */
+/** A query word matches a text word if:
+ *  - it's contained in it, OR
+ *  - it's 1 typo away from the full word (4+ letters), OR
+ *  - it's 1 typo away from the word's prefix of the same length (3+ letters)
+ *    → rescues phonetic typos like "dri"→"dry", "gim"→"gym" */
 function wordMatches(queryWord: string, textWord: string): boolean {
   if (textWord.includes(queryWord)) return true;
+
   if (queryWord.length >= 4) {
-    return editDistance(queryWord, textWord) <= 1;   // "gim" won't reach here, but "jaket"→"jacket" will
+    if (editDistance(queryWord, textWord) <= 1) return true;
   }
+
+  if (queryWord.length >= 3 && textWord.length >= queryWord.length) {
+    const prefix = textWord.slice(0, queryWord.length);
+    if (editDistance(queryWord, prefix) <= 1) return true;
+  }
+
   return false;
 }
 

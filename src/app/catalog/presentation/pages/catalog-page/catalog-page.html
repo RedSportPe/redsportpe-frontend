@@ -1,17 +1,19 @@
 <section class="catalog">
-  <h1>Catálogo</h1>
+  <div class="catalog-header">
+    <h1>Catálogo</h1>
+
+    <label class="search-control">
+      <input
+        type="search"
+        placeholder="Buscar productos..."
+        [value]="store.searchQuery()"
+        (input)="onSearchInput($event)"
+      />
+    </label>
+  </div>
 
   <div class="catalog-body">
     <aside class="filters">
-      <label class="control search-control">
-        <span>Buscar:</span>
-        <input
-          type="search"
-          placeholder="Buscar productos..."
-          [value]="store.searchQuery()"
-          (input)="onSearchInput($event)"
-        />
-      </label>
       <label class="control">
         <span>Ordenar por:</span>
         <select (change)="onSortChange($event)">
