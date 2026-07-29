@@ -14,7 +14,9 @@ export class CatalogStore {
   readonly products = this._products.asReadonly();
   readonly loading = this._loading.asReadonly();
   readonly totalProducts = computed(() => this._products().length);
-
+  readonly featuredProducts = computed(() =>
+    this._products().filter(p => p.featured)
+  );
   loadCatalog(): void {
     this._loading.set(true);
     this.repository.getPublishedProducts().subscribe({

@@ -4,6 +4,11 @@ export const CATALOG_ROUTES: Routes = [
   {
     path: '',
     loadComponent: () =>
+      import('./presentation/pages/home-page/home-page').then(m => m.HomePage),
+  },
+  {
+    path: 'catalogo',
+    loadComponent: () =>
       import('./presentation/pages/catalog-page/catalog-page').then(m => m.CatalogPage),
   },
 ];

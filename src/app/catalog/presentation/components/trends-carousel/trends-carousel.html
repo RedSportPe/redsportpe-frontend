@@ -1,0 +1,33 @@
+<section class="trends">
+  <h2>Tendencias</h2>
+
+  <div class="carousel">
+    <button class="arrow" type="button" (click)="rotatePrev()" aria-label="Anterior">
+      <svg viewBox="0 0 24 80" fill="none">
+        <path d="M18 6 L6 40 L18 74" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+
+    <div class="stage">
+      @for (slide of visibleSlides(); track slide.product.id) {
+        <article
+          class="slide"
+          [class]="slide.position"
+          (click)="onSlideClick(slide.position)"
+        >
+          <img [src]="slide.product.imageUrl" [alt]="slide.product.name" />
+          <div class="slide-info">
+            <h3>{{ slide.product.name }}</h3>
+            <p class="price">{{ slide.product.price | currency:'PEN':'S/ ' }}</p>
+          </div>
+        </article>
+      }
+    </div>
+
+    <button class="arrow" type="button" (click)="rotateNext()" aria-label="Siguiente">
+      <svg viewBox="0 0 24 80" fill="none">
+        <path d="M6 6 L18 40 L6 74" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </div>
+</section>

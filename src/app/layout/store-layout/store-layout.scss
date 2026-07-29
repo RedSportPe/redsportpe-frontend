@@ -72,3 +72,22 @@ main {
   border-top: 1px solid var(--rs-border);
   margin-top: 3rem;
 }
+@media (max-width: 768px) {
+  .navbar {
+    padding: 0.7rem 1rem;
+    gap: 0.8rem;
+  }
+
+  .logo { font-size: 1.25rem; }
+
+  .nav-links { gap: 1rem; }
+
+  .nav-actions {
+    gap: 0.5rem;
+
+    button {
+      padding: 0.4rem 0.6rem;
+      font-size: 0.85rem;
+    }
+  }
+}

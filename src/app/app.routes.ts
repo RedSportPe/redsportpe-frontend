@@ -5,7 +5,7 @@ export const routes: Routes = [
     // Public store: top navbar
     path: '',
     loadComponent: () =>
-      import('./layouts/store-layout/store-layout').then(m => m.StoreLayout),
+      import('./layout/store-layout/store-layout').then(m => m.StoreLayout),
     children: [
       {
         path: '',
@@ -17,7 +17,7 @@ export const routes: Routes = [
     // Staff panel: left sidebar
     path: 'admin',
     loadComponent: () =>
-      import('./layouts/admin-layout/admin-layout').then(m => m.AdminLayout),
+      import('./layout/admin-layout/admin-layout').then(m => m.AdminLayout),
     children: [],
   },
 ];

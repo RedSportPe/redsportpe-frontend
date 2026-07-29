@@ -1,0 +1,11 @@
+<section class="home">
+  <div class="hero">
+    <h1>Viste tu esfuerzo</h1>
+    <p>Ropa deportiva hecha para quienes no se rinden.</p>
+    <a routerLink="/catalogo" class="cta">Ver catálogo</a>
+  </div>
+
+  @if (!store.loading() && store.featuredProducts().length >= 2) {
+    <app-trends-carousel [products]="store.featuredProducts()" />
+  }
+</section>

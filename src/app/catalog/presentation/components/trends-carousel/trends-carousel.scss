@@ -1,0 +1,139 @@
+.trends {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem 0;
+
+  h2 {
+    font-size: 1.6rem;
+    margin-bottom: 1.5rem;
+
+    &::after {
+      content: '';
+      display: block;
+      width: 50px;
+      height: 4px;
+      background: var(--rs-red);
+      margin-top: 0.4rem;
+    }
+  }
+}
+
+.carousel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  min-height: 380px;
+}
+
+.slide {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 12px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.45s ease, opacity 0.45s ease, border-color 0.2s;
+
+  img {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+  }
+
+  .slide-info {
+    padding: 0.9rem;
+    text-align: center;
+
+    h3 { font-size: 1rem; }
+    .price { font-weight: 600; margin-top: 0.3rem; }
+  }
+
+  &.left,
+  &.right {
+    width: 220px;
+    opacity: 0.55;
+
+    &:hover { opacity: 0.8; border-color: var(--rs-red); }
+  }
+
+  &.left  { transform: scale(0.85) perspective(600px) rotateY(12deg); }
+  &.right { transform: scale(0.85) perspective(600px) rotateY(-12deg); }
+
+  &.center {
+    width: 300px;
+    opacity: 1;
+    transform: scale(1);
+    border-color: var(--rs-red);
+    box-shadow: 0 10px 40px rgba(185, 28, 28, 0.25);
+    z-index: 2;
+  }
+}
+
+// ===== New arrows: tall stretched chevrons =====
+.arrow {
+  background: transparent;
+  border: none;
+  color: var(--rs-text-muted);
+  padding: 0.5rem 0.3rem;
+  transition: color 0.2s, transform 0.2s;
+
+  svg {
+    width: 22px;
+    height: 80px;
+    display: block;
+  }
+
+  &:hover {
+    color: var(--rs-red);
+    transform: scaleY(1.08);
+  }
+}
+
+// ===== Responsive =====
+@media (max-width: 768px) {
+  .trends {
+    padding: 1.5rem 0.5rem 0;
+
+    h2 { padding-left: 1rem; }
+  }
+
+  .stage {
+    gap: 0.6rem;
+    min-height: 300px;
+  }
+
+  // Side cards shrink a lot; center stays the star
+  .slide {
+    &.left,
+    &.right {
+      width: 90px;
+
+      .slide-info { display: none; }  // only image on tiny side cards
+    }
+
+    &.center {
+      width: 200px;
+    }
+  }
+
+  .arrow svg {
+    width: 16px;
+    height: 60px;
+  }
+}
+
+@media (max-width: 420px) {
+  // Very small screens: hide side cards, single card + arrows
+  .slide {
+    &.left,
+    &.right { display: none; }
+    &.center { width: 230px; }
+  }
+}

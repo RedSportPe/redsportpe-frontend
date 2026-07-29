@@ -14,5 +14,6 @@ export interface Product {
   price: number;            // in soles (PEN)
   imageUrl: string;
   published: boolean;
+  featured: boolean;
   variants: Variant[];
 }

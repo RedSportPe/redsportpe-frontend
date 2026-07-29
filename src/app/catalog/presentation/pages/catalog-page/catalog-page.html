@@ -1,14 +1,14 @@
 <section class="catalog">
-  <h1>RedSport Catalog</h1>
+  <h1>Catálogo</h1>
 
   @if (store.loading()) {
-    <p>Loading products...</p>
+    <p>Cargando productos...</p>
   } @else {
     <div class="grid">
       @for (product of store.products(); track product.id) {
         <app-product-card [product]="product" />
       } @empty {
-        <p>No products available.</p>
+        <p>No hay productos disponibles.</p>
       }
     </div>
   }
