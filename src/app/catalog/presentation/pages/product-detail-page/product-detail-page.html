@@ -1,0 +1,83 @@
+<section class="detail">
+  @if (store.loadingProduct()) {
+    <p class="state-msg">Cargando producto...</p>
+  } @else if (!store.selectedProduct()) {
+    <div class="state-msg">
+      <p>Producto no encontrado.</p>
+      <a routerLink="/catalogo" class="back-link">← Volver al catálogo</a>
+    </div>
+  } @else {
+    @let product = store.selectedProduct()!;
+
+    <a routerLink="/catalogo" class="back-link">← Volver al catálogo</a>
+
+    <div class="detail-body">
+      <div class="gallery">
+        <img [src]="product.imageUrl" [alt]="product.name" />
+      </div>
+
+      <div class="info">
+        <span class="category">{{ product.category }}</span>
+        <h1>{{ product.name }}</h1>
+        <p class="price">{{ product.price | currency:'PEN':'S/ ' }}</p>
+        <p class="description">{{ product.description }}</p>
+
+        <div class="selector">
+          <span class="selector-label">Talla:</span>
+          <div class="options">
+            @for (size of availableSizes(); track size) {
+              <button
+                type="button"
+                class="option"
+                [class.selected]="selectedSize() === size"
+                (click)="selectSize(size)"
+              >
+                {{ size }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <div class="selector">
+          <span class="selector-label">Color:</span>
+          <div class="options">
+            @for (color of availableColors(); track color) {
+              <button
+                type="button"
+                class="option"
+                [class.selected]="selectedColor() === color"
+                (click)="selectColor(color)"
+              >
+                {{ colorLabel(color) }}
+              </button>
+            }
+          </div>
+        </div>
+
+        @if (selectedVariant(); as variant) {
+          <p class="stock" [class.low]="variant.totalStock <= 5">
+            @if (variant.totalStock === 0) {
+              Agotado en esta combinación
+            } @else if (variant.totalStock <= 5) {
+              ¡Últimas {{ variant.totalStock }} unidades!
+            } @else {
+              Stock disponible
+            }
+          </p>
+          <p class="sku">SKU: {{ variant.sku }}</p>
+        } @else if (selectedSize() && selectedColor()) {
+          <p class="stock low">Esta combinación no está disponible</p>
+        }
+
+        <button
+          type="button"
+          class="add-to-cart"
+          [disabled]="!canAddToCart()"
+          (click)="addToCart()"
+        >
+          {{ canAddToCart() ? 'Agregar al carrito' : 'Selecciona talla y color' }}
+        </button>
+      </div>
+    </div>
+  }
+</section>
