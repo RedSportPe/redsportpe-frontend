@@ -2,7 +2,14 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { CatalogRepository } from '../infrastructure/catalog.repository';
 import { Product } from '../domain/product.model';
 import { SortOption, sortProducts } from '../domain/product-sorting';
-import { GenderFilter, filterByCategory, filterByGender } from '../domain/product-filtering';
+import {
+  GenderFilter,
+  filterByCategory,
+  filterByGender,
+  filterByColor,
+  filterBySize,
+  sortSizes,
+} from '../domain/product-filtering';
 
 @Injectable({ providedIn: 'root' })
 export class CatalogStore {
@@ -14,12 +21,17 @@ export class CatalogStore {
   private _sortOption = signal<SortOption>('relevance');
   private _categoryFilter = signal<string | 'all'>('all');
   private _genderFilter = signal<GenderFilter>('all');
-
+  private _colorFilter = signal<string | 'all'>('all');
+  private _sizeFilter = signal<string | 'all'>('all');
+  // Favorites (in-memory for now; will persist per account once IAM exists)
+  private _favorites = signal<Set<string>>(new Set());
   // Public read-only state
   readonly loading = this._loading.asReadonly();
   readonly sortOption = this._sortOption.asReadonly();
   readonly categoryFilter = this._categoryFilter.asReadonly();
   readonly genderFilter = this._genderFilter.asReadonly();
+  readonly colorFilter = this._colorFilter.asReadonly();
+  readonly sizeFilter = this._sizeFilter.asReadonly();
 
   readonly featuredProducts = computed(() =>
     this._products().filter(p => p.featured)
@@ -30,12 +42,39 @@ export class CatalogStore {
     [...new Set(this._products().map(p => p.category))].sort()
   );
 
-  /** The catalog view: filter by category → filter by gender → sort */
+  /** Available colors, derived from the actual products' variants */
+  readonly availableColors = computed(() =>
+    [...new Set(
+      this._products().flatMap(p => p.variants.map(v => v.color))
+    )].sort()
+  );
+
+  /** Available sizes, derived from variants, in business order (8-16, S-XXL) */
+  readonly availableSizes = computed(() =>
+    sortSizes([...new Set(
+      this._products().flatMap(p => p.variants.map(v => v.size))
+    )])
+  );
+
+  /** The catalog view: category → gender → color → size → sort */
   readonly products = computed(() => {
     let result = filterByCategory(this._products(), this._categoryFilter());
     result = filterByGender(result, this._genderFilter());
+    result = filterByColor(result, this._colorFilter());
+    result = filterBySize(result, this._sizeFilter());
     return sortProducts(result, this._sortOption());
   });
+
+  /** Results counter for the UI */
+  readonly resultsCount = computed(() => this.products().length);
+
+  /** True when any filter differs from its default */
+  readonly hasActiveFilters = computed(() =>
+    this._categoryFilter() !== 'all' ||
+    this._genderFilter() !== 'all' ||
+    this._colorFilter() !== 'all' ||
+    this._sizeFilter() !== 'all'
+  );
 
   loadCatalog(): void {
     this._loading.set(true);
@@ -59,4 +98,31 @@ export class CatalogStore {
   changeGender(gender: GenderFilter): void {
     this._genderFilter.set(gender);
   }
+
+  changeColor(colorCode: string | 'all'): void {
+    this._colorFilter.set(colorCode);
+  }
+
+  changeSize(size: string | 'all'): void {
+    this._sizeFilter.set(size);
+  }
+
+  /** Resets all filters to default (sort is kept — it's not a filter) */
+  clearFilters(): void {
+    this._categoryFilter.set('all');
+    this._genderFilter.set('all');
+    this._colorFilter.set('all');
+    this._sizeFilter.set('all');
+  }
+  isFavorite(productId: string): boolean {
+    return this._favorites().has(productId);
+  }
+  toggleFavorite(productId: string): void {
+    const next = new Set(this._favorites());
+    next.has(productId) ? next.delete(productId) : next.add(productId);
+    this._favorites.set(next);
+  }
+
+
+
 }

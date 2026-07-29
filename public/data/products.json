@@ -9,9 +9,11 @@
     "published": true,
     "featured": true,
     "salesCount": 22,
+    "createdAt": "2026-03-15",
     "variants": [
       { "sku": "RS-CJCN-H-S-NEG", "gender": "H", "size": "S", "color": "NEG", "totalStock": 12 },
-      { "sku": "RS-CJCN-H-M-NEG", "gender": "H", "size": "M", "color": "NEG", "totalStock": 8 }
+      { "sku": "RS-CJCN-H-M-NEG", "gender": "H", "size": "M", "color": "NEG", "totalStock": 8 },
+      { "sku": "RS-CJCN-M-S-ROJ", "gender": "M", "size": "S", "color": "ROJ", "totalStock": 6 }
     ]
   },
   {
@@ -24,8 +26,11 @@
     "published": true,
     "featured": false,
     "salesCount": 35,
+    "createdAt": "2026-02-10",
     "variants": [
-      { "sku": "RS-PDRF-U-M-ROJ", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 25 }
+      { "sku": "RS-PDRF-U-M-ROJ", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 25 },
+      { "sku": "RS-PDRF-U-L-BLA", "gender": "U", "size": "L", "color": "BLA", "totalStock": 15 },
+      { "sku": "RS-PDRF-NO-12-ROJ", "gender": "NO", "size": "12", "color": "ROJ", "totalStock": 10 }
     ]
   },
   {
@@ -38,9 +43,11 @@
     "published": true,
     "featured": true,
     "salesCount": 22,
+    "createdAt": "2026-04-05",
     "variants": [
       { "sku": "RS-SHRT-H-M-NEG", "gender": "H", "size": "M", "color": "NEG", "totalStock": 18 },
-      { "sku": "RS-SHRT-H-L-NEG", "gender": "H", "size": "L", "color": "NEG", "totalStock": 10 }
+      { "sku": "RS-SHRT-H-L-NEG", "gender": "H", "size": "L", "color": "NEG", "totalStock": 10 },
+      { "sku": "RS-SHRT-NO-10-AZU", "gender": "NO", "size": "10", "color": "AZU", "totalStock": 7 }
     ]
   },
   {
@@ -53,9 +60,11 @@
     "published": true,
     "featured": true,
     "salesCount": 18,
+    "createdAt": "2026-05-12",
     "variants": [
       { "sku": "RS-LEGG-M-S-ROJ", "gender": "M", "size": "S", "color": "ROJ", "totalStock": 15 },
-      { "sku": "RS-LEGG-M-M-NEG", "gender": "M", "size": "M", "color": "NEG", "totalStock": 20 }
+      { "sku": "RS-LEGG-M-M-NEG", "gender": "M", "size": "M", "color": "NEG", "totalStock": 20 },
+      { "sku": "RS-LEGG-M-XL-NEG", "gender": "M", "size": "XL", "color": "NEG", "totalStock": 5 }
     ]
   },
   {
@@ -68,9 +77,11 @@
     "published": true,
     "featured": true,
     "salesCount": 27,
+    "createdAt": "2026-03-28",
     "variants": [
       { "sku": "RS-HOOD-U-M-NEG", "gender": "U", "size": "M", "color": "NEG", "totalStock": 14 },
-      { "sku": "RS-HOOD-U-L-GRI", "gender": "U", "size": "L", "color": "GRI", "totalStock": 9 }
+      { "sku": "RS-HOOD-U-L-GRI", "gender": "U", "size": "L", "color": "GRI", "totalStock": 9 },
+      { "sku": "RS-HOOD-U-XXL-NEG", "gender": "U", "size": "XXL", "color": "NEG", "totalStock": 4 }
     ]
   },
   {
@@ -83,8 +94,40 @@
     "published": true,
     "featured": false,
     "salesCount": 40,
+    "createdAt": "2026-07-20",
     "variants": [
-      { "sku": "RS-CAPP-U-M-ROJ", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 30 }
+      { "sku": "RS-CAPP-U-M-ROJ", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 30 },
+      { "sku": "RS-CAPP-U-M-BLA", "gender": "U", "size": "M", "color": "BLA", "totalStock": 22 }
+    ]
+  },
+  {
+    "id": "7",
+    "name": "RS Gym Bag",
+    "description": "Water-resistant duffel bag",
+    "category": "Accessories",
+    "price": 79.90,
+    "imageUrl": "/images/products/gym-bag-black.jpg",
+    "published": true,
+    "featured": false,
+    "salesCount": 12,
+    "createdAt": "2026-04-10",
+    "variants": [
+      { "sku": "RS-GBAG-U-M-NEG", "gender": "U", "size": "M", "color": "NEG", "totalStock": 0 }
+    ]
+  },
+  {
+    "id": "8",
+    "name": "RS Compression Socks",
+    "description": "Ankle compression socks pair",
+    "category": "Accessories",
+    "price": 24.90,
+    "imageUrl": "/images/products/socks-white.jpg",
+    "published": true,
+    "featured": false,
+    "salesCount": 8,
+    "createdAt": "2026-07-25",
+    "variants": [
+      { "sku": "RS-SOCK-U-M-BLA", "gender": "U", "size": "M", "color": "BLA", "totalStock": 3 }
     ]
   }
 ]

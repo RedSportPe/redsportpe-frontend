@@ -18,7 +18,7 @@
   }
 }
 
-// Sidebar + results layout
+// ===== Sidebar + results layout =====
 .catalog-body {
   display: grid;
   grid-template-columns: 240px 1fr;
@@ -35,7 +35,7 @@
   border-radius: 10px;
   padding: 1.2rem;
   position: sticky;
-  top: 90px;   // stays visible below the sticky navbar when scrolling
+  top: 90px;
 }
 
 .control {
@@ -59,18 +59,88 @@
   }
 }
 
+// ===== Products grid =====
 .grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 1.5rem;
 }
 
-.no-results {
+// ===== Clear filters button =====
+.clear-filters {
+  background: transparent;
+  border: 1px solid var(--rs-border);
   color: var(--rs-text-muted);
-  padding: 2rem 0;
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  transition: border-color 0.2s, color 0.2s;
+
+  &:hover {
+    border-color: var(--rs-red);
+    color: var(--rs-text);
+  }
 }
 
-// Mobile: sidebar collapses on top, controls back to full width
+// ===== Results counter =====
+.results-count {
+  color: var(--rs-text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.no-results {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 2rem 0;
+
+  p { color: var(--rs-text-muted); }
+}
+
+// ===== Skeleton loaders =====
+.skeleton-card {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.skeleton-img {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: var(--rs-border);
+}
+
+.skeleton-body {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background: var(--rs-border);
+  width: 100%;
+
+  &.short { width: 40%; }
+  &.medium { width: 60%; }
+}
+
+.skeleton-img,
+.skeleton-line {
+  animation: skeleton-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+// ===== Mobile =====
 @media (max-width: 768px) {
   .catalog { padding: 1.5rem 1rem; }
 
@@ -79,8 +149,5 @@
     gap: 1.2rem;
   }
 
-  .filters {
-    position: static;
-    flex-direction: column;
-  }
+  .filters { position: static; }
 }

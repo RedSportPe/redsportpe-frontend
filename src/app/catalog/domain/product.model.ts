@@ -16,5 +16,6 @@ export interface Product {
   published: boolean;
   featured: boolean;
   salesCount: number;
+  createdAt: string;   // ISO date, used for the "Nuevo" badge
   variants: Variant[];
 }

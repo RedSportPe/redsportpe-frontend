@@ -1,5 +1,29 @@
-<article class="card">
-  <img [src]="product().imageUrl" [alt]="product().name" />
+<article class="card" [class.sold-out]="isSoldOut(product())">
+  <div class="card-media">
+    <img [src]="product().imageUrl" [alt]="product().name" />
+
+    <div class="badges">
+      @if (isSoldOut(product())) {
+        <span class="badge badge-soldout">Agotado</span>
+      } @else if (isLowStock(product())) {
+        <span class="badge badge-lowstock">Últimas unidades</span>
+      }
+      @if (isNew(product())) {
+        <span class="badge badge-new">Nuevo</span>
+      }
+    </div>
+
+    <button
+      class="fav-btn"
+      type="button"
+      [class.active]="store.isFavorite(product().id)"
+      (click)="onFavoriteClick($event)"
+      [attr.aria-label]="store.isFavorite(product().id) ? 'Quitar de favoritos' : 'Agregar a favoritos'"
+    >
+      {{ store.isFavorite(product().id) ? '♥' : '♡' }}
+    </button>
+  </div>
+
   <div class="card-body">
     <span class="category">{{ product().category }}</span>
     <h3>{{ product().name }}</h3>
