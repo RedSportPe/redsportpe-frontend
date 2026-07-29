@@ -11,6 +11,15 @@ import { GenderFilter, GENDER_LABELS, colorLabel, sizeLabel } from '../../../dom
   styleUrl: './catalog-page.scss',
 })
 export class CatalogPage implements OnInit {
+  private searchDebounce?: ReturnType<typeof setTimeout>;
+
+  onSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    // Debounce: waits 300ms after the user stops typing
+    clearTimeout(this.searchDebounce);
+    this.searchDebounce = setTimeout(() => this.store.changeSearch(value), 300);
+  }
+
   readonly store = inject(CatalogStore);
 
   readonly sortOptions = Object.entries(SORT_LABELS) as [SortOption, string][];

@@ -3,6 +3,15 @@
 
   <div class="catalog-body">
     <aside class="filters">
+      <label class="control search-control">
+        <span>Buscar:</span>
+        <input
+          type="search"
+          placeholder="Buscar productos..."
+          [value]="store.searchQuery()"
+          (input)="onSearchInput($event)"
+        />
+      </label>
       <label class="control">
         <span>Ordenar por:</span>
         <select (change)="onSortChange($event)">

@@ -10,6 +10,7 @@ import {
   filterBySize,
   sortSizes,
 } from '../domain/product-filtering';
+import { searchProducts } from '../domain/product-search';
 
 @Injectable({ providedIn: 'root' })
 export class CatalogStore {
@@ -27,7 +28,7 @@ export class CatalogStore {
   private _favorites = signal<Set<string>>(new Set());
   private _selectedProduct = signal<Product | undefined>(undefined);
   private _loadingProduct = signal(false);
-
+  private _searchQuery = signal('');
 
   // Public read-only state
   readonly loading = this._loading.asReadonly();
@@ -56,8 +57,10 @@ export class CatalogStore {
     )])
   );
   /** The catalog view: category → gender → color → size → sort */
+  /** The catalog view: search → category → gender → color → size → sort */
   readonly products = computed(() => {
-    let result = filterByCategory(this._products(), this._categoryFilter());
+    let result = searchProducts(this._products(), this._searchQuery());
+    result = filterByCategory(result, this._categoryFilter());
     result = filterByGender(result, this._genderFilter());
     result = filterByColor(result, this._colorFilter());
     result = filterBySize(result, this._sizeFilter());
@@ -67,6 +70,7 @@ export class CatalogStore {
   readonly resultsCount = computed(() => this.products().length);
   /** True when any filter differs from its default */
   readonly hasActiveFilters = computed(() =>
+    this._searchQuery() !== '' ||
     this._categoryFilter() !== 'all' ||
     this._genderFilter() !== 'all' ||
     this._colorFilter() !== 'all' ||
@@ -74,7 +78,7 @@ export class CatalogStore {
   );
   readonly selectedProduct = this._selectedProduct.asReadonly();
   readonly loadingProduct = this._loadingProduct.asReadonly();
-
+  readonly searchQuery = this._searchQuery.asReadonly();
 
   loadCatalog(): void {
     this._loading.set(true);
@@ -108,7 +112,9 @@ export class CatalogStore {
   }
 
   /** Resets all filters to default (sort is kept — it's not a filter) */
+  /** Resets all filters to default (sort is kept — it's not a filter) */
   clearFilters(): void {
+    this._searchQuery.set('');
     this._categoryFilter.set('all');
     this._genderFilter.set('all');
     this._colorFilter.set('all');
@@ -132,7 +138,8 @@ export class CatalogStore {
       },
       error: () => this._loadingProduct.set(false),
     });
+  }changeSearch(query: string): void {
+    this._searchQuery.set(query);
   }
-
 
 }

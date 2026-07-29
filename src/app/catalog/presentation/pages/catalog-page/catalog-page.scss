@@ -151,3 +151,15 @@
 
   .filters { position: static; }
 }
+.search-control input {
+  background: var(--rs-black);
+  color: var(--rs-text);
+  border: 1px solid var(--rs-border);
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  width: 100%;
+  font-family: var(--font-body);
+
+  &::placeholder { color: var(--rs-text-muted); }
+  &:hover, &:focus { border-color: var(--rs-red); outline: none; }
+}
