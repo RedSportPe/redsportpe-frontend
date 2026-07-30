@@ -1,0 +1,67 @@
+<section class="cart">
+  <h1>Tu carrito</h1>
+
+  @if (store.isEmpty()) {
+    <div class="empty">
+      <p>Tu carrito está vacío.</p>
+      <a routerLink="/catalogo" class="cta">Ir al catálogo</a>
+    </div>
+  } @else {
+    <div class="cart-body">
+      <div class="items">
+        @for (item of store.items(); track item.sku) {
+          <article class="item">
+            <img [src]="item.imageUrl" [alt]="item.name" />
+
+            <div class="item-info">
+              <h3>{{ item.name }}</h3>
+              <p class="variant">
+                Talla {{ item.size }} · {{ colorLabel(item.color) }}
+              </p>
+              <p class="sku">{{ item.sku }}</p>
+            </div>
+
+            <div class="item-controls">
+              <label class="qty">
+                <button type="button" (click)="store.updateQuantity(item.sku, item.quantity - 1)">−</button>
+                <input
+                  type="number"
+                  [value]="item.quantity"
+                  min="1"
+                  [max]="item.maxStock"
+                  (change)="onQuantityChange(item.sku, $event)"
+                />
+                <button type="button" (click)="store.updateQuantity(item.sku, item.quantity + 1)">+</button>
+              </label>
+              @if (item.quantity >= item.maxStock) {
+                <p class="stock-limit">Máx. disponible: {{ item.maxStock }}</p>
+              }
+            </div>
+
+            <p class="item-total">{{ item.unitPrice * item.quantity | currency:'PEN':'S/ ' }}</p>
+
+            <button class="remove" type="button" (click)="store.removeItem(item.sku)" aria-label="Quitar del carrito">
+              ✕
+            </button>
+          </article>
+        }
+      </div>
+
+      <aside class="summary">
+        <h2>Resumen</h2>
+        <div class="summary-row">
+          <span>Productos ({{ store.totalQuantity() }})</span>
+          <span>{{ store.totalAmount() | currency:'PEN':'S/ ' }}</span>
+        </div>
+        <div class="summary-row total">
+          <span>Total</span>
+          <span>{{ store.totalAmount() | currency:'PEN':'S/ ' }}</span>
+        </div>
+        <button class="checkout-btn" type="button" disabled>
+          Continuar compra (próximamente)
+        </button>
+        <a routerLink="/catalogo" class="keep-shopping">← Seguir comprando</a>
+      </aside>
+    </div>
+  }
+</section>

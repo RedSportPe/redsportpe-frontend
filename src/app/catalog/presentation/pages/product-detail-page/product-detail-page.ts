@@ -3,7 +3,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { CurrencyPipe } from '@angular/common';
 import { CatalogStore } from '../../../application/catalog.store';
 import { colorLabel, sizeLabel } from '../../../domain/product-filtering';
-
+import { CartStore } from '../../../../orders/application/cart.store';
 @Component({
   selector: 'app-product-detail-page',
   imports: [RouterLink, CurrencyPipe],
@@ -12,6 +12,7 @@ import { colorLabel, sizeLabel } from '../../../domain/product-filtering';
 })
 export class ProductDetailPage implements OnInit {
   private route = inject(ActivatedRoute);
+  private cartStore = inject(CartStore);
   readonly store = inject(CatalogStore);
 
   readonly colorLabel = colorLabel;
@@ -72,11 +73,20 @@ export class ProductDetailPage implements OnInit {
   selectColor(color: string): void {
     this.selectedColor.set(color);
   }
-
   addToCart(): void {
+    const product = this.store.selectedProduct();
     const variant = this.selectedVariant();
-    if (!variant) return;
-    // TODO: Orders context (cart) will take it from here
-    console.log('[Add to cart] SKU:', variant.sku, '| stock:', variant.totalStock);
+    if (!product || !variant) return;
+
+    this.cartStore.addItem({
+      sku: variant.sku,
+      productId: product.id,
+      name: product.name,
+      imageUrl: product.imageUrl,
+      size: variant.size,
+      color: variant.color,
+      unitPrice: product.price,
+      maxStock: variant.totalStock,
+    });
   }
 }

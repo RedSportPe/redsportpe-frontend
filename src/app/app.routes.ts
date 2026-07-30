@@ -11,6 +11,10 @@ export const routes: Routes = [
         path: '',
         loadChildren: () => import('./catalog/catalog.routes').then(m => m.CATALOG_ROUTES),
       },
+      {
+        path: 'carrito',
+        loadChildren: () => import('./orders/orders.routes').then(m => m.ORDERS_ROUTES),
+      },
     ],
   },
   {
