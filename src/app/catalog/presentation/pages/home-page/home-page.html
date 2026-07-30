@@ -1,11 +1,71 @@
-<section class="home">
-  <div class="hero">
-    <h1>Viste tu esfuerzo</h1>
-    <p>Ropa deportiva hecha para quienes no se rinden.</p>
-    <a routerLink="/catalogo" class="cta">Ver catálogo</a>
-  </div>
+<div class="home">
 
+  <!-- 1. Tendencias -->
   @if (!store.loading() && store.featuredProducts().length >= 2) {
     <app-trends-carousel [products]="store.featuredProducts()" />
   }
-</section>
+
+  <!-- 2. Novedades -->
+  @if (!store.loading() && store.newestProducts().length > 0) {
+    <section class="section">
+      <span class="eyebrow">Selección reciente</span>
+      <h2>Novedades</h2>
+      <div class="news-grid">
+        @for (product of store.newestProducts(); track product.id) {
+          <app-product-card [product]="product" />
+        }
+      </div>
+    </section>
+  }
+
+  <!-- 3. Club RedSport en WhatsApp -->
+  <section class="section club-banner">
+    <div class="club-content">
+      <span class="eyebrow">Acceso anticipado</span>
+      <h2>Club RedSport en WhatsApp</h2>
+      <p>
+        Únete a nuestra comunidad oficial. Sé el primero en enterarte de los
+        nuevos drops, promos exclusivas y contenido de entrenamiento.
+      </p>
+      <a [href]="whatsappCommunityUrl" target="_blank" rel="noopener" class="btn-whatsapp">
+        Unirse a la Comunidad
+      </a>
+    </div>
+  </section>
+
+  <!-- 4. Membresía RedSport -->
+  <section class="section membership">
+    <span class="eyebrow">Membresía</span>
+    <h2>Club RedSport</h2>
+    <p class="membership-intro">
+      Tu esfuerzo también suma fuera del entrenamiento. Muy pronto, cada compra
+      te acercará a beneficios exclusivos.
+    </p>
+
+    <div class="steps">
+      <article class="step">
+        <span class="step-number">01</span>
+        <h3>Únete al club</h3>
+        <p>Crea tu cuenta gratis y forma parte de la comunidad RedSport.</p>
+      </article>
+      <article class="step">
+        <span class="step-number">02</span>
+        <h3>Acumula puntos</h3>
+        <p>Cada sol de tus compras se convierte en puntos RedSport.</p>
+      </article>
+      <article class="step">
+        <span class="step-number">03</span>
+        <h3>Canjea beneficios</h3>
+        <p>Descuentos, acceso anticipado a drops y productos exclusivos.</p>
+      </article>
+    </div>
+  </section>
+
+  <!-- 5. Hero de cierre -->
+  <section class="hero">
+    <h1>Viste tu esfuerzo</h1>
+    <p>Ropa deportiva hecha para quienes no se rinden.</p>
+    <a routerLink="/catalogo" class="cta">Ver catálogo</a>
+  </section>
+
+</div>

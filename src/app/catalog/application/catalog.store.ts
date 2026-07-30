@@ -76,6 +76,12 @@ export class CatalogStore {
     this._colorFilter() !== 'all' ||
     this._sizeFilter() !== 'all'
   );
+  /** Newest products first (by createdAt), top 4 — for the home "Novedades" section */
+  readonly newestProducts = computed(() =>
+    [...this._products()]
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 4)
+  );
   readonly selectedProduct = this._selectedProduct.asReadonly();
   readonly loadingProduct = this._loadingProduct.asReadonly();
   readonly searchQuery = this._searchQuery.asReadonly();
