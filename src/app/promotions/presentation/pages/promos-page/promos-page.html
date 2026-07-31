@@ -12,12 +12,91 @@
       <a routerLink="/catalogo" class="cta">Ir al catálogo</a>
     </div>
   } @else {
-    <p class="results-count">{{ store.resultsCount() }} producto(s) en promoción</p>
+    <div class="promos-body">
+      <aside class="filters">
+        <label class="control">
+          <span>Ordenar por:</span>
+          <select (change)="onSortChange($event)">
+            @for (option of sortOptions; track option[0]) {
+              <option [value]="option[0]" [selected]="option[0] === store.sortOption()">
+                {{ option[1] }}
+              </option>
+            }
+          </select>
+        </label>
 
-    <div class="grid">
-      @for (item of store.promoProducts(); track item.promo.id) {
-        <app-promo-card [item]="item" />
-      }
+        <label class="control">
+          <span>Filtrar por:</span>
+          <select (change)="onCategoryChange($event)">
+            <option value="all" [selected]="store.categoryFilter() === 'all'">Todos</option>
+            @for (category of store.categories(); track category) {
+              <option [value]="category" [selected]="category === store.categoryFilter()">
+                {{ category }}
+              </option>
+            }
+          </select>
+        </label>
+
+        <label class="control">
+          <span>Para:</span>
+          <select (change)="onGenderChange($event)">
+            @for (option of genderOptions; track option[0]) {
+              <option [value]="option[0]" [selected]="option[0] === store.genderFilter()">
+                {{ option[1] }}
+              </option>
+            }
+          </select>
+        </label>
+
+        <label class="control">
+          <span>Color:</span>
+          <select (change)="onColorChange($event)">
+            <option value="all" [selected]="store.colorFilter() === 'all'">Todos</option>
+            @for (code of store.availableColors(); track code) {
+              <option [value]="code" [selected]="code === store.colorFilter()">
+                {{ colorLabel(code) }}
+              </option>
+            }
+          </select>
+        </label>
+
+        <label class="control">
+          <span>Talla:</span>
+          <select (change)="onSizeChange($event)">
+            <option value="all" [selected]="store.sizeFilter() === 'all'">Todas</option>
+            @for (size of store.availableSizes(); track size) {
+              <option [value]="size" [selected]="size === store.sizeFilter()">
+                {{ sizeLabel(size) }}
+              </option>
+            }
+          </select>
+        </label>
+
+        @if (store.hasActiveFilters()) {
+          <button class="clear-filters" type="button" (click)="store.clearFilters()">
+            ✕ Limpiar filtros
+          </button>
+        }
+      </aside>
+
+      <div class="results">
+        <p class="results-count">
+          {{ store.resultsCount() }} {{ store.resultsCount() === 1 ? 'producto en promoción' : 'productos en promoción' }}
+        </p>
+
+        <div class="grid">
+          @for (item of store.promoProducts(); track item.promo.id) {
+            <app-promo-card [item]="item" />
+          } @empty {
+            <div class="no-results">
+              <p>No hay promos que coincidan con los filtros.</p>
+              <button class="clear-filters" type="button" (click)="store.clearFilters()">
+                ✕ Limpiar filtros
+              </button>
+            </div>
+          }
+        </div>
+      </div>
     </div>
   }
 </section>

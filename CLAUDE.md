@@ -7,7 +7,7 @@ E-commerce frontend for RedSport, a Peruvian sportswear brand. Angular 21, SCSS,
 Folders under `src/app/` map to bounded contexts from our event storming:
 - `catalog/` — products, variants, filters, search, detail page (DONE)
 - `orders/` — cart with drawer (DONE); checkout pending
-- `promotions/` — public name "Promos": discounted products page at /promos (customer side DONE; admin discount form pending)
+- `promotions/` — public name "Promos": discounted products page at /promos with catalog-style filters and promo-price sorting (customer side DONE; admin discount form pending)
 - `identity/` — IAM: Google login for customers, internal roles (PENDING)
 - `layout/` — store-layout (top navbar) and admin-layout (sidebar)
 - Future contexts: inventory, payments, shipping, notifications, marketing

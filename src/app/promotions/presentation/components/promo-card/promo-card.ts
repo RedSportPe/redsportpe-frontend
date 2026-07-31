@@ -1,7 +1,7 @@
 import { Component, input } from '@angular/core';
 import { CurrencyPipe, DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { PromoProduct } from '../../../application/promotions.store';
+import { PromoProduct } from '../../../domain/promo-product.model';
 import {
   promoPrice,
   discountPercent,
