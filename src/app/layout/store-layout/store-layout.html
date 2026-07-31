@@ -7,12 +7,18 @@
   </nav>
 
   <div class="nav-actions">
-    <a routerLink="/carrito" class="cart-btn" aria-label="Ver carrito">
+    <button
+      type="button"
+      class="cart-btn"
+      [class.active]="cartStore.drawerOpen()"
+      (click)="onCartClick()"
+      aria-label="Ver carrito"
+    >
       🛒
       @if (cartStore.totalQuantity() > 0) {
         <span class="badge">{{ cartStore.totalQuantity() }}</span>
       }
-    </a>
+    </button>
     <button class="account-btn" type="button">Mi cuenta</button>
   </div>
 </header>
@@ -24,3 +30,5 @@
 <footer class="footer">
   <p>RedSport — Viste tu esfuerzo 💪</p>
 </footer>
+
+<app-cart-drawer />

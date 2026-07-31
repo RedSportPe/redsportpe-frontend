@@ -110,6 +110,7 @@
 }
 
 .add-to-cart {
+
   width: 100%;
   background: var(--rs-red);
   color: #fff;
@@ -119,6 +120,8 @@
   padding: 0.9rem;
   border-radius: 8px;
   transition: background 0.2s;
+
+  &.added { background: #16a34a; }
 
   &:hover:not(:disabled) { background: var(--rs-red-dark); }
 

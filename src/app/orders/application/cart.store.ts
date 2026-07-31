@@ -3,8 +3,10 @@ import { CartItem } from '../domain/cart-item.model';
 
 @Injectable({ providedIn: 'root' })
 export class CartStore {
-  private _items = signal<CartItem[]>([]);
-
+  private readonly STORAGE_KEY = 'redsport_cart';
+  private _items = signal<CartItem[]>(this.loadFromSession());
+  private _drawerOpen = signal(false);
+  readonly drawerOpen = this._drawerOpen.asReadonly();
   readonly items = this._items.asReadonly();
 
   /** Total units — the navbar badge */
@@ -47,8 +49,34 @@ export class CartStore {
   removeItem(sku: string): void {
     this._items.set(this._items().filter(item => item.sku !== sku));
   }
+  /** Session persistence: survives page reloads, cleared when the tab closes.
+   *  Real persistence (account-linked) will come with IAM + backend. */
+  private loadFromSession(): CartItem[] {
+    try {
+      const raw = sessionStorage.getItem(this.STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  }
 
+  private saveToSession(): void {
+    try {
+      sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(this._items()));
+    } catch {
+      // storage unavailable — cart works in memory only
+    }
+  }
   clearCart(): void {
     this._items.set([]);
   }
+
+  toggleDrawer(): void {
+    this._drawerOpen.set(!this._drawerOpen());
+  }
+
+  closeDrawer(): void {
+    this._drawerOpen.set(false);
+  }
+
 }

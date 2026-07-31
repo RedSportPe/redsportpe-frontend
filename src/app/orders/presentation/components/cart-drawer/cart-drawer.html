@@ -1,0 +1,42 @@
+<!-- Backdrop: clicking outside closes the drawer -->
+
+<aside class="drawer" [class.open]="store.drawerOpen()">
+  <header class="drawer-header">
+    <h2>Tu carrito</h2>
+    <button type="button" class="close" (click)="store.closeDrawer()" aria-label="Cerrar">✕</button>
+  </header>
+
+  @if (store.isEmpty()) {
+    <p class="empty">Tu carrito está vacío.</p>
+  } @else {
+    <div class="drawer-items">
+      @for (item of store.items(); track item.sku) {
+        <article class="drawer-item">
+          <img [src]="item.imageUrl" [alt]="item.name" />
+          <div class="drawer-item-info">
+            <h3>{{ item.name }}</h3>
+            <p class="variant">Talla {{ item.size }} · {{ colorLabel(item.color) }}</p>
+
+            <div class="drawer-item-row">
+              <label class="qty">
+                <button type="button" (click)="store.updateQuantity(item.sku, item.quantity - 1)">−</button>
+                <span>{{ item.quantity }}</span>
+                <button type="button" (click)="store.updateQuantity(item.sku, item.quantity + 1)">+</button>
+              </label>
+              <span class="line-total">{{ item.unitPrice * item.quantity | currency:'PEN':'S/ ' }}</span>
+            </div>
+          </div>
+          <button class="remove" type="button" (click)="store.removeItem(item.sku)" aria-label="Quitar">✕</button>
+        </article>
+      }
+    </div>
+
+    <footer class="drawer-footer">
+      <div class="total-row">
+        <span>Total ({{ store.totalQuantity() }})</span>
+        <span class="total">{{ store.totalAmount() | currency:'PEN':'S/ ' }}</span>
+      </div>
+      <button type="button" class="view-cart" (click)="goToCart()">Ver carrito</button>
+    </footer>
+  }
+</aside>

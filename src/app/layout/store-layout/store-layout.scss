@@ -91,3 +91,22 @@ main {
     }
   }
 }
+.cart-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: transparent;
+  border: 1px solid var(--rs-border);
+  color: var(--rs-text);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+
+  &:hover { border-color: var(--rs-red); }
+
+  &.active {
+    border-color: var(--rs-red);
+    background: var(--rs-red-dark);
+  }
+}

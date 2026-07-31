@@ -17,7 +17,7 @@ export class ProductDetailPage implements OnInit {
 
   readonly colorLabel = colorLabel;
   readonly sizeLabel = sizeLabel;
-
+  readonly justAdded = signal(false);
   // User's current selection
   readonly selectedSize = signal<string | null>(null);
   readonly selectedColor = signal<string | null>(null);
@@ -88,5 +88,8 @@ export class ProductDetailPage implements OnInit {
       unitPrice: product.price,
       maxStock: variant.totalStock,
     });
+    this.justAdded.set(true);
+    setTimeout(() => this.justAdded.set(false), 2000);
   }
+
 }

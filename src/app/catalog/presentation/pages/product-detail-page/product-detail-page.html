@@ -72,10 +72,15 @@
         <button
           type="button"
           class="add-to-cart"
+          [class.added]="justAdded()"
           [disabled]="!canAddToCart()"
           (click)="addToCart()"
         >
-          {{ canAddToCart() ? 'Agregar al carrito' : 'Selecciona talla y color' }}
+          @if (justAdded()) {
+            ✓ Agregado al carrito
+          } @else {
+            {{ canAddToCart() ? 'Agregar al carrito' : 'Selecciona talla y color' }}
+          }
         </button>
       </div>
     </div>
