@@ -1,0 +1,23 @@
+<section class="promos">
+  <header class="promos-header">
+    <h1>Promos</h1>
+    <p class="subtitle">Descuentos por tiempo o unidades limitadas — aprovéchalos antes de que vuelen 🔥</p>
+  </header>
+
+  @if (store.loading()) {
+    <p class="state-msg">Cargando promociones...</p>
+  } @else if (store.isEmpty()) {
+    <div class="state-msg">
+      <p>No hay promociones activas por ahora. ¡Vuelve pronto!</p>
+      <a routerLink="/catalogo" class="cta">Ir al catálogo</a>
+    </div>
+  } @else {
+    <p class="results-count">{{ store.resultsCount() }} producto(s) en promoción</p>
+
+    <div class="grid">
+      @for (item of store.promoProducts(); track item.promo.id) {
+        <app-promo-card [item]="item" />
+      }
+    </div>
+  }
+</section>

@@ -1,0 +1,26 @@
+[
+  {
+    "id": "promo-1",
+    "productId": "5",
+    "discountAmount": 30,
+    "maxUnits": 10,
+    "unitsSold": 3
+  },
+  {
+    "id": "promo-2",
+    "productId": "1",
+    "discountAmount": 39,
+    "endsAt": "2026-08-15"
+  },
+  {
+    "id": "promo-3",
+    "productId": "6",
+    "discountAmount": 5
+  },
+  {
+    "id": "promo-4",
+    "productId": "3",
+    "discountAmount": 20,
+    "endsAt": "2026-07-15"
+  }
+]

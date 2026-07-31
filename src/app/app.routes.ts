@@ -12,6 +12,10 @@ export const routes: Routes = [
         loadChildren: () => import('./catalog/catalog.routes').then(m => m.CATALOG_ROUTES),
       },
       {
+        path: 'promos',
+        loadChildren: () => import('./promotions/promotions.routes').then(m => m.PROMOTIONS_ROUTES),
+      },
+      {
         path: 'carrito',
         loadChildren: () => import('./orders/orders.routes').then(m => m.ORDERS_ROUTES),
       },

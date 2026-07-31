@@ -1,0 +1,28 @@
+<a [routerLink]="['/producto', item().product.id]" class="card-link">
+  <article class="card" [class.sold-out]="isSoldOut(item().product)">
+    <div class="card-media">
+      <img [src]="item().product.imageUrl" [alt]="item().product.name" />
+
+      <div class="badges">
+        <span class="badge badge-discount">
+          -{{ discountPercent(item().product.price, item().promo) }}%
+        </span>
+        @if (item().promo.endsAt; as endsAt) {
+          <span class="badge badge-deadline">Hasta el {{ endsAt | date:'dd/MM' }}</span>
+        }
+        @if (remainingPromoUnits(item().promo); as remaining) {
+          <span class="badge badge-units">¡Quedan {{ remaining }} en promo!</span>
+        }
+      </div>
+    </div>
+
+    <div class="card-body">
+      <span class="category">{{ item().product.category }}</span>
+      <h3>{{ item().product.name }}</h3>
+      <p class="prices">
+        <span class="original">{{ item().product.price | currency:'PEN':'S/ ' }}</span>
+        <span class="promo">{{ promoPrice(item().product.price, item().promo) | currency:'PEN':'S/ ' }}</span>
+      </p>
+    </div>
+  </article>
+</a>

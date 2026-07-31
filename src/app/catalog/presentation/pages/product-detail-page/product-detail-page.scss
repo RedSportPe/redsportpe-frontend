@@ -54,6 +54,42 @@
     margin-bottom: 1rem;
   }
 
+  .price-block {
+    display: flex;
+    align-items: baseline;
+    gap: 0.7rem;
+    margin-bottom: 0.4rem;
+
+    .price { margin-bottom: 0; }
+
+    .original {
+      font-size: 1.1rem;
+      font-weight: 400;
+      color: var(--rs-text-muted);
+      text-decoration: line-through;
+    }
+
+    .promo { color: var(--rs-red); }
+
+    .discount-tag {
+      background: var(--rs-red);
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 5px;
+    }
+  }
+
+  .promo-note {
+    font-size: 0.85rem;
+    color: var(--rs-red);
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+
+    & + .description { margin-top: 1rem; }
+  }
+
   .description {
     color: var(--rs-text-muted);
     margin-bottom: 1.8rem;

@@ -1,22 +1,46 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { CatalogStore } from '../../../application/catalog.store';
 import { colorLabel, sizeLabel } from '../../../domain/product-filtering';
 import { CartStore } from '../../../../orders/application/cart.store';
+import { PromotionsStore } from '../../../../promotions/application/promotions.store';
+import {
+  promoPrice,
+  discountPercent,
+  remainingPromoUnits,
+} from '../../../../promotions/domain/promotion-rules';
 @Component({
   selector: 'app-product-detail-page',
-  imports: [RouterLink, CurrencyPipe],
+  imports: [RouterLink, CurrencyPipe, DatePipe],
   templateUrl: './product-detail-page.html',
   styleUrl: './product-detail-page.scss',
 })
 export class ProductDetailPage implements OnInit {
   private route = inject(ActivatedRoute);
   private cartStore = inject(CartStore);
+  private promotionsStore = inject(PromotionsStore);
   readonly store = inject(CatalogStore);
 
   readonly colorLabel = colorLabel;
   readonly sizeLabel = sizeLabel;
+  readonly discountPercent = discountPercent;
+  readonly remainingPromoUnits = remainingPromoUnits;
+
+  /** Active promo for this product, if any (Promotions context decides) */
+  readonly activePromo = computed(() => {
+    const product = this.store.selectedProduct();
+    if (!product) return undefined;
+    return this.promotionsStore.promoByProductId().get(product.id);
+  });
+
+  /** What the customer actually pays per unit: promo price if active, regular otherwise */
+  readonly effectivePrice = computed(() => {
+    const product = this.store.selectedProduct();
+    if (!product) return 0;
+    const promo = this.activePromo();
+    return promo ? promoPrice(product.price, promo) : product.price;
+  });
   readonly justAdded = signal(false);
   // User's current selection
   readonly selectedSize = signal<string | null>(null);
@@ -60,6 +84,8 @@ export class ProductDetailPage implements OnInit {
     if (id) {
       this.store.loadProduct(id);
     }
+    // Promos affect the price shown here, so this page needs them loaded too
+    this.promotionsStore.loadPromos();
   }
 
   selectSize(size: string): void {
@@ -85,7 +111,7 @@ export class ProductDetailPage implements OnInit {
       imageUrl: product.imageUrl,
       size: variant.size,
       color: variant.color,
-      unitPrice: product.price,
+      unitPrice: this.effectivePrice(),  // snapshot: promo price if one is active
       maxStock: variant.totalStock,
     });
     this.justAdded.set(true);

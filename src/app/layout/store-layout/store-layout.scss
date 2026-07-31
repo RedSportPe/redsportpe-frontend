@@ -33,6 +33,14 @@
     &:hover { color: var(--rs-text); }
     &.active { color: var(--rs-text); border-color: var(--rs-red); }
   }
+
+  // Promos stands out: always red, like a permanent "sale" sign
+  .promos-link {
+    color: var(--rs-red);
+    font-weight: 700;
+
+    &:hover, &.active { color: var(--rs-red); }
+  }
 }
 
 .nav-actions {

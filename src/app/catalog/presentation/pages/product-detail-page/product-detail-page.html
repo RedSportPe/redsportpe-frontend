@@ -19,7 +19,21 @@
       <div class="info">
         <span class="category">{{ product.category }}</span>
         <h1>{{ product.name }}</h1>
-        <p class="price">{{ product.price | currency:'PEN':'S/ ' }}</p>
+        @if (activePromo(); as promo) {
+          <div class="price-block">
+            <span class="price original">{{ product.price | currency:'PEN':'S/ ' }}</span>
+            <span class="price promo">{{ effectivePrice() | currency:'PEN':'S/ ' }}</span>
+            <span class="discount-tag">-{{ discountPercent(product.price, promo) }}%</span>
+          </div>
+          @if (promo.endsAt; as endsAt) {
+            <p class="promo-note">Promo válida hasta el {{ endsAt | date:'dd/MM/yyyy' }}</p>
+          }
+          @if (remainingPromoUnits(promo); as remaining) {
+            <p class="promo-note">¡Solo {{ remaining }} unidades al precio promo!</p>
+          }
+        } @else {
+          <p class="price">{{ product.price | currency:'PEN':'S/ ' }}</p>
+        }
         <p class="description">{{ product.description }}</p>
 
         <div class="selector">
