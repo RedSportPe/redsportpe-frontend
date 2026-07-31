@@ -1,4 +1,5 @@
-<!-- Backdrop: clicking outside closes the drawer -->
+<!-- No backdrop by design: the drawer stays open while the user keeps
+     browsing the catalog. It only closes via the ✕ button (or "Ver carrito"). -->
 
 <aside class="drawer" [class.open]="store.drawerOpen()">
   <header class="drawer-header">
