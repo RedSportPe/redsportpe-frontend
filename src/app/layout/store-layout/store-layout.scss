@@ -99,6 +99,42 @@ main {
     }
   }
 }
+// Auth actions: ghost "Iniciar sesión" + brand-red "Registrarse"
+.login-btn {
+  white-space: nowrap;
+}
+
+.nav-actions .register-btn {
+  background: var(--rs-red);
+  border-color: var(--rs-red);
+  color: #fff;
+  font-weight: 600;
+  white-space: nowrap;
+
+  &:hover {
+    background: var(--rs-red-dark);
+    border-color: var(--rs-red-dark);
+  }
+}
+
+// Logged in: "Mi cuenta" is a link styled like the other action buttons
+.account-btn {
+  display: inline-block;
+  border: 1px solid var(--rs-border);
+  color: var(--rs-text);
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  transition: border-color 0.2s, background 0.2s;
+
+  &:hover { border-color: var(--rs-red); }
+
+  &.active {
+    border-color: var(--rs-red);
+    background: var(--rs-red-dark);
+  }
+}
+
 .cart-btn {
   display: inline-flex;
   align-items: center;

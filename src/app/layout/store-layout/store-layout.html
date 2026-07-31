@@ -20,7 +20,16 @@
         <span class="badge">{{ cartStore.totalQuantity() }}</span>
       }
     </button>
-    <button class="account-btn" type="button">Mi cuenta</button>
+    @if (authStore.isAuthenticated()) {
+      <a routerLink="/cuenta" routerLinkActive="active" class="account-btn">Mi cuenta</a>
+    } @else {
+      <button class="login-btn" type="button" (click)="authStore.openModal('login')">
+        Iniciar sesión
+      </button>
+      <button class="register-btn" type="button" (click)="authStore.openModal('register')">
+        Registrarse
+      </button>
+    }
   </div>
 </header>
 
@@ -33,3 +42,6 @@
 </footer>
 
 <app-cart-drawer />
+
+<!-- Auth overlay: lives in the layout so it can open over ANY page -->
+<app-auth-modal />

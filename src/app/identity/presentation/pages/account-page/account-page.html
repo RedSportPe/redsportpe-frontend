@@ -1,0 +1,45 @@
+<section class="account">
+  @if (!store.isAuthenticated()) {
+    <div class="not-logged">
+      <h1>Mi cuenta</h1>
+      <p>Inicia sesión para ver tu perfil y tus Puntos RedSport.</p>
+      <div class="actions">
+        <button type="button" class="login-btn" (click)="store.openModal('login')">Iniciar sesión</button>
+        <button type="button" class="register-btn" (click)="store.openModal('register')">Registrarse</button>
+      </div>
+    </div>
+  } @else {
+    @let user = store.currentUser()!;
+
+    <h1>Mi cuenta</h1>
+
+    <div class="account-grid">
+      <article class="card profile">
+        <div class="avatar">{{ initial() }}</div>
+        <div class="profile-info">
+          <h2>{{ user.name }}</h2>
+          <p class="email">{{ user.email }}</p>
+          <p class="meta">
+            <span class="provider" [class.google]="user.provider === 'google'">
+              {{ user.provider === 'google' ? 'Cuenta Google' : 'Cuenta con correo' }}
+            </span>
+            · Miembro desde {{ user.createdAt | date:'MM/yyyy' }}
+          </p>
+        </div>
+      </article>
+
+      <article class="card points">
+        <h2>Puntos RedSport</h2>
+        <p class="points-value">{{ user.points }}</p>
+        <p class="points-rule">Ganas 1 punto por cada S/ 1 en compras.</p>
+      </article>
+
+      <article class="card history">
+        <h2>Historial de compras</h2>
+        <p class="soon">Próximamente — aquí verás tus pedidos y los puntos que ganaste en cada uno.</p>
+      </article>
+    </div>
+
+    <button type="button" class="logout" (click)="store.logout()">Cerrar sesión</button>
+  }
+</section>

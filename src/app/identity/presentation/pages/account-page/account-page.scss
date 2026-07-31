@@ -1,0 +1,146 @@
+.account {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+
+    &::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 4px;
+      background: var(--rs-red);
+      margin-top: 0.5rem;
+    }
+  }
+}
+
+.not-logged {
+  p { color: var(--rs-text-muted); margin-bottom: 1.5rem; }
+
+  .actions {
+    display: flex;
+    gap: 0.8rem;
+  }
+
+  .login-btn {
+    background: transparent;
+    border: 1px solid var(--rs-border);
+    color: var(--rs-text);
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: border-color 0.2s;
+
+    &:hover { border-color: var(--rs-red); }
+  }
+
+  .register-btn {
+    background: var(--rs-red);
+    border: none;
+    color: #fff;
+    padding: 0.7rem 1.4rem;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 0.2s;
+
+    &:hover { background: var(--rs-red-dark); }
+  }
+}
+
+.account-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+  margin-bottom: 1.5rem;
+}
+
+.card {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 10px;
+  padding: 1.5rem;
+
+  h2 { font-size: 1.05rem; margin-bottom: 0.8rem; }
+}
+
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+
+  h2 { margin-bottom: 0.2rem; }
+}
+
+.avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--rs-red);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.email { color: var(--rs-text-muted); font-size: 0.9rem; }
+
+.meta {
+  color: var(--rs-text-muted);
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+
+  .provider {
+    font-weight: 600;
+
+    &.google { color: #4285f4; }
+  }
+}
+
+.points {
+  border-top: 3px solid var(--rs-red);
+
+  .points-value {
+    font-family: var(--font-display);
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--rs-red);
+    line-height: 1;
+  }
+
+  .points-rule {
+    color: var(--rs-text-muted);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+}
+
+.history {
+  grid-column: 1 / -1;
+
+  .soon { color: var(--rs-text-muted); font-size: 0.9rem; }
+}
+
+.logout {
+  background: transparent;
+  border: 1px solid var(--rs-border);
+  color: var(--rs-text-muted);
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s, color 0.2s;
+
+  &:hover { border-color: var(--rs-red); color: var(--rs-text); }
+}
+
+@media (max-width: 768px) {
+  .account { padding: 1.2rem; }
+
+  .account-grid { grid-template-columns: 1fr; }
+}
