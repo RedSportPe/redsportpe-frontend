@@ -1,7 +1,12 @@
 <section class="favorites">
   <h1>Mis favoritos</h1>
 
-  @if (store.loading()) {
+  @if (!authStore.isAuthenticated()) {
+    <div class="state-msg">
+      <p>Inicia sesión para guardar y ver tus favoritos.</p>
+      <button type="button" class="cta" (click)="authStore.openModal('login')">Iniciar sesión</button>
+    </div>
+  } @else if (store.loading()) {
     <p class="state-msg">Cargando favoritos...</p>
   } @else if (store.favoriteProducts().length === 0) {
     <div class="state-msg">

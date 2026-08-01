@@ -5,6 +5,7 @@ import {
   isDelivered,
   nextTrackingStep,
   FINAL_TRACKING_STEP,
+  productHasActiveOrders,
 } from './order-tracking';
 
 function makeOrder(method: Order['method'], trackingStep: number): Order {
@@ -45,5 +46,27 @@ describe('order-tracking', () => {
   it('an order at the last step is delivered / at destination', () => {
     expect(isDelivered(makeOrder('motorizado', 3))).toBe(true);
     expect(isDelivered(makeOrder('shalom', 2))).toBe(false);
+  });
+
+  describe('productHasActiveOrders (delete-product rule)', () => {
+    const item = {
+      sku: 'RS-CJCN-H-S-NEG', productId: 'p-1', name: 'Jacket', imageUrl: '',
+      size: 'S', color: 'NEG', unitPrice: 100, quantity: 1, maxStock: 5,
+    };
+
+    it('blocks deletion while an undelivered order references the product', () => {
+      const active = { ...makeOrder('motorizado', 1), items: [item] };
+      expect(productHasActiveOrders([active], 'p-1')).toBe(true);
+    });
+
+    it('allows deletion once every referencing order was delivered', () => {
+      const delivered = { ...makeOrder('motorizado', 3), items: [item] };
+      expect(productHasActiveOrders([delivered], 'p-1')).toBe(false);
+    });
+
+    it('ignores orders of other products', () => {
+      const active = { ...makeOrder('motorizado', 0), items: [item] };
+      expect(productHasActiveOrders([active], 'p-99')).toBe(false);
+    });
   });
 });

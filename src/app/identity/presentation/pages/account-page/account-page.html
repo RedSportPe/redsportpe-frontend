@@ -25,6 +25,9 @@
             </span>
             · Miembro desde {{ user.createdAt | date:'MM/yyyy' }}
           </p>
+          @if (user.role === 'admin') {
+            <a routerLink="/admin" class="admin-link">⚙ Panel de administración →</a>
+          }
         </div>
       </article>
 

@@ -1,20 +1,18 @@
-export class Sku {
-  private constructor(readonly value: string) {}
+/** SKU — the Published Language between Catalog, Orders and Inventory.
+ *  Format: RS-[PRODUCT]-[GENDER]-[SIZE]-[COLOR], e.g. RS-CJCN-H-S-NEG.
+ *  Gender: H (hombre), M (mujer), U (unisex adulto), NO (niño), NA (niña).
+ *  Sizes: 8-16 kids, S-XXL adults. Colors: 3-letter codes (COLOR_LABELS). */
+const SKU_PATTERN = /^RS-[A-Z0-9]{2,6}-(H|M|U|NO|NA)-(8|10|12|14|16|S|M|L|XL|XXL)-[A-Z]{3}$/;
 
-  /** Creates a SKU validating the RS-PRODUCT-GENDER-SIZE-COLOR format */
-  static create(value: string): Sku {
-    const pattern = /^RS-[A-Z0-9]{2,6}-(M|W|U)-(XS|S|M|L|XL|XXL)-[A-Z]{3}$/;
-    if (!pattern.test(value)) {
-      throw new Error(`Invalid SKU: ${value}`);
-    }
-    return new Sku(value);
-  }
+export function isValidSku(value: string): boolean {
+  return SKU_PATTERN.test(value);
+}
 
-  static generate(product: string, gender: 'M' | 'W' | 'U', size: string, color: string): Sku {
-    return Sku.create(`RS-${product}-${gender}-${size}-${color}`.toUpperCase());
+/** Builds a SKU from its parts; throws if the result breaks the format */
+export function buildSku(productCode: string, gender: string, size: string, color: string): string {
+  const sku = `RS-${productCode}-${gender}-${size}-${color}`.toUpperCase();
+  if (!isValidSku(sku)) {
+    throw new Error(`Invalid SKU: ${sku}`);
   }
-
-  equals(other: Sku): boolean {
-    return this.value === other.value;
-  }
+  return sku;
 }

@@ -20,3 +20,11 @@ export function isDelivered(order: Order): boolean {
 export function nextTrackingStep(current: number): number {
   return Math.min(current + 1, FINAL_TRACKING_STEP);
 }
+
+/** Business rule: a product cannot be deleted while any order that references
+ *  it (by SKU line) is still active — i.e. not yet delivered/at destination. */
+export function productHasActiveOrders(orders: Order[], productId: string): boolean {
+  return orders.some(
+    order => !isDelivered(order) && order.items.some(item => item.productId === productId)
+  );
+}

@@ -5,10 +5,10 @@ E-commerce frontend for RedSport, a Peruvian sportswear brand. Angular 21, SCSS,
 
 ## Architecture: DDD-lite by bounded contexts
 Folders under `src/app/` map to bounded contexts from our event storming:
-- `catalog/` — products, variants, filters, search, detail page (DONE)
+- `catalog/` — products, variants, filters, search, detail page, favorites (customer DONE); admin product management at /admin/productos: list, create/edit with variant editor + auto-SKU, publish toggle, delete (DONE)
 - `orders/` — cart with drawer, checkout (delivery data → QR payment → confirmation), unpaid-orders section in cart, "Mis pedidos" at /pedidos with 4-dot tracking (DONE)
 - `promotions/` — public name "Promos": discounted products page at /promos with catalog-style filters and promo-price sorting (customer side DONE; admin discount form pending)
-- `identity/` — IAM: auth modal (login/register/Google) overlaid from store-layout on any page, account page at /cuenta with RedSport points and saved delivery info (customer side DONE, simulated in AuthRepository; real Google Identity Services + backend auth pending; internal roles PENDING)
+- `identity/` — IAM: auth modal (login/register/Google) overlaid from store-layout on any page, account page at /cuenta with RedSport points and saved delivery info, roles customer|admin with adminGuard on /admin/* (simulated in AuthRepository; real Google Identity Services + backend auth pending). Demo admin: admin@redsport.pe / admin123.
 - `layout/` — store-layout (top navbar) and admin-layout (sidebar)
 - Future contexts: inventory, payments, shipping, notifications, marketing
 
@@ -24,7 +24,9 @@ Full tactical DDD (aggregates, entities, VOs) is reserved for the BACKEND (not b
 - Product vs Variant: customers browse products; stock/cart/orders operate on variants.
 - Relevance sorting: salesCount desc, tie-break by lower price.
 - Filters derive from actual product data (categories, colors, sizes appear/disappear automatically).
-- Favorites (catalog): in-memory Set in CatalogStore (account-linked persistence comes with the backend). Heart on product cards and detail page, /favoritos page lists them, "Favoritos" card in /cuenta links there with a count.
+- Favorites (catalog): NO anonymous favorites — hearting without a session opens the auth modal. In-memory Set in CatalogStore (account-linked persistence comes with the backend). Heart on product cards and detail page, /favoritos page lists them, "Favoritos" card in /cuenta links there with a count.
+- Admin (vista, not a separate context — each context owns its admin side): only role 'admin' enters /admin/* (adminGuard). CatalogStore is cache-first and holds ALL products; customers see only published ones. A product cannot be deleted while it has active (undelivered) orders — productHasActiveOrders in orders/domain, enforced by the admin page. Admin catalog mutations are in-memory until the backend.
+- SKU helpers (sku.value-object.ts): isValidSku/buildSku with the REAL codes (H/M/U/NO/NA, kids sizes) — the admin variant editor autogenerates SKUs with buildSku.
 - Cart: one line per SKU, quantity capped by variant stock. In-memory only for now: `saveToSession()` exists in CartStore but is intentionally not wired up — persistence will be revisited when the backend lands. Drawer has no backdrop by design: it stays open while browsing and only closes via ✕.
 - RedSport points (loyalty): 1 sol = 1 point, DECIMALS INCLUDED (S/ 150.99 → 150.99 points, redsport-points.ts). Credited the moment an order is PAID. No refunds: paid points never return, even if the order is cancelled.
 - Checkout (orders): requires session (opens auth modal otherwise). Methods: motorizado (delivery) or Shalom (agency pickup). Payment: QR (Yape/Plin, simulated) valid 8 HOURS; expired/postponed orders appear under the cart as "Pedidos no pagados" (pay with a fresh QR or delete). 3PM CUTOFF: motorizado paid before 3pm delivers tomorrow, after 3pm the day after; Shalom paid before 3pm is dropped at the agency same day, after 3pm next day (delivery-rules.ts).
@@ -42,7 +44,7 @@ Full tactical DDD (aggregates, entities, VOs) is reserved for the BACKEND (not b
 - UI text in Spanish, code in English. Brand tokens in styles.scss (--rs-red, --rs-surface, Oswald + Inter fonts).
 
 ## Current state / next steps
-- Done: catalog context complete, home sections (trends carousel, novedades, WhatsApp club, membership), cart with drawer, Promos customer page (/promos, navbar link right of Catálogo), identity customer side (auth modal + /cuenta with points), checkout with QR payment + Mis pedidos tracking.
+- Done: full customer side (catalog, promos, favorites, cart+checkout+QR, mis pedidos, cuenta with points/delivery info) and the first admin view: product management (/admin/productos) behind adminGuard, with admin-layout sidebar (Inventario/Pedidos/Descuentos marked "próximamente").
 - Known issue: 8 CLI-generated component specs fail (missing HttpClient/Router providers in TestBed) — pre-existing, fix pattern in promos-page.spec.ts.
-- Next candidates: feature/auth (IAM, Google login), admin promotions form, or starting the backend (10 bounded contexts from event storming, stack TBD).
+- Next candidates: admin Descuentos form (promotions), admin Pedidos (verify QR payments + drive real tracking), or starting the backend (10 bounded contexts from event storming, stack TBD).
 - Deploy target: Hostinger. Domain + SSL already purchased.

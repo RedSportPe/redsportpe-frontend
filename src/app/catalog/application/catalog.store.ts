@@ -37,29 +37,34 @@ export class CatalogStore {
   readonly genderFilter = this._genderFilter.asReadonly();
   readonly colorFilter = this._colorFilter.asReadonly();
   readonly sizeFilter = this._sizeFilter.asReadonly();
+
+  /** Customers only ever see published products; admin sees everything */
+  private publishedProducts = computed(() => this._products().filter(p => p.published));
+  /** The admin view: every product, published or not */
+  readonly allProducts = computed(() => this._products());
+
   readonly featuredProducts = computed(() =>
-    this._products().filter(p => p.featured)
+    this.publishedProducts().filter(p => p.featured)
   );
   /** Available categories, derived from the actual products */
   readonly categories = computed(() =>
-    [...new Set(this._products().map(p => p.category))].sort()
+    [...new Set(this.publishedProducts().map(p => p.category))].sort()
   );
   /** Available colors, derived from the actual products' variants */
   readonly availableColors = computed(() =>
     [...new Set(
-      this._products().flatMap(p => p.variants.map(v => v.color))
+      this.publishedProducts().flatMap(p => p.variants.map(v => v.color))
     )].sort()
   );
   /** Available sizes, derived from variants, in business order (8-16, S-XXL) */
   readonly availableSizes = computed(() =>
     sortSizes([...new Set(
-      this._products().flatMap(p => p.variants.map(v => v.size))
+      this.publishedProducts().flatMap(p => p.variants.map(v => v.size))
     )])
   );
-  /** The catalog view: category → gender → color → size → sort */
   /** The catalog view: search → category → gender → color → size → sort */
   readonly products = computed(() => {
-    let result = searchProducts(this._products(), this._searchQuery());
+    let result = searchProducts(this.publishedProducts(), this._searchQuery());
     result = filterByCategory(result, this._categoryFilter());
     result = filterByGender(result, this._genderFilter());
     result = filterByColor(result, this._colorFilter());
@@ -78,7 +83,7 @@ export class CatalogStore {
   );
   /** Newest products first (by createdAt), top 4 — for the home "Novedades" section */
   readonly newestProducts = computed(() =>
-    [...this._products()]
+    [...this.publishedProducts()]
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
       .slice(0, 4)
   );
@@ -87,10 +92,13 @@ export class CatalogStore {
   readonly searchQuery = this._searchQuery.asReadonly();
 
   loadCatalog(): void {
+    // Cache-first: reloading would wipe the admin's in-memory edits.
+    // Real freshness arrives with the backend API.
+    if (this._products().length > 0) return;
     this._loading.set(true);
     this.repository.getPublishedProducts().subscribe({
       next: (products) => {
-        this._products.set(products.filter(p => p.published));
+        this._products.set(products);
         this._loading.set(false);
       },
       error: () => this._loading.set(false),
@@ -128,7 +136,7 @@ export class CatalogStore {
   }
   /** The favorites view: full products, only those the customer hearted */
   readonly favoriteProducts = computed(() =>
-    this._products().filter(p => this._favorites().has(p.id))
+    this.publishedProducts().filter(p => this._favorites().has(p.id))
   );
   readonly favoritesCount = computed(() => this._favorites().size);
   isFavorite(productId: string): boolean {
@@ -140,6 +148,13 @@ export class CatalogStore {
     this._favorites.set(next);
   }
   loadProduct(id: string): void {
+    // Cache-first so admin-created/edited products resolve too
+    const cached = this._products().find(p => p.id === id);
+    if (cached) {
+      this._selectedProduct.set(cached);
+      this._loadingProduct.set(false);
+      return;
+    }
     this._loadingProduct.set(true);
     this._selectedProduct.set(undefined);
     this.repository.getProductById(id).subscribe({
@@ -149,8 +164,45 @@ export class CatalogStore {
       },
       error: () => this._loadingProduct.set(false),
     });
-  }changeSearch(query: string): void {
+  }
+
+  changeSearch(query: string): void {
     this._searchQuery.set(query);
   }
 
+  // ===== Admin commands =====
+  // Today they mutate the in-memory catalog (resets on reload).
+  // Tomorrow: POST/PUT/DELETE /api/products through the repository.
+
+  createProduct(data: Omit<Product, 'id' | 'salesCount' | 'createdAt'>): Product {
+    const nextId = String(
+      Math.max(0, ...this._products().map(p => Number(p.id) || 0)) + 1
+    );
+    const product: Product = {
+      ...data,
+      id: nextId,
+      salesCount: 0,
+      createdAt: new Date().toISOString().slice(0, 10),
+    };
+    this._products.set([...this._products(), product]);
+    return product;
+  }
+
+  updateProduct(id: string, changes: Partial<Omit<Product, 'id'>>): void {
+    this._products.set(
+      this._products().map(p => (p.id === id ? { ...p, ...changes } : p))
+    );
+  }
+
+  togglePublished(id: string): void {
+    this._products.set(
+      this._products().map(p => (p.id === id ? { ...p, published: !p.published } : p))
+    );
+  }
+
+  /** The "can it be deleted?" rule (no active orders) is enforced by the caller
+   *  with productHasActiveOrders — Orders owns that knowledge, not Catalog. */
+  deleteProduct(id: string): void {
+    this._products.set(this._products().filter(p => p.id !== id));
+  }
 }

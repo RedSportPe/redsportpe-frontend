@@ -1,0 +1,103 @@
+<section class="product-form">
+  <a routerLink="/admin/productos" class="back-link">← Volver a productos</a>
+
+  @if (notFound()) {
+    <p class="state-msg">Producto no encontrado.</p>
+  } @else {
+    <h1>{{ editingId() ? 'Editar producto' : 'Nuevo producto' }}</h1>
+
+    <div class="form-grid">
+      <label class="field span-2">
+        <span>Nombre</span>
+        <input type="text" [value]="name()" (input)="onText('name', $event)" />
+      </label>
+
+      <label class="field span-2">
+        <span>Descripción</span>
+        <input type="text" [value]="description()" (input)="onText('description', $event)" />
+      </label>
+
+      <label class="field">
+        <span>Categoría</span>
+        <input type="text" placeholder="Hoodies, T-Shirts..." [value]="category()" (input)="onText('category', $event)" />
+      </label>
+
+      <label class="field">
+        <span>Precio (S/)</span>
+        <input type="number" min="0" step="0.10" [value]="price()" (input)="onPrice($event)" />
+      </label>
+
+      <label class="field">
+        <span>Imagen (URL)</span>
+        <input type="text" placeholder="/images/products/..." [value]="imageUrl()" (input)="onText('imageUrl', $event)" />
+      </label>
+
+      <label class="field">
+        <span>Código de producto (para el SKU)</span>
+        <input type="text" placeholder="CJCN, HOOD... (2-6 caracteres)" [value]="productCode()" (input)="onText('productCode', $event)" />
+      </label>
+
+      <label class="check">
+        <input type="checkbox" [checked]="published()" (change)="published.set(!published())" />
+        <span>Publicado (visible en la tienda)</span>
+      </label>
+
+      <label class="check">
+        <input type="checkbox" [checked]="featured()" (change)="featured.set(!featured())" />
+        <span>Destacado (aparece en tendencias)</span>
+      </label>
+    </div>
+
+    <h2>Variantes</h2>
+    <p class="hint">El SKU se genera solo: RS-[código]-[género]-[talla]-[color]</p>
+
+    <div class="variants">
+      @for (row of variants(); track $index) {
+        <div class="variant-row">
+          <select [value]="row.gender" (change)="updateRow($index, 'gender', $event)">
+            @for (option of genderOptions; track option[0]) {
+              <option [value]="option[0]" [selected]="option[0] === row.gender">{{ option[1] }}</option>
+            }
+          </select>
+
+          <select [value]="row.size" (change)="updateRow($index, 'size', $event)">
+            @for (size of sizeOptions; track size) {
+              <option [value]="size" [selected]="size === row.size">{{ sizeLabel(size) }}</option>
+            }
+          </select>
+
+          <select [value]="row.color" (change)="updateRow($index, 'color', $event)">
+            @for (color of colorOptions; track color[0]) {
+              <option [value]="color[0]" [selected]="color[0] === row.color">{{ color[1] }}</option>
+            }
+          </select>
+
+          <input
+            type="number"
+            min="0"
+            [value]="row.stock"
+            (input)="updateRow($index, 'stock', $event)"
+            aria-label="Stock"
+          />
+
+          <code class="sku-preview">{{ skuFor(row) }}</code>
+
+          <button type="button" class="remove-row" (click)="removeRow($index)" aria-label="Quitar variante">✕</button>
+        </div>
+      }
+    </div>
+
+    <button type="button" class="add-row" (click)="addRow()">＋ Agregar variante</button>
+
+    @if (error(); as err) {
+      <p class="form-error">{{ err }}</p>
+    }
+
+    <div class="form-actions">
+      <button type="button" class="save-btn" [disabled]="!canSave()" (click)="save()">
+        {{ editingId() ? 'Guardar cambios' : 'Crear producto' }}
+      </button>
+      <a routerLink="/admin/productos" class="cancel-link">Cancelar</a>
+    </div>
+  }
+</section>

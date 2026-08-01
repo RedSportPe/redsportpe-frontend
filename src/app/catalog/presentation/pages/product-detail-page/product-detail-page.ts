@@ -5,6 +5,7 @@ import { CatalogStore } from '../../../application/catalog.store';
 import { colorLabel, sizeLabel } from '../../../domain/product-filtering';
 import { CartStore } from '../../../../orders/application/cart.store';
 import { PromotionsStore } from '../../../../promotions/application/promotions.store';
+import { AuthStore } from '../../../../identity/application/auth.store';
 import {
   promoPrice,
   discountPercent,
@@ -20,7 +21,17 @@ export class ProductDetailPage implements OnInit {
   private route = inject(ActivatedRoute);
   private cartStore = inject(CartStore);
   private promotionsStore = inject(PromotionsStore);
+  private authStore = inject(AuthStore);
   readonly store = inject(CatalogStore);
+
+  /** Business rule: no anonymous favorites — hearting requires an account */
+  onFavoriteClick(productId: string): void {
+    if (!this.authStore.isAuthenticated()) {
+      this.authStore.openModal('login');
+      return;
+    }
+    this.store.toggleFavorite(productId);
+  }
 
   readonly colorLabel = colorLabel;
   readonly sizeLabel = sizeLabel;

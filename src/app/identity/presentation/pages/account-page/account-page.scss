@@ -91,6 +91,16 @@
 
 .email { color: var(--rs-text-muted); font-size: 0.9rem; }
 
+.admin-link {
+  display: inline-block;
+  margin-top: 0.6rem;
+  color: var(--rs-red);
+  font-weight: 600;
+  font-size: 0.88rem;
+
+  &:hover { text-decoration: underline; }
+}
+
 .meta {
   color: var(--rs-text-muted);
   font-size: 0.8rem;

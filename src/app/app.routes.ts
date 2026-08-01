@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from './identity/application/admin.guard';
 
 export const routes: Routes = [
   {
@@ -30,10 +31,17 @@ export const routes: Routes = [
     ],
   },
   {
-    // Staff panel: left sidebar
+    // Staff panel: left sidebar. Business rule: admins only.
     path: 'admin',
+    canActivate: [adminGuard],
     loadComponent: () =>
       import('./layout/admin-layout/admin-layout').then(m => m.AdminLayout),
-    children: [],
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'productos' },
+      {
+        path: 'productos',
+        loadChildren: () => import('./catalog/catalog.routes').then(m => m.CATALOG_ADMIN_ROUTES),
+      },
+    ],
   },
 ];

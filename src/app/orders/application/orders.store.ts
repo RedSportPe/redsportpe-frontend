@@ -27,6 +27,9 @@ export class OrdersStore {
     });
   }
 
+  /** Every order in the system — the admin side needs the full picture */
+  readonly allOrders = computed(() => this._orders());
+
   /** Orders of the logged-in customer, newest first */
   readonly myOrders = computed(() => {
     const user = this.authStore.currentUser();

@@ -24,7 +24,7 @@
             type="button"
             class="fav-btn"
             [class.active]="store.isFavorite(product.id)"
-            (click)="store.toggleFavorite(product.id)"
+            (click)="onFavoriteClick(product.id)"
             [attr.aria-label]="store.isFavorite(product.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'"
           >
             {{ store.isFavorite(product.id) ? '♥' : '♡' }}

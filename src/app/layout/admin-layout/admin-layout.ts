@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthStore } from '../../identity/application/auth.store';
 
 @Component({
   selector: 'app-admin-layout',
@@ -7,4 +8,6 @@ import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
   templateUrl: './admin-layout.html',
   styleUrl: './admin-layout.scss',
 })
-export class AdminLayout {}
+export class AdminLayout {
+  readonly authStore = inject(AuthStore);
+}

@@ -3,11 +3,18 @@
     <div class="sidebar-logo">RedSport <span>Panel</span></div>
 
     <nav class="sidebar-nav">
-      <a routerLink="/admin/products" routerLinkActive="active">📦 Productos</a>
-      <a routerLink="/admin/inventory" routerLinkActive="active">🏷️ Inventario</a>
-      <a routerLink="/admin/orders" routerLinkActive="active">🧾 Pedidos</a>
-      <a routerLink="/admin/discounts" routerLinkActive="active">💸 Descuentos</a>
+      <a routerLink="/admin/productos" routerLinkActive="active">📦 Productos</a>
+      <span class="soon" title="Próximamente">🏷️ Inventario</span>
+      <span class="soon" title="Próximamente">🧾 Pedidos</span>
+      <span class="soon" title="Próximamente">💸 Descuentos</span>
     </nav>
+
+    <footer class="sidebar-footer">
+      @if (authStore.currentUser(); as user) {
+        <p class="admin-user">👤 {{ user.name }}</p>
+      }
+      <a routerLink="/" class="back-store">← Volver a la tienda</a>
+    </footer>
   </aside>
 
   <main class="admin-content">

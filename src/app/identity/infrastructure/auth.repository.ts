@@ -8,7 +8,21 @@ import { DeliveryInfo } from '../domain/delivery-info.model';
  *  flow — only this repository changes, the store and components stay intact. */
 @Injectable({ providedIn: 'root' })
 export class AuthRepository {
-  private registered = new Map<string, { user: User; password: string }>();
+  private registered = new Map<string, { user: User; password: string }>([
+    // Seeded internal admin (demo) — real staff accounts come with the backend
+    ['admin@redsport.pe', {
+      user: {
+        id: 'user-admin-demo',
+        name: 'Admin RedSport',
+        email: 'admin@redsport.pe',
+        provider: 'email',
+        role: 'admin',
+        points: 0,
+        createdAt: '2026-01-05T12:00:00.000Z',
+      },
+      password: 'admin123',
+    }],
+  ]);
 
   register(name: string, email: string, password: string): Observable<User> {
     const key = email.trim().toLowerCase();
@@ -20,6 +34,7 @@ export class AuthRepository {
       name: name.trim(),
       email: key,
       provider: 'email',
+      role: 'customer',   // self-registration is always a customer
       points: 0,
       createdAt: new Date().toISOString(),
     };
@@ -41,6 +56,7 @@ export class AuthRepository {
     name: 'Cliente Google',
     email: 'cliente.demo@gmail.com',
     provider: 'google',
+    role: 'customer',
     points: 320,
     createdAt: '2026-05-15T12:00:00.000Z',  // midday: same date in any timezone
   };

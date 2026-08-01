@@ -3,6 +3,7 @@ import { CurrencyPipe } from '@angular/common';
 import { Product } from '../../../domain/product.model';
 import { isSoldOut, isLowStock, isNew } from '../../../domain/product-badges';
 import { CatalogStore } from '../../../application/catalog.store';
+import { AuthStore } from '../../../../identity/application/auth.store';
 import {RouterLink} from '@angular/router';
 
 @Component({
@@ -15,6 +16,7 @@ export class ProductCard {
   product = input.required<Product>();
 
   readonly store = inject(CatalogStore);
+  private authStore = inject(AuthStore);
   readonly isSoldOut = isSoldOut;
   readonly isLowStock = isLowStock;
   readonly isNew = isNew;
@@ -24,6 +26,11 @@ export class ProductCard {
     // native navigation and stopPropagation keeps routerLink from firing.
     event.preventDefault();
     event.stopPropagation();
+    // Business rule: no anonymous favorites — hearting requires an account
+    if (!this.authStore.isAuthenticated()) {
+      this.authStore.openModal('login');
+      return;
+    }
     this.store.toggleFavorite(this.product().id);
   }
 }

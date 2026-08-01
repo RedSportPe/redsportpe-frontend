@@ -1,0 +1,60 @@
+<section class="admin-products">
+  <header class="page-header">
+    <div>
+      <h1>Productos</h1>
+      <p class="subtitle">{{ store.allProducts().length }} producto(s) en el catálogo</p>
+    </div>
+    <a routerLink="/admin/productos/nuevo" class="new-btn">＋ Nuevo producto</a>
+  </header>
+
+  @if (deleteError(); as error) {
+    <p class="delete-error">⚠️ {{ error }}</p>
+  }
+
+  @if (store.loading()) {
+    <p class="state-msg">Cargando catálogo...</p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>Producto</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Stock</th>
+            <th>Ventas</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of store.allProducts(); track product.id) {
+            <tr [class.unpublished]="!product.published">
+              <td><img [src]="product.imageUrl" [alt]="product.name" /></td>
+              <td class="name">{{ product.name }}</td>
+              <td>{{ product.category }}</td>
+              <td>{{ product.price | currency:'PEN':'S/ ' }}</td>
+              <td>{{ totalStock(product) }} ({{ product.variants.length }} var.)</td>
+              <td>{{ product.salesCount }}</td>
+              <td>
+                <span class="status" [class.on]="product.published">
+                  {{ product.published ? 'Publicado' : 'Oculto' }}
+                </span>
+              </td>
+              <td class="actions">
+                <a [routerLink]="['/admin/productos', product.id]" class="action edit">Editar</a>
+                <button type="button" class="action toggle" (click)="store.togglePublished(product.id)">
+                  {{ product.published ? 'Ocultar' : 'Publicar' }}
+                </button>
+                <button type="button" class="action delete" (click)="onDelete(product)">
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

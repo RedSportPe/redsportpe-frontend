@@ -1,0 +1,127 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 1.7rem;
+
+    &::after {
+      content: '';
+      display: block;
+      width: 50px;
+      height: 4px;
+      background: var(--rs-red);
+      margin-top: 0.4rem;
+    }
+  }
+
+  .subtitle {
+    color: var(--rs-text-muted);
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
+  }
+
+  .new-btn {
+    background: var(--rs-red);
+    color: #fff;
+    font-weight: 600;
+    padding: 0.65rem 1.2rem;
+    border-radius: 8px;
+    white-space: nowrap;
+
+    &:hover { background: var(--rs-red-dark); }
+  }
+}
+
+.delete-error {
+  background: var(--rs-surface);
+  border: 1px solid #ca8a04;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+}
+
+.state-msg {
+  padding: 2rem 0;
+  color: var(--rs-text-muted);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+
+  th {
+    text-align: left;
+    padding: 0.8rem 1rem;
+    color: var(--rs-text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--rs-border);
+  }
+
+  td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--rs-border);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr.unpublished { opacity: 0.55; }
+
+  img {
+    width: 44px;
+    height: 44px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid var(--rs-border);
+  }
+
+  .name { font-weight: 600; }
+}
+
+.status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 5px;
+  background: #3f3f3f;
+  color: #d4d4d4;
+
+  &.on {
+    background: #14532d;
+    color: #86efac;
+  }
+}
+
+.actions {
+  white-space: nowrap;
+
+  .action {
+    background: transparent;
+    border: 1px solid var(--rs-border);
+    color: var(--rs-text-muted);
+    font-size: 0.78rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 6px;
+    margin-right: 0.35rem;
+    display: inline-block;
+
+    &:hover { border-color: var(--rs-red); color: var(--rs-text); }
+
+    &.delete:hover { background: var(--rs-red-dark); }
+  }
+}
