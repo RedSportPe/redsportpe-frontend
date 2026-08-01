@@ -48,6 +48,10 @@
           </div>
 
           <footer class="order-footer">
+            <button type="button" class="detail-btn" (click)="toggleDetail(order.id)">
+              {{ isExpanded(order.id) ? 'Ocultar detalle ▲' : 'Ver detalle ▼' }}
+            </button>
+
             @if (isDelivered(order)) {
               <p class="delivered">
                 ✓ {{ order.method === 'motorizado' ? 'Entregado' : 'En destino — listo para recoger' }}
@@ -58,6 +62,34 @@
               </button>
             }
           </footer>
+
+          @if (isExpanded(order.id)) {
+            <div class="order-detail">
+              <h3>Productos</h3>
+              @for (item of order.items; track item.sku) {
+                <div class="detail-item">
+                  <img [src]="item.imageUrl" [alt]="item.name" />
+                  <div class="detail-item-info">
+                    <p class="item-name">{{ item.name }}</p>
+                    <p class="item-variant">Talla {{ item.size }} · {{ colorLabel(item.color) }} · {{ item.sku }}</p>
+                  </div>
+                  <p class="item-qty">{{ item.quantity }} × {{ item.unitPrice | currency:'PEN':'S/ ' }}</p>
+                  <p class="item-subtotal">{{ item.quantity * item.unitPrice | currency:'PEN':'S/ ' }}</p>
+                </div>
+              }
+
+              <div class="detail-summary">
+                <div class="detail-row">
+                  <span>Total pagado</span>
+                  <span class="detail-total">{{ order.total | currency:'PEN':'S/ ' }}</span>
+                </div>
+                <div class="detail-row">
+                  <span>Medio de pago</span>
+                  <span>QR Yape/Plin — {{ order.paidAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                </div>
+              </div>
+            </div>
+          }
         </article>
       }
     </div>
