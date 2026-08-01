@@ -6,7 +6,7 @@ E-commerce frontend for RedSport, a Peruvian sportswear brand. Angular 21, SCSS,
 ## Architecture: DDD-lite by bounded contexts
 Folders under `src/app/` map to bounded contexts from our event storming:
 - `catalog/` — products, variants, filters, search, detail page (DONE)
-- `orders/` — cart with drawer (DONE); checkout pending
+- `orders/` — cart with drawer, checkout (delivery data → QR payment → confirmation), unpaid-orders section in cart, "Mis pedidos" at /pedidos with 4-dot tracking (DONE)
 - `promotions/` — public name "Promos": discounted products page at /promos with catalog-style filters and promo-price sorting (customer side DONE; admin discount form pending)
 - `identity/` — IAM: auth modal (login/register/Google) overlaid from store-layout on any page, account page at /cuenta with RedSport points (customer side DONE, simulated in AuthRepository; real Google Identity Services + backend auth pending; internal roles PENDING)
 - `layout/` — store-layout (top navbar) and admin-layout (sidebar)
@@ -25,7 +25,10 @@ Full tactical DDD (aggregates, entities, VOs) is reserved for the BACKEND (not b
 - Relevance sorting: salesCount desc, tie-break by lower price.
 - Filters derive from actual product data (categories, colors, sizes appear/disappear automatically).
 - Cart: one line per SKU, quantity capped by variant stock. In-memory only for now: `saveToSession()` exists in CartStore but is intentionally not wired up — persistence will be revisited when the backend lands. Drawer has no backdrop by design: it stays open while browsing and only closes via ✕.
-- RedSport points (loyalty): 1 point per full sol spent, cents never round up (redsport-points.ts). Earned at checkout (pending); shown in the /cuenta profile.
+- RedSport points (loyalty): 1 sol = 1 point, DECIMALS INCLUDED (S/ 150.99 → 150.99 points, redsport-points.ts). Credited the moment an order is PAID. No refunds: paid points never return, even if the order is cancelled.
+- Checkout (orders): requires session (opens auth modal otherwise). Methods: motorizado (delivery) or Shalom (agency pickup). Payment: QR (Yape/Plin, simulated) valid 8 HOURS; expired/postponed orders appear under the cart as "Pedidos no pagados" (pay with a fresh QR or delete). 3PM CUTOFF: motorizado paid before 3pm delivers tomorrow, after 3pm the day after; Shalom paid before 3pm is dropped at the agency same day, after 3pm next day (delivery-rules.ts).
+- Order tracking (order-tracking.ts): 4-dot timeline per method — motorizado: Preparando → Despachado → En camino → Entregado; shalom: Almacén → En agencia → En tránsito → En destino. Button says "Consultar" on first query of a login session, then "Actualizar pedido" (resets on logout). Simulation advances one step per query until the backend/Shalom API lands.
+- Orders persist in sessionStorage (redsport_orders, per userId) — unlike the cart, "Mis pedidos" needs it.
 - Auth: session is in-memory like the cart (lost on reload — by design until backend). Unauthenticated navbar shows "Iniciar sesión" + red "Registrarse"; authenticated shows "Mi cuenta". AuthRepository simulates register/login/Google with fake latency.
 - Promotions: admin subtracts a fixed amount in soles from the regular price (139 - 39 = 100). Optional endsAt (inclusive: promo lives through that whole day) and optional maxUnits/unitsSold cap ("10 of 22"). A promo is active when neither expired nor depleted (promotion-rules.ts). Product detail shows the promo price and the cart snapshots it as unitPrice. unitsSold accounting is the backend's job.
 - Data source: `public/data/products.json` via CatalogRepository (HttpClient); promos in `public/data/promotions.json` via PromotionsRepository. Will be swapped for the real API by changing only the repositories.
@@ -37,7 +40,7 @@ Full tactical DDD (aggregates, entities, VOs) is reserved for the BACKEND (not b
 - UI text in Spanish, code in English. Brand tokens in styles.scss (--rs-red, --rs-surface, Oswald + Inter fonts).
 
 ## Current state / next steps
-- Done: catalog context complete, home sections (trends carousel, novedades, WhatsApp club, membership), cart with drawer, Promos customer page (/promos, navbar link right of Catálogo), identity customer side (auth modal + /cuenta with points).
+- Done: catalog context complete, home sections (trends carousel, novedades, WhatsApp club, membership), cart with drawer, Promos customer page (/promos, navbar link right of Catálogo), identity customer side (auth modal + /cuenta with points), checkout with QR payment + Mis pedidos tracking.
 - Known issue: 8 CLI-generated component specs fail (missing HttpClient/Router providers in TestBed) — pre-existing, fix pattern in promos-page.spec.ts.
 - Next candidates: feature/auth (IAM, Google login), admin promotions form, or starting the backend (10 bounded contexts from event storming, stack TBD).
 - Deploy target: Hostinger. Domain + SSL already purchased.

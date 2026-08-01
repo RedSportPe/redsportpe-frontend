@@ -1,0 +1,151 @@
+.payment {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  text-align: center;
+
+  h1 { font-size: 1.8rem; }
+}
+
+.state-msg {
+  padding: 2rem 0;
+  color: var(--rs-text-muted);
+}
+
+.subtitle {
+  color: var(--rs-text-muted);
+  margin: 0.4rem 0 1.5rem;
+}
+
+.qr-box {
+  display: inline-block;
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.4rem;
+  margin-bottom: 1.2rem;
+
+  .qr {
+    width: 220px;
+    height: 220px;
+    display: block;
+
+    rect { fill: #111; }
+  }
+
+  .amount {
+    color: #111;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-top: 0.8rem;
+  }
+}
+
+.expiry {
+  color: var(--rs-text-muted);
+  font-size: 0.85rem;
+  max-width: 420px;
+  margin: 0 auto 1.4rem;
+}
+
+.red-btn {
+  display: inline-block;
+  background: var(--rs-red);
+  border: none;
+  color: #fff;
+  padding: 0.8rem 1.6rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background 0.2s;
+
+  &:hover { background: var(--rs-red-dark); }
+}
+
+.paid-btn {
+  width: 100%;
+  max-width: 320px;
+}
+
+.ghost-btn {
+  display: inline-block;
+  background: transparent;
+  border: 1px solid var(--rs-border);
+  color: var(--rs-text);
+  padding: 0.8rem 1.6rem;
+  border-radius: 8px;
+  font-weight: 600;
+
+  &:hover { border-color: var(--rs-red); }
+}
+
+.back-link {
+  display: block;
+  color: var(--rs-text-muted);
+  font-size: 0.88rem;
+  margin-top: 1rem;
+
+  &:hover { color: var(--rs-red); }
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+  flex-wrap: wrap;
+}
+
+// ===== Confirmation =====
+.confirmation {
+  .check {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: #16a34a;
+    color: #fff;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+  }
+
+  .order-code {
+    color: var(--rs-text-muted);
+    margin: 0.4rem 0 1.4rem;
+  }
+}
+
+.detail-card {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 10px;
+  padding: 1.2rem 1.4rem;
+  text-align: left;
+
+  .row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.45rem 0;
+    font-size: 0.95rem;
+
+    &.points {
+      color: var(--rs-red);
+      font-weight: 700;
+    }
+  }
+}
+
+// ===== Expired =====
+.expired {
+  p {
+    color: var(--rs-text-muted);
+    max-width: 420px;
+    margin: 0.8rem auto 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .payment { padding: 1.5rem 1.2rem; }
+}

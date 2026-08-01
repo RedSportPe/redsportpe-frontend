@@ -6,6 +6,7 @@ import {
   isValidPassword,
   MIN_PASSWORD_LENGTH,
 } from '../domain/credentials-rules';
+import { addPoints } from '../domain/redsport-points';
 
 export type AuthMode = 'login' | 'register';
 
@@ -76,6 +77,13 @@ export class AuthStore {
 
   logout(): void {
     this._currentUser.set(null);
+  }
+
+  /** Command (called by Orders when a payment confirms): credit RedSport points */
+  creditPoints(earned: number): void {
+    const user = this._currentUser();
+    if (!user) return;
+    this._currentUser.set({ ...user, points: addPoints(user.points, earned) });
   }
 
   /** Shared flow: loading → success closes the modal, failure shows the message */

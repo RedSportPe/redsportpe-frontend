@@ -1,0 +1,65 @@
+<section class="my-orders">
+  <h1>Mis pedidos</h1>
+
+  @if (!authStore.isAuthenticated()) {
+    <div class="state-msg">
+      <p>Inicia sesión para ver tus pedidos y su seguimiento.</p>
+      <button type="button" class="red-btn" (click)="authStore.openModal('login')">Iniciar sesión</button>
+    </div>
+  } @else if (ordersStore.paidOrders().length === 0) {
+    <div class="state-msg">
+      <p>Aún no tienes pedidos pagados. ¡Tu primera compra te espera!</p>
+      <a routerLink="/catalogo" class="red-btn">Ir al catálogo</a>
+    </div>
+  } @else {
+    <div class="orders-list">
+      @for (order of ordersStore.paidOrders(); track order.id) {
+        <article class="order-card">
+          <header class="order-header">
+            <div>
+              <h2>Pedido {{ order.code }}</h2>
+              <p class="meta">
+                {{ order.paidAt | date:'dd/MM/yyyy HH:mm' }} ·
+                {{ methodLabels[order.method] }} ·
+                {{ itemsCount(order) }} producto(s)
+              </p>
+            </div>
+            <p class="total">{{ order.total | currency:'PEN':'S/ ' }}</p>
+          </header>
+
+          <p class="delivery">
+            @if (order.method === 'motorizado') {
+              🛵 Entrega estimada: <strong>{{ order.deliveryDate | date:'dd/MM/yyyy' }}</strong>
+              — {{ order.shipping.address }}, {{ order.shipping.district }}
+            } @else {
+              📦 Se deja en Shalom el <strong>{{ order.deliveryDate | date:'dd/MM/yyyy' }}</strong>
+              — recojo en {{ order.shipping.agency }}
+            }
+          </p>
+
+          <!-- The 4-dot timeline, filling left to right -->
+          <div class="tracker">
+            @for (step of steps(order); track $index) {
+              <div class="step" [class.done]="$index <= order.trackingStep">
+                <span class="dot"></span>
+                <span class="label">{{ step }}</span>
+              </div>
+            }
+          </div>
+
+          <footer class="order-footer">
+            @if (isDelivered(order)) {
+              <p class="delivered">
+                ✓ {{ order.method === 'motorizado' ? 'Entregado' : 'En destino — listo para recoger' }}
+              </p>
+            } @else {
+              <button type="button" class="consult-btn" (click)="ordersStore.refreshTracking(order.id)">
+                {{ buttonLabel(order) }}
+              </button>
+            }
+          </footer>
+        </article>
+      }
+    </div>
+  }
+</section>

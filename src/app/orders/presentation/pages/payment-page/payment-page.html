@@ -1,0 +1,86 @@
+<section class="payment">
+  @if (!order()) {
+    <div class="state-msg">
+      <p>Pedido no encontrado.</p>
+      <a routerLink="/carrito" class="back-link">← Volver al carrito</a>
+    </div>
+  } @else {
+    @let currentOrder = order()!;
+
+    @if (currentOrder.paidAt) {
+      <!-- Payment confirmed -->
+      <div class="confirmation">
+        <div class="check">✓</div>
+        <h1>¡Pago confirmado!</h1>
+        <p class="order-code">Pedido <strong>{{ currentOrder.code }}</strong></p>
+
+        <div class="detail-card">
+          <div class="row">
+            <span>Total pagado</span>
+            <span>{{ currentOrder.total | currency:'PEN':'S/ ' }}</span>
+          </div>
+          <div class="row points">
+            <span>⭐ Puntos RedSport ganados</span>
+            <span>+{{ pointsForPurchase(currentOrder.total) }}</span>
+          </div>
+          <div class="row">
+            @if (currentOrder.method === 'motorizado') {
+              <span>🛵 Entrega a domicilio</span>
+              <span>{{ currentOrder.deliveryDate | date:'dd/MM/yyyy' }}</span>
+            } @else {
+              <span>📦 Se deja en Shalom</span>
+              <span>{{ currentOrder.deliveryDate | date:'dd/MM/yyyy' }}</span>
+            }
+          </div>
+        </div>
+
+        <div class="actions">
+          <a routerLink="/pedidos" class="red-btn">Ver mis pedidos</a>
+          <a routerLink="/catalogo" class="ghost-btn">Seguir comprando</a>
+        </div>
+      </div>
+    } @else if (qrExpired()) {
+      <!-- QR died: 8 hours passed without payment -->
+      <div class="expired">
+        <h1>QR vencido</h1>
+        <p>
+          Pasaron más de 8 horas y no registramos tu pago del pedido
+          <strong>{{ currentOrder.code }}</strong>. Tranquilo: puedes generar un QR nuevo.
+        </p>
+        <div class="actions">
+          <button type="button" class="red-btn" (click)="renewQr()">Generar nuevo QR</button>
+          <a routerLink="/carrito" class="ghost-btn">Volver al carrito</a>
+        </div>
+      </div>
+    } @else {
+      <!-- Active QR waiting for payment -->
+      <div class="qr-screen">
+        <h1>Paga con QR</h1>
+        <p class="subtitle">Escanea con Yape o Plin — Pedido {{ currentOrder.code }}</p>
+
+        <div class="qr-box">
+          <svg viewBox="0 0 11 11" class="qr" aria-label="Código QR de pago">
+            @for (cell of qrCells(); track $index) {
+              @if (cell) {
+                <rect [attr.x]="$index % 11" [attr.y]="($index - ($index % 11)) / 11" width="1" height="1" />
+              }
+            }
+          </svg>
+          <p class="amount">{{ currentOrder.total | currency:'PEN':'S/ ' }}</p>
+        </div>
+
+        <p class="expiry">
+          ⏱ El QR vence el {{ currentOrder.qrExpiresAt | date:'dd/MM' }} a las
+          {{ currentOrder.qrExpiresAt | date:'HH:mm' }}. Si no pagas, el pedido se libera
+          y quedará en tu carrito como pedido no pagado.
+        </p>
+
+        <!-- Simulated: with a real provider this confirmation arrives by webhook -->
+        <button type="button" class="red-btn paid-btn" (click)="confirmPayment()">
+          Ya pagué
+        </button>
+        <a routerLink="/carrito" class="back-link">Pagar más tarde</a>
+      </div>
+    }
+  }
+</section>

@@ -20,6 +20,10 @@ export const routes: Routes = [
         loadChildren: () => import('./orders/orders.routes').then(m => m.ORDERS_ROUTES),
       },
       {
+        path: 'pedidos',
+        loadChildren: () => import('./orders/orders.routes').then(m => m.MY_ORDERS_ROUTES),
+      },
+      {
         path: 'cuenta',
         loadChildren: () => import('./identity/identity.routes').then(m => m.IDENTITY_ROUTES),
       },

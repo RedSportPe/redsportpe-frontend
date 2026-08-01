@@ -57,11 +57,42 @@
           <span>Total</span>
           <span>{{ store.totalAmount() | currency:'PEN':'S/ ' }}</span>
         </div>
-        <button class="checkout-btn" type="button" disabled>
-          Continuar compra (próximamente)
+        <button class="checkout-btn" type="button" (click)="goToCheckout()">
+          Continuar compra
         </button>
         <a routerLink="/catalogo" class="keep-shopping">← Seguir comprando</a>
       </aside>
+    </div>
+  }
+
+  <!-- Unpaid orders: born at checkout, QR expired or postponed. Pay again or delete. -->
+  @if (ordersStore.unpaidOrders().length > 0) {
+    <div class="pending-orders">
+      <h2>Pedidos no pagados</h2>
+      @for (order of ordersStore.unpaidOrders(); track order.id) {
+        <article class="pending-order">
+          <div class="pending-info">
+            <h3>Pedido {{ order.code }}</h3>
+            <p class="pending-meta">
+              {{ order.createdAt | date:'dd/MM/yyyy HH:mm' }} ·
+              {{ order.total | currency:'PEN':'S/ ' }}
+            </p>
+            @if (isQrExpired(order.qrExpiresAt)) {
+              <p class="qr-state expired">QR vencido — genera uno nuevo al proceder</p>
+            } @else {
+              <p class="qr-state">QR activo hasta las {{ order.qrExpiresAt | date:'HH:mm' }}</p>
+            }
+          </div>
+          <div class="pending-actions">
+            <button type="button" class="pay-pending" (click)="payPendingOrder(order.id)">
+              Proceder con el pago
+            </button>
+            <button type="button" class="delete-pending" (click)="ordersStore.deleteUnpaidOrder(order.id)">
+              Eliminar
+            </button>
+          </div>
+        </article>
+      }
     </div>
   }
 </section>

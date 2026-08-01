@@ -1,0 +1,98 @@
+<section class="checkout">
+  <h1>Finalizar compra</h1>
+
+  @if (!authStore.isAuthenticated()) {
+    <div class="state-msg">
+      <p>Para comprar necesitas una cuenta — así acumulas tus Puntos RedSport.</p>
+      <div class="auth-actions">
+        <button type="button" class="ghost-btn" (click)="authStore.openModal('login')">Iniciar sesión</button>
+        <button type="button" class="red-btn" (click)="authStore.openModal('register')">Registrarse</button>
+      </div>
+    </div>
+  } @else if (cartStore.isEmpty()) {
+    <div class="state-msg">
+      <p>Tu carrito está vacío — no hay nada que comprar todavía.</p>
+      <a routerLink="/catalogo" class="red-btn">Ir al catálogo</a>
+    </div>
+  } @else {
+    <div class="checkout-body">
+      <div class="form-column">
+        <h2>1. Método de entrega</h2>
+        <div class="method-options">
+          <button
+            type="button"
+            class="method"
+            [class.selected]="method() === 'motorizado'"
+            (click)="selectMethod('motorizado')"
+          >
+            <span class="method-icon">🛵</span>
+            <span class="method-name">Motorizado</span>
+            <span class="method-desc">Delivery hasta tu puerta</span>
+          </button>
+          <button
+            type="button"
+            class="method"
+            [class.selected]="method() === 'shalom'"
+            (click)="selectMethod('shalom')"
+          >
+            <span class="method-icon">📦</span>
+            <span class="method-name">Shalom</span>
+            <span class="method-desc">Recojo en agencia</span>
+          </button>
+        </div>
+
+        <p class="estimate">📅 {{ deliveryEstimate() }}</p>
+
+        <h2>2. Datos de entrega</h2>
+        <div class="fields">
+          <label class="field">
+            <span>Nombre completo</span>
+            <input type="text" [value]="fullName()" (input)="onInput('fullName', $event)" />
+          </label>
+          <label class="field">
+            <span>Teléfono</span>
+            <input type="tel" placeholder="9 dígitos" [value]="phone()" (input)="onInput('phone', $event)" />
+          </label>
+
+          @if (method() === 'motorizado') {
+            <label class="field">
+              <span>Dirección</span>
+              <input type="text" placeholder="Calle y número" [value]="address()" (input)="onInput('address', $event)" />
+            </label>
+            <label class="field">
+              <span>Distrito</span>
+              <input type="text" [value]="district()" (input)="onInput('district', $event)" />
+            </label>
+          } @else {
+            <label class="field">
+              <span>Agencia Shalom de destino</span>
+              <input type="text" placeholder="Ciudad / sede donde recoges" [value]="agency()" (input)="onInput('agency', $event)" />
+            </label>
+          }
+        </div>
+      </div>
+
+      <aside class="summary">
+        <h2>Resumen</h2>
+        @for (item of cartStore.items(); track item.sku) {
+          <div class="summary-item">
+            <span>{{ item.name }} × {{ item.quantity }}</span>
+            <span>{{ item.unitPrice * item.quantity | currency:'PEN':'S/ ' }}</span>
+          </div>
+        }
+        <div class="summary-row total">
+          <span>Total a pagar</span>
+          <span>{{ cartStore.totalAmount() | currency:'PEN':'S/ ' }}</span>
+        </div>
+        <p class="points-note">
+          ⭐ Este pedido te dará {{ cartStore.totalAmount() }} Puntos RedSport al pagar.
+        </p>
+        <button type="button" class="pay-btn" [disabled]="!canPlaceOrder()" (click)="placeOrder()">
+          Generar QR de pago
+        </button>
+        <p class="qr-note">El QR de pago vence en 8 horas.</p>
+        <a routerLink="/carrito" class="back-link">← Volver al carrito</a>
+      </aside>
+    </div>
+  }
+</section>
