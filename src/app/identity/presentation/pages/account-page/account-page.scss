@@ -208,9 +208,9 @@
   }
 }
 
+// Favoritos and Historial share a row (and their link/text styles)
+.favorites,
 .history {
-  grid-column: 1 / -1;
-
   .soon { color: var(--rs-text-muted); font-size: 0.9rem; }
 
   .orders-link {

@@ -18,7 +18,18 @@
 
       <div class="info">
         <span class="category">{{ product.category }}</span>
-        <h1>{{ product.name }}</h1>
+        <div class="title-row">
+          <h1>{{ product.name }}</h1>
+          <button
+            type="button"
+            class="fav-btn"
+            [class.active]="store.isFavorite(product.id)"
+            (click)="store.toggleFavorite(product.id)"
+            [attr.aria-label]="store.isFavorite(product.id) ? 'Quitar de favoritos' : 'Agregar a favoritos'"
+          >
+            {{ store.isFavorite(product.id) ? '♥' : '♡' }}
+          </button>
+        </div>
         @if (activePromo(); as promo) {
           <div class="price-block">
             <span class="price original">{{ product.price | currency:'PEN':'S/ ' }}</span>

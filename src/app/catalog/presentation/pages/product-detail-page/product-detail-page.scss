@@ -48,6 +48,30 @@
     margin: 0.4rem 0 0.6rem;
   }
 
+  .title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+
+    .fav-btn {
+      flex-shrink: 0;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid var(--rs-border);
+      background: var(--rs-surface);
+      color: var(--rs-text);
+      font-size: 1.3rem;
+      line-height: 1;
+      margin-top: 0.4rem;
+      transition: color 0.2s, border-color 0.2s, transform 0.15s;
+
+      &:hover { border-color: var(--rs-red); transform: scale(1.08); }
+      &.active { color: var(--rs-red); border-color: var(--rs-red); }
+    }
+  }
+
   .price {
     font-size: 1.5rem;
     font-weight: 600;

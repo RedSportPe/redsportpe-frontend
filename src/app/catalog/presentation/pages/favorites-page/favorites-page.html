@@ -1,0 +1,23 @@
+<section class="favorites">
+  <h1>Mis favoritos</h1>
+
+  @if (store.loading()) {
+    <p class="state-msg">Cargando favoritos...</p>
+  } @else if (store.favoriteProducts().length === 0) {
+    <div class="state-msg">
+      <p>Aún no tienes favoritos. Toca el ♡ de un producto para guardarlo aquí.</p>
+      <a routerLink="/catalogo" class="cta">Ir al catálogo</a>
+    </div>
+  } @else {
+    <p class="results-count">
+      {{ store.favoriteProducts().length }}
+      {{ store.favoriteProducts().length === 1 ? 'producto guardado' : 'productos guardados' }}
+    </p>
+
+    <div class="grid">
+      @for (product of store.favoriteProducts(); track product.id) {
+        <app-product-card [product]="product" />
+      }
+    </div>
+  }
+</section>

@@ -24,6 +24,7 @@ Full tactical DDD (aggregates, entities, VOs) is reserved for the BACKEND (not b
 - Product vs Variant: customers browse products; stock/cart/orders operate on variants.
 - Relevance sorting: salesCount desc, tie-break by lower price.
 - Filters derive from actual product data (categories, colors, sizes appear/disappear automatically).
+- Favorites (catalog): in-memory Set in CatalogStore (account-linked persistence comes with the backend). Heart on product cards and detail page, /favoritos page lists them, "Favoritos" card in /cuenta links there with a count.
 - Cart: one line per SKU, quantity capped by variant stock. In-memory only for now: `saveToSession()` exists in CartStore but is intentionally not wired up — persistence will be revisited when the backend lands. Drawer has no backdrop by design: it stays open while browsing and only closes via ✕.
 - RedSport points (loyalty): 1 sol = 1 point, DECIMALS INCLUDED (S/ 150.99 → 150.99 points, redsport-points.ts). Credited the moment an order is PAID. No refunds: paid points never return, even if the order is cancelled.
 - Checkout (orders): requires session (opens auth modal otherwise). Methods: motorizado (delivery) or Shalom (agency pickup). Payment: QR (Yape/Plin, simulated) valid 8 HOURS; expired/postponed orders appear under the cart as "Pedidos no pagados" (pay with a fresh QR or delete). 3PM CUTOFF: motorizado paid before 3pm delivers tomorrow, after 3pm the day after; Shalom paid before 3pm is dropped at the agency same day, after 3pm next day (delivery-rules.ts).

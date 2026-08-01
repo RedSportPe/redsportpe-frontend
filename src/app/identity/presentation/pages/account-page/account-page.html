@@ -77,6 +77,19 @@
         }
       </article>
 
+      <article class="card favorites">
+        <h2>Favoritos</h2>
+        @if (catalogStore.favoritesCount() > 0) {
+          <p class="soon">
+            Tienes {{ catalogStore.favoritesCount() }}
+            {{ catalogStore.favoritesCount() === 1 ? 'producto guardado' : 'productos guardados' }} con ♥.
+          </p>
+        } @else {
+          <p class="soon">Guarda productos con el ♥ y encuéntralos aquí.</p>
+        }
+        <a routerLink="/favoritos" class="orders-link">Ver mis favoritos →</a>
+      </article>
+
       <article class="card history">
         <h2>Historial de compras</h2>
         <p class="soon">Revisa tus pedidos, su estado y el seguimiento de cada entrega.</p>

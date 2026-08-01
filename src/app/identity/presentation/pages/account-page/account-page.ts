@@ -2,6 +2,7 @@ import { Component, inject, computed, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { AuthStore } from '../../../application/auth.store';
+import { CatalogStore } from '../../../../catalog/application/catalog.store';
 
 @Component({
   selector: 'app-account-page',
@@ -11,6 +12,7 @@ import { AuthStore } from '../../../application/auth.store';
 })
 export class AccountPage {
   readonly store = inject(AuthStore);
+  readonly catalogStore = inject(CatalogStore);
 
   readonly initial = computed(() =>
     (this.store.currentUser()?.name.charAt(0) ?? '?').toUpperCase()

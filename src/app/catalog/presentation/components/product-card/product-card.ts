@@ -20,7 +20,10 @@ export class ProductCard {
   readonly isNew = isNew;
 
   onFavoriteClick(event: Event): void {
-    event.stopPropagation();  // don't trigger the card click (future: navigate to detail)
+    // The heart lives INSIDE the card's <a>: preventDefault stops the anchor's
+    // native navigation and stopPropagation keeps routerLink from firing.
+    event.preventDefault();
+    event.stopPropagation();
     this.store.toggleFavorite(this.product().id);
   }
 }

@@ -126,6 +126,11 @@ export class CatalogStore {
     this._colorFilter.set('all');
     this._sizeFilter.set('all');
   }
+  /** The favorites view: full products, only those the customer hearted */
+  readonly favoriteProducts = computed(() =>
+    this._products().filter(p => this._favorites().has(p.id))
+  );
+  readonly favoritesCount = computed(() => this._favorites().size);
   isFavorite(productId: string): boolean {
     return this._favorites().has(productId);
   }
