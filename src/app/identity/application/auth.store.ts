@@ -7,6 +7,7 @@ import {
   MIN_PASSWORD_LENGTH,
 } from '../domain/credentials-rules';
 import { addPoints } from '../domain/redsport-points';
+import { DeliveryInfo } from '../domain/delivery-info.model';
 
 export type AuthMode = 'login' | 'register';
 
@@ -84,6 +85,14 @@ export class AuthStore {
     const user = this._currentUser();
     if (!user) return;
     this._currentUser.set({ ...user, points: addPoints(user.points, earned) });
+  }
+
+  /** Command: save/update the customer's delivery data (first checkout or "Mi cuenta" edit) */
+  saveDeliveryInfo(deliveryInfo: DeliveryInfo): void {
+    const user = this._currentUser();
+    if (!user) return;
+    this.repository.saveDeliveryInfo(user.id, deliveryInfo);
+    this._currentUser.set({ ...user, deliveryInfo });
   }
 
   /** Shared flow: loading → success closes the modal, failure shows the message */

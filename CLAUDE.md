@@ -8,7 +8,7 @@ Folders under `src/app/` map to bounded contexts from our event storming:
 - `catalog/` — products, variants, filters, search, detail page (DONE)
 - `orders/` — cart with drawer, checkout (delivery data → QR payment → confirmation), unpaid-orders section in cart, "Mis pedidos" at /pedidos with 4-dot tracking (DONE)
 - `promotions/` — public name "Promos": discounted products page at /promos with catalog-style filters and promo-price sorting (customer side DONE; admin discount form pending)
-- `identity/` — IAM: auth modal (login/register/Google) overlaid from store-layout on any page, account page at /cuenta with RedSport points (customer side DONE, simulated in AuthRepository; real Google Identity Services + backend auth pending; internal roles PENDING)
+- `identity/` — IAM: auth modal (login/register/Google) overlaid from store-layout on any page, account page at /cuenta with RedSport points and saved delivery info (customer side DONE, simulated in AuthRepository; real Google Identity Services + backend auth pending; internal roles PENDING)
 - `layout/` — store-layout (top navbar) and admin-layout (sidebar)
 - Future contexts: inventory, payments, shipping, notifications, marketing
 
@@ -29,6 +29,7 @@ Full tactical DDD (aggregates, entities, VOs) is reserved for the BACKEND (not b
 - Checkout (orders): requires session (opens auth modal otherwise). Methods: motorizado (delivery) or Shalom (agency pickup). Payment: QR (Yape/Plin, simulated) valid 8 HOURS; expired/postponed orders appear under the cart as "Pedidos no pagados" (pay with a fresh QR or delete). 3PM CUTOFF: motorizado paid before 3pm delivers tomorrow, after 3pm the day after; Shalom paid before 3pm is dropped at the agency same day, after 3pm next day (delivery-rules.ts).
 - Order tracking (order-tracking.ts): 4-dot timeline per method — motorizado: Preparando → Despachado → En camino → Entregado; shalom: Almacén → En agencia → En tránsito → En destino. Button says "Consultar" on first query of a login session, then "Actualizar pedido" (resets on logout). Simulation advances one step per query until the backend/Shalom API lands.
 - Orders persist in sessionStorage (redsport_orders, per userId) — unlike the cart, "Mis pedidos" needs it.
+- Delivery info (identity, delivery-info.model.ts): saved to the profile on the FIRST checkout, shown/editable in the "Datos de entrega" card at /cuenta, and prefilled on later checkouts.
 - Auth: session is in-memory like the cart (lost on reload — by design until backend). Unauthenticated navbar shows "Iniciar sesión" + red "Registrarse"; authenticated shows "Mi cuenta". AuthRepository simulates register/login/Google with fake latency.
 - Promotions: admin subtracts a fixed amount in soles from the regular price (139 - 39 = 100). Optional endsAt (inclusive: promo lives through that whole day) and optional maxUnits/unitsSold cap ("10 of 22"). A promo is active when neither expired nor depleted (promotion-rules.ts). Product detail shows the promo price and the cart snapshots it as unitPrice. unitsSold accounting is the backend's job.
 - Data source: `public/data/products.json` via CatalogRepository (HttpClient); promos in `public/data/promotions.json` via PromotionsRepository. Will be swapped for the real API by changing only the repositories.

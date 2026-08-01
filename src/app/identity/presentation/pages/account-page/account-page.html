@@ -34,6 +34,49 @@
         <p class="points-rule">Ganas 1 punto por cada S/ 1 en compras.</p>
       </article>
 
+      <article class="card delivery">
+        <h2>Datos de entrega</h2>
+
+        @if (editing()) {
+          <div class="edit-form">
+            <label class="field">
+              <span>Teléfono</span>
+              <input type="tel" placeholder="9 dígitos" [value]="phone()" (input)="onInput('phone', $event)" />
+            </label>
+            <label class="field">
+              <span>Dirección (motorizado)</span>
+              <input type="text" placeholder="Calle y número" [value]="address()" (input)="onInput('address', $event)" />
+            </label>
+            <label class="field">
+              <span>Distrito</span>
+              <input type="text" [value]="district()" (input)="onInput('district', $event)" />
+            </label>
+            <label class="field">
+              <span>Agencia Shalom (recojo)</span>
+              <input type="text" placeholder="Ciudad / sede" [value]="agency()" (input)="onInput('agency', $event)" />
+            </label>
+            <div class="edit-actions">
+              <button type="button" class="save-btn" [disabled]="!canSave()" (click)="saveDeliveryInfo()">Guardar</button>
+              <button type="button" class="cancel-btn" (click)="cancelEditing()">Cancelar</button>
+            </div>
+          </div>
+        } @else if (user.deliveryInfo; as info) {
+          <ul class="delivery-data">
+            <li>📞 {{ info.phone }}</li>
+            @if (info.address) {
+              <li>🛵 {{ info.address }}{{ info.district ? ', ' + info.district : '' }}</li>
+            }
+            @if (info.agency) {
+              <li>📦 Shalom: {{ info.agency }}</li>
+            }
+          </ul>
+          <button type="button" class="edit-link" (click)="startEditing()">Editar</button>
+        } @else {
+          <p class="soon">Aún no tienes datos guardados — se registrarán automáticamente en tu primera compra.</p>
+          <button type="button" class="edit-link" (click)="startEditing()">Agregar ahora</button>
+        }
+      </article>
+
       <article class="card history">
         <h2>Historial de compras</h2>
         <p class="soon">Revisa tus pedidos, su estado y el seguimiento de cada entrega.</p>

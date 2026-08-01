@@ -23,11 +23,12 @@ export class CheckoutPage {
   readonly cutoffHour = PAYMENT_CUTOFF_HOUR;
 
   readonly method = signal<DeliveryMethod>('motorizado');
+  // Prefilled from the profile — saved data from a previous checkout (or its edit in Mi cuenta)
   readonly fullName = signal(this.authStore.currentUser()?.name ?? '');
-  readonly phone = signal('');
-  readonly address = signal('');
-  readonly district = signal('');
-  readonly agency = signal('');
+  readonly phone = signal(this.authStore.currentUser()?.deliveryInfo?.phone ?? '');
+  readonly address = signal(this.authStore.currentUser()?.deliveryInfo?.address ?? '');
+  readonly district = signal(this.authStore.currentUser()?.deliveryInfo?.district ?? '');
+  readonly agency = signal(this.authStore.currentUser()?.deliveryInfo?.agency ?? '');
 
   /** Delivery estimate shown BEFORE paying, driven by the 3pm cutoff rule */
   readonly deliveryEstimate = computed(() => {
@@ -81,6 +82,15 @@ export class CheckoutPage {
       }
     );
     if (order) {
+      // First checkout: the delivery data sticks to the profile (visible in Mi cuenta)
+      if (!this.authStore.currentUser()?.deliveryInfo) {
+        this.authStore.saveDeliveryInfo({
+          phone: this.phone().trim(),
+          address: order.shipping.address,
+          district: order.shipping.district,
+          agency: order.shipping.agency,
+        });
+      }
       this.cartStore.clearCart();
       this.router.navigate(['/carrito/pago', order.id]);
     }

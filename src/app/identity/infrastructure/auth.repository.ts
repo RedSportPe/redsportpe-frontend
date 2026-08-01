@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, timer, delay, map } from 'rxjs';
 import { User } from '../domain/user.model';
+import { DeliveryInfo } from '../domain/delivery-info.model';
 
 /** Today: in-memory simulation so the whole auth UX can be built and demoed.
  *  Tomorrow: POST /api/auth/register|login + the real Google Identity Services
@@ -34,17 +35,33 @@ export class AuthRepository {
     return of(entry.user).pipe(delay(500));
   }
 
+  // Kept as an instance so re-logins in the same app session keep saved data
+  private googleUser: User = {
+    id: 'user-google-demo',
+    name: 'Cliente Google',
+    email: 'cliente.demo@gmail.com',
+    provider: 'google',
+    points: 320,
+    createdAt: '2026-05-15T12:00:00.000Z',  // midday: same date in any timezone
+  };
+
   loginWithGoogle(): Observable<User> {
     // Simulated Google account (with demo points) until the real GIS flow lands
-    const user: User = {
-      id: 'user-google-demo',
-      name: 'Cliente Google',
-      email: 'cliente.demo@gmail.com',
-      provider: 'google',
-      points: 320,
-      createdAt: '2026-05-15T12:00:00.000Z',  // midday: same date in any timezone
-    };
-    return of(user).pipe(delay(700));
+    return of(this.googleUser).pipe(delay(700));
+  }
+
+  /** Today: updates the in-memory user. Tomorrow: PATCH /api/customers/me */
+  saveDeliveryInfo(userId: string, deliveryInfo: DeliveryInfo): void {
+    if (this.googleUser.id === userId) {
+      this.googleUser = { ...this.googleUser, deliveryInfo };
+      return;
+    }
+    for (const entry of this.registered.values()) {
+      if (entry.user.id === userId) {
+        entry.user = { ...entry.user, deliveryInfo };
+        return;
+      }
+    }
   }
 
   /** Errors also take a moment, like a real network call would */
