@@ -48,6 +48,7 @@
 .empty {
   color: var(--rs-text-muted);
   padding: 1.5rem 1.3rem;
+  flex: 1;   // pushes the footer (Ver carrito) to the bottom of the drawer
 }
 
 .drawer-items {

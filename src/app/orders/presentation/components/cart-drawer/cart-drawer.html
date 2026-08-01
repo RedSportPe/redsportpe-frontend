@@ -9,6 +9,10 @@
 
   @if (store.isEmpty()) {
     <p class="empty">Tu carrito está vacío.</p>
+
+    <footer class="drawer-footer">
+      <button type="button" class="view-cart" (click)="goToCart()">Ver carrito</button>
+    </footer>
   } @else {
     <div class="drawer-items">
       @for (item of store.items(); track item.sku) {
