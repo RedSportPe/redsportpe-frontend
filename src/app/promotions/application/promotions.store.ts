@@ -1,8 +1,6 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { forkJoin } from 'rxjs';
 import { PromotionsRepository } from '../infrastructure/promotions.repository';
-import { CatalogRepository } from '../../catalog/infrastructure/catalog.repository';
-import { Product } from '../../catalog/domain/product.model';
+import { CatalogStore } from '../../catalog/application/catalog.store';
 import { Promotion } from '../domain/promotion.model';
 import { PromoProduct } from '../domain/promo-product.model';
 import { isPromotionActive } from '../domain/promotion-rules';
@@ -19,11 +17,13 @@ import {
 @Injectable({ providedIn: 'root' })
 export class PromotionsStore {
   private promotionsRepository = inject(PromotionsRepository);
-  private catalogRepository = inject(CatalogRepository);
+  // Products come from the catalog's in-memory store (single source of truth):
+  // promos see admin-created products and survive admin edits.
+  private catalogStore = inject(CatalogStore);
 
   // Private state
   private _promotions = signal<Promotion[]>([]);
-  private _products = signal<Product[]>([]);
+  private _loaded = signal(false);
   private _loading = signal(false);
   private _sortOption = signal<PromoSortOption>('discount');
   private _categoryFilter = signal<string | 'all'>('all');
@@ -32,21 +32,24 @@ export class PromotionsStore {
   private _sizeFilter = signal<string | 'all'>('all');
 
   // Public read-only state
-  readonly loading = this._loading.asReadonly();
+  readonly loading = computed(() => this._loading() || this.catalogStore.loading());
   readonly sortOption = this._sortOption.asReadonly();
   readonly categoryFilter = this._categoryFilter.asReadonly();
   readonly genderFilter = this._genderFilter.asReadonly();
   readonly colorFilter = this._colorFilter.asReadonly();
   readonly sizeFilter = this._sizeFilter.asReadonly();
 
+  /** Every promotion, any state — the admin Descuentos view */
+  readonly allPromotions = computed(() => this._promotions());
+
   /** Only promos that are neither expired nor depleted — the domain decides, not the UI */
   readonly activePromotions = computed(() =>
     this._promotions().filter(promo => isPromotionActive(promo))
   );
 
-  /** Every active promo joined with its product, before any filtering */
+  /** Every active promo joined with its (published) product, before any filtering */
   readonly allPromoProducts = computed<PromoProduct[]>(() => {
-    const products = this._products();
+    const products = this.catalogStore.allProducts().filter(p => p.published);
     return this.activePromotions()
       .map(promo => {
         const product = products.find(p => p.id === promo.productId);
@@ -102,14 +105,14 @@ export class PromotionsStore {
   );
 
   loadPromos(): void {
+    this.catalogStore.loadCatalog();
+    // Cache-first: reloading would wipe the admin's in-memory promos
+    if (this._loaded()) return;
     this._loading.set(true);
-    forkJoin({
-      promotions: this.promotionsRepository.getPromotions(),
-      products: this.catalogRepository.getPublishedProducts(),
-    }).subscribe({
-      next: ({ promotions, products }) => {
+    this.promotionsRepository.getPromotions().subscribe({
+      next: promotions => {
         this._promotions.set(promotions);
-        this._products.set(products.filter(p => p.published));
+        this._loaded.set(true);
         this._loading.set(false);
       },
       error: () => this._loading.set(false),
@@ -142,5 +145,18 @@ export class PromotionsStore {
     this._genderFilter.set('all');
     this._colorFilter.set('all');
     this._sizeFilter.set('all');
+  }
+
+  // ===== Admin commands =====
+  // Today they mutate the in-memory list (resets on reload).
+  // Tomorrow: POST/DELETE /api/promotions through the repository.
+
+  createPromotion(data: Omit<Promotion, 'id'>): void {
+    const promotion: Promotion = { ...data, id: `promo-${Date.now()}` };
+    this._promotions.set([...this._promotions(), promotion]);
+  }
+
+  deletePromotion(id: string): void {
+    this._promotions.set(this._promotions().filter(p => p.id !== id));
   }
 }

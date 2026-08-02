@@ -1,0 +1,118 @@
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 1.7rem;
+
+    &::after {
+      content: '';
+      display: block;
+      width: 50px;
+      height: 4px;
+      background: var(--rs-red);
+      margin-top: 0.4rem;
+    }
+  }
+
+  .subtitle {
+    color: var(--rs-text-muted);
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
+
+    .alert { color: var(--rs-red); font-weight: 700; }
+    .warn  { color: #ca8a04; font-weight: 700; }
+  }
+
+  .search {
+    background: var(--rs-surface);
+    color: var(--rs-text);
+    border: 1px solid var(--rs-border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    width: 280px;
+    font-family: var(--font-body);
+
+    &::placeholder { color: var(--rs-text-muted); }
+    &:hover, &:focus { border-color: var(--rs-red); outline: none; }
+  }
+}
+
+.state-msg {
+  padding: 2rem 0;
+  color: var(--rs-text-muted);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+
+  th {
+    text-align: left;
+    padding: 0.8rem 1rem;
+    color: var(--rs-text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--rs-border);
+  }
+
+  td {
+    padding: 0.6rem 1rem;
+    border-bottom: 1px solid var(--rs-border);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+  tr.unpublished { opacity: 0.55; }
+
+  .sku {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--rs-text-muted);
+  }
+
+  .name { font-weight: 600; }
+
+  .hidden-tag {
+    font-size: 0.7rem;
+    color: var(--rs-text-muted);
+    border: 1px solid var(--rs-border);
+    border-radius: 4px;
+    padding: 0.1rem 0.4rem;
+    margin-left: 0.4rem;
+  }
+
+  .empty {
+    color: var(--rs-text-muted);
+    text-align: center;
+    padding: 2rem;
+  }
+}
+
+.stock-input {
+  width: 80px;
+  background: var(--rs-black);
+  color: var(--rs-text);
+  border: 1px solid var(--rs-border);
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+
+  &:hover, &:focus { border-color: var(--rs-red); outline: none; }
+
+  &.low { border-color: #ca8a04; color: #facc15; }
+  &.out { border-color: var(--rs-red); color: var(--rs-red); font-weight: 700; }
+}

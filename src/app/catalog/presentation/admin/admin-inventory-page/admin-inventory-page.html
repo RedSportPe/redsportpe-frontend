@@ -1,0 +1,63 @@
+<section class="admin-inventory">
+  <header class="page-header">
+    <div>
+      <h1>Inventario</h1>
+      <p class="subtitle">
+        {{ rows().length }} SKU(s)
+        @if (outOfStockCount() > 0) { · <span class="alert">{{ outOfStockCount() }} agotado(s)</span> }
+        @if (lowStockCount() > 0) { · <span class="warn">{{ lowStockCount() }} con stock bajo</span> }
+      </p>
+    </div>
+    <input
+      type="search"
+      class="search"
+      placeholder="Buscar por SKU o producto..."
+      [value]="search()"
+      (input)="onSearch($event)"
+    />
+  </header>
+
+  @if (store.loading()) {
+    <p class="state-msg">Cargando inventario...</p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>SKU</th>
+            <th>Producto</th>
+            <th>Talla</th>
+            <th>Color</th>
+            <th>Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of rows(); track row.sku) {
+            <tr [class.unpublished]="!row.published">
+              <td class="sku">{{ row.sku }}</td>
+              <td class="name">
+                {{ row.productName }}
+                @if (!row.published) { <span class="hidden-tag">oculto</span> }
+              </td>
+              <td>{{ sizeLabel(row.size) }}</td>
+              <td>{{ colorLabel(row.color) }}</td>
+              <td>
+                <input
+                  type="number"
+                  min="0"
+                  class="stock-input"
+                  [class.out]="row.stock === 0"
+                  [class.low]="row.stock > 0 && row.stock <= 5"
+                  [value]="row.stock"
+                  (change)="onStockChange(row, $event)"
+                />
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="empty">Ningún SKU coincide con la búsqueda.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

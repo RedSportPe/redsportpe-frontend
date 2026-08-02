@@ -205,4 +205,20 @@ export class CatalogStore {
   deleteProduct(id: string): void {
     this._products.set(this._products().filter(p => p.id !== id));
   }
+
+  /** Admin inventory: set the stock of ONE variant (by SKU, the Published Language) */
+  updateVariantStock(productId: string, sku: string, stock: number): void {
+    this._products.set(
+      this._products().map(p =>
+        p.id === productId
+          ? {
+              ...p,
+              variants: p.variants.map(v =>
+                v.sku === sku ? { ...v, totalStock: Math.max(0, stock) } : v
+              ),
+            }
+          : p
+      )
+    );
+  }
 }

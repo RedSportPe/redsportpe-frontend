@@ -5,9 +5,9 @@ E-commerce frontend for RedSport, a Peruvian sportswear brand. Angular 21, SCSS,
 
 ## Architecture: DDD-lite by bounded contexts
 Folders under `src/app/` map to bounded contexts from our event storming:
-- `catalog/` — products, variants, filters, search, detail page, favorites (customer DONE); admin product management at /admin/productos: list, create/edit with variant editor + auto-SKU, publish toggle, delete (DONE)
-- `orders/` — cart with drawer, checkout (delivery data → QR payment → confirmation), unpaid-orders section in cart, "Mis pedidos" at /pedidos with 4-dot tracking (DONE)
-- `promotions/` — public name "Promos": discounted products page at /promos with catalog-style filters and promo-price sorting (customer side DONE; admin discount form pending)
+- `catalog/` — products, variants, filters, search, detail page, favorites (customer DONE); admin: product management at /admin/productos (list, create/edit with variant editor + auto-SKU, publish toggle, delete) and inventory at /admin/inventario (per-SKU stock editing, low/out-of-stock counters) (DONE)
+- `orders/` — cart with drawer, checkout (delivery data → QR payment → confirmation), unpaid-orders section in cart, "Mis pedidos" at /pedidos with 4-dot tracking (DONE); admin: all orders at /admin/pedidos with payment status (Pagado/QR activo/QR vencido) and "Avanzar estado" driving the tracking (DONE)
+- `promotions/` — public name "Promos": discounted products page at /promos with catalog-style filters and promo-price sorting (DONE); admin: discount form + promo list with states at /admin/descuentos (DONE)
 - `identity/` — IAM: auth modal (login/register/Google) overlaid from store-layout on any page, account page at /cuenta with RedSport points and saved delivery info, roles customer|admin with adminGuard on /admin/* (simulated in AuthRepository; real Google Identity Services + backend auth pending). Demo admin: admin@redsport.pe / admin123.
 - `layout/` — store-layout (top navbar) and admin-layout (sidebar)
 - Future contexts: inventory, payments, shipping, notifications, marketing
@@ -34,7 +34,8 @@ Full tactical DDD (aggregates, entities, VOs) is reserved for the BACKEND (not b
 - Orders persist in sessionStorage (redsport_orders, per userId) — unlike the cart, "Mis pedidos" needs it.
 - Delivery info (identity, delivery-info.model.ts): saved to the profile on the FIRST checkout, shown/editable in the "Datos de entrega" card at /cuenta, and prefilled on later checkouts.
 - Auth: session is in-memory like the cart (lost on reload — by design until backend). Unauthenticated navbar shows "Iniciar sesión" + red "Registrarse"; authenticated shows "Mi cuenta". AuthRepository simulates register/login/Google with fake latency.
-- Promotions: admin subtracts a fixed amount in soles from the regular price (139 - 39 = 100). Optional endsAt (inclusive: promo lives through that whole day) and optional maxUnits/unitsSold cap ("10 of 22"). A promo is active when neither expired nor depleted (promotion-rules.ts). Product detail shows the promo price and the cart snapshots it as unitPrice. unitsSold accounting is the backend's job.
+- Promotions: admin subtracts a fixed amount in soles from the regular price (139 - 39 = 100). Optional endsAt (inclusive: promo lives through that whole day) and optional maxUnits/unitsSold cap ("10 of 22"). A promo is active when neither expired nor depleted (promotion-rules.ts). ONE active promo per product (enforced by the admin form). Product detail shows the promo price and the cart snapshots it as unitPrice. unitsSold accounting is the backend's job.
+- PromotionsStore is cache-first and joins against CatalogStore's products (single source of truth — admin-created products/promos survive navigation). Admin mutations (promos, stock, orders' tracking) are in-memory/sessionStorage until the backend.
 - Data source: `public/data/products.json` via CatalogRepository (HttpClient); promos in `public/data/promotions.json` via PromotionsRepository. Will be swapped for the real API by changing only the repositories.
 
 ## Conventions
@@ -44,7 +45,7 @@ Full tactical DDD (aggregates, entities, VOs) is reserved for the BACKEND (not b
 - UI text in Spanish, code in English. Brand tokens in styles.scss (--rs-red, --rs-surface, Oswald + Inter fonts).
 
 ## Current state / next steps
-- Done: full customer side (catalog, promos, favorites, cart+checkout+QR, mis pedidos, cuenta with points/delivery info) and the first admin view: product management (/admin/productos) behind adminGuard, with admin-layout sidebar (Inventario/Pedidos/Descuentos marked "próximamente").
+- Done: full customer side (catalog, promos, favorites, cart+checkout+QR, mis pedidos, cuenta with points/delivery info) and the full admin panel behind adminGuard: Productos, Inventario, Pedidos and Descuentos, all in the admin-layout sidebar.
 - Known issue: 8 CLI-generated component specs fail (missing HttpClient/Router providers in TestBed) — pre-existing, fix pattern in promos-page.spec.ts.
-- Next candidates: admin Descuentos form (promotions), admin Pedidos (verify QR payments + drive real tracking), or starting the backend (10 bounded contexts from event storming, stack TBD).
+- Next candidates: starting the backend (10 bounded contexts from event storming, stack TBD), payment verification flow (operation number + "Verificando pago" state), or deploy to Hostinger.
 - Deploy target: Hostinger. Domain + SSL already purchased.

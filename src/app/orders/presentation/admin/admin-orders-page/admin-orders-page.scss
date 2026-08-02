@@ -1,0 +1,92 @@
+.page-header {
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 1.7rem;
+
+    &::after {
+      content: '';
+      display: block;
+      width: 50px;
+      height: 4px;
+      background: var(--rs-red);
+      margin-top: 0.4rem;
+    }
+  }
+
+  .subtitle {
+    color: var(--rs-text-muted);
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
+  }
+}
+
+.state-msg {
+  padding: 2rem 0;
+  color: var(--rs-text-muted);
+}
+
+.table-wrap {
+  overflow-x: auto;
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+
+  th {
+    text-align: left;
+    padding: 0.8rem 1rem;
+    color: var(--rs-text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--rs-border);
+  }
+
+  td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--rs-border);
+    vertical-align: middle;
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .code { font-weight: 700; }
+}
+
+.pay {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 5px;
+
+  &.paid    { background: #14532d; color: #86efac; }
+  &.pending { background: #713f12; color: #fde047; }
+  &.expired { background: #3f3f3f; color: #d4d4d4; }
+}
+
+.tracking {
+  font-size: 0.82rem;
+  font-weight: 600;
+
+  &.done { color: #16a34a; }
+  &.muted { color: var(--rs-text-muted); }
+}
+
+.actions .advance {
+  background: transparent;
+  border: 1px solid var(--rs-red);
+  color: var(--rs-red);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.35rem 0.8rem;
+  border-radius: 6px;
+
+  &:hover { background: var(--rs-red); color: #fff; }
+}

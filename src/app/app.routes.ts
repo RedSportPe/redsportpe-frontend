@@ -42,6 +42,21 @@ export const routes: Routes = [
         path: 'productos',
         loadChildren: () => import('./catalog/catalog.routes').then(m => m.CATALOG_ADMIN_ROUTES),
       },
+      {
+        path: 'inventario',
+        loadComponent: () =>
+          import('./catalog/presentation/admin/admin-inventory-page/admin-inventory-page').then(m => m.AdminInventoryPage),
+      },
+      {
+        path: 'pedidos',
+        loadComponent: () =>
+          import('./orders/presentation/admin/admin-orders-page/admin-orders-page').then(m => m.AdminOrdersPage),
+      },
+      {
+        path: 'descuentos',
+        loadComponent: () =>
+          import('./promotions/presentation/admin/admin-promos-page/admin-promos-page').then(m => m.AdminPromosPage),
+      },
     ],
   },
 ];

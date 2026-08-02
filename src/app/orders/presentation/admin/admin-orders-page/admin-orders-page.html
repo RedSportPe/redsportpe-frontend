@@ -1,0 +1,69 @@
+<section class="admin-orders">
+  <header class="page-header">
+    <div>
+      <h1>Pedidos</h1>
+      <p class="subtitle">
+        {{ orders().length }} pedido(s) · {{ paidCount() }} pagado(s) · {{ pendingCount() }} sin pagar
+      </p>
+    </div>
+  </header>
+
+  @if (orders().length === 0) {
+    <p class="state-msg">
+      Aún no hay pedidos. (Los pedidos viven en sessionStorage de este navegador hasta que exista el backend.)
+    </p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Pedido</th>
+            <th>Fecha</th>
+            <th>Cliente</th>
+            <th>Método</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Pago</th>
+            <th>Seguimiento</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (order of orders(); track order.id) {
+            <tr>
+              <td class="code">{{ order.code }}</td>
+              <td>{{ order.createdAt | date:'dd/MM HH:mm' }}</td>
+              <td>{{ order.shipping.fullName }}</td>
+              <td>{{ methodLabels[order.method] }}</td>
+              <td>{{ itemsCount(order) }}</td>
+              <td>{{ order.total | currency:'PEN':'S/ ' }}</td>
+              <td>
+                @switch (paymentStatus(order)) {
+                  @case ('paid') { <span class="pay paid">Pagado</span> }
+                  @case ('pending') { <span class="pay pending">QR activo</span> }
+                  @case ('expired') { <span class="pay expired">QR vencido</span> }
+                }
+              </td>
+              <td>
+                @if (order.paidAt) {
+                  <span class="tracking" [class.done]="isDelivered(order)">
+                    {{ trackingLabel(order) }}
+                  </span>
+                } @else {
+                  <span class="tracking muted">—</span>
+                }
+              </td>
+              <td class="actions">
+                @if (order.paidAt && !isDelivered(order)) {
+                  <button type="button" class="advance" (click)="advance(order)">
+                    Avanzar estado →
+                  </button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

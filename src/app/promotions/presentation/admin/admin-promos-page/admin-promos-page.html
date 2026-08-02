@@ -1,0 +1,106 @@
+<section class="admin-promos">
+  <header class="page-header">
+    <div>
+      <h1>Descuentos</h1>
+      <p class="subtitle">{{ store.allPromotions().length }} promoción(es) · {{ store.activePromotions().length }} activa(s)</p>
+    </div>
+  </header>
+
+  <!-- Create: subtract a fixed amount in soles (139 - 39 = 100) -->
+  <article class="create-card">
+    <h2>Nueva promoción</h2>
+
+    <div class="create-grid">
+      <label class="field">
+        <span>Producto</span>
+        <select [value]="productId()" (change)="onProduct($event)">
+          <option value="" [selected]="productId() === ''">— Elegir producto —</option>
+          @for (product of catalogStore.allProducts(); track product.id) {
+            <option [value]="product.id" [selected]="product.id === productId()">
+              {{ product.name }} (S/ {{ product.price }})
+            </option>
+          }
+        </select>
+      </label>
+
+      <label class="field">
+        <span>Descuento en soles (se resta del precio)</span>
+        <input type="number" min="0" step="0.10" placeholder="39" [value]="discountAmount() || ''" (input)="onAmount($event)" />
+      </label>
+
+      <label class="field">
+        <span>Fecha límite (opcional — incluye todo ese día)</span>
+        <input type="date" [value]="endsAt()" (input)="onEndsAt($event)" />
+      </label>
+
+      <label class="field">
+        <span>Unidades en promo (opcional — vacío = todo el stock)</span>
+        <input type="number" min="1" placeholder="10" [value]="maxUnits()" (input)="onMaxUnits($event)" />
+      </label>
+    </div>
+
+    @if (preview(); as p) {
+      <p class="preview">
+        {{ p.regular | currency:'PEN':'S/ ' }} →
+        <strong>{{ p.promo | currency:'PEN':'S/ ' }}</strong>
+        <span class="percent">-{{ p.percent }}%</span>
+      </p>
+    }
+    @if (productId() && productAlreadyOnPromo()) {
+      <p class="form-warn">Este producto ya tiene una promoción activa — elimínala primero.</p>
+    }
+
+    <button type="button" class="create-btn" [disabled]="!canCreate()" (click)="create()">
+      Crear promoción
+    </button>
+  </article>
+
+  @if (store.allPromotions().length > 0) {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Precio</th>
+            <th>Descuento</th>
+            <th>Precio promo</th>
+            <th>Vigencia</th>
+            <th>Unidades</th>
+            <th>Estado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (promo of store.allPromotions(); track promo.id) {
+            <tr [class.inactive]="status(promo) !== 'Activa'">
+              <td class="name">{{ productName(promo) }}</td>
+              <td>{{ productPrice(promo) | currency:'PEN':'S/ ' }}</td>
+              <td>-{{ promo.discountAmount | currency:'PEN':'S/ ' }}</td>
+              <td class="promo-price">
+                {{ promoPrice(productPrice(promo), promo) | currency:'PEN':'S/ ' }}
+                <span class="percent">-{{ discountPercent(productPrice(promo), promo) }}%</span>
+              </td>
+              <td>
+                @if (promo.endsAt) { Hasta el {{ promo.endsAt | date:'dd/MM/yyyy' }} }
+                @else { Sin límite }
+              </td>
+              <td>
+                @if (promo.maxUnits) {
+                  {{ promo.unitsSold ?? 0 }}/{{ promo.maxUnits }} vendidas
+                } @else { Todo el stock }
+              </td>
+              <td>
+                <span class="status" [class.on]="status(promo) === 'Activa'">{{ status(promo) }}</span>
+              </td>
+              <td>
+                <button type="button" class="delete" (click)="store.deletePromotion(promo.id)">
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>
