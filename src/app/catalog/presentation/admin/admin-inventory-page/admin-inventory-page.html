@@ -17,6 +17,17 @@
     />
   </header>
 
+  <!-- Draft mode: edits live here until the admin confirms -->
+  @if (pendingCount() > 0) {
+    <div class="save-bar">
+      <span>✏️ {{ pendingCount() }} cambio(s) sin guardar</span>
+      <div class="save-actions">
+        <button type="button" class="apply" (click)="applyChanges()">Guardar cambios</button>
+        <button type="button" class="discard" (click)="discardChanges()">Descartar</button>
+      </div>
+    </div>
+  }
+
   @if (store.loading()) {
     <p class="state-msg">Cargando inventario...</p>
   } @else {
@@ -33,7 +44,7 @@
         </thead>
         <tbody>
           @for (row of rows(); track row.sku) {
-            <tr [class.unpublished]="!row.published">
+            <tr [class.unpublished]="!row.published" [class.edited]="row.modified">
               <td class="sku">{{ row.sku }}</td>
               <td class="name">
                 {{ row.productName }}
@@ -41,16 +52,20 @@
               </td>
               <td>{{ sizeLabel(row.size) }}</td>
               <td>{{ colorLabel(row.color) }}</td>
-              <td>
+              <td class="stock-cell">
                 <input
                   type="number"
                   min="0"
                   class="stock-input"
-                  [class.out]="row.stock === 0"
-                  [class.low]="row.stock > 0 && row.stock <= 5"
+                  [class.out]="!row.modified && row.stock === 0"
+                  [class.low]="!row.modified && row.stock > 0 && row.stock <= 5"
+                  [class.dirty]="row.modified"
                   [value]="row.stock"
-                  (change)="onStockChange(row, $event)"
+                  (input)="onStockInput(row, $event)"
                 />
+                @if (row.modified) {
+                  <span class="was">antes: {{ row.originalStock }}</span>
+                }
               </td>
             </tr>
           } @empty {
