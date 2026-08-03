@@ -3,6 +3,43 @@ import { adminGuard } from './identity/application/admin.guard';
 
 export const routes: Routes = [
   {
+    // Staff panel: left sidebar. Business rule: admins only.
+    // MUST be declared before the store: the store mounts at '' (prefix match)
+    // and its '**' fallback would otherwise swallow every /admin URL.
+    path: 'admin',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./layout/admin-layout/admin-layout').then(m => m.AdminLayout),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'productos' },
+      {
+        path: 'productos',
+        loadChildren: () => import('./catalog/catalog.routes').then(m => m.CATALOG_ADMIN_ROUTES),
+      },
+      {
+        path: 'inventario',
+        loadComponent: () =>
+          import('./catalog/presentation/admin/admin-inventory-page/admin-inventory-page').then(m => m.AdminInventoryPage),
+      },
+      {
+        path: 'pedidos',
+        loadComponent: () =>
+          import('./orders/presentation/admin/admin-orders-page/admin-orders-page').then(m => m.AdminOrdersPage),
+      },
+      {
+        path: 'descuentos',
+        loadComponent: () =>
+          import('./promotions/presentation/admin/admin-promos-page/admin-promos-page').then(m => m.AdminPromosPage),
+      },
+      {
+        // 404 inside the panel: unknown /admin URLs keep the sidebar
+        path: '**',
+        loadComponent: () =>
+          import('./layout/not-found-page/not-found-page').then(m => m.NotFoundPage),
+      },
+    ],
+  },
+  {
     // Public store: top navbar
     path: '',
     loadComponent: () =>
@@ -28,34 +65,11 @@ export const routes: Routes = [
         path: 'cuenta',
         loadChildren: () => import('./identity/identity.routes').then(m => m.IDENTITY_ROUTES),
       },
-    ],
-  },
-  {
-    // Staff panel: left sidebar. Business rule: admins only.
-    path: 'admin',
-    canActivate: [adminGuard],
-    loadComponent: () =>
-      import('./layout/admin-layout/admin-layout').then(m => m.AdminLayout),
-    children: [
-      { path: '', pathMatch: 'full', redirectTo: 'productos' },
       {
-        path: 'productos',
-        loadChildren: () => import('./catalog/catalog.routes').then(m => m.CATALOG_ADMIN_ROUTES),
-      },
-      {
-        path: 'inventario',
+        // 404 inside the store: unknown URLs keep the navbar
+        path: '**',
         loadComponent: () =>
-          import('./catalog/presentation/admin/admin-inventory-page/admin-inventory-page').then(m => m.AdminInventoryPage),
-      },
-      {
-        path: 'pedidos',
-        loadComponent: () =>
-          import('./orders/presentation/admin/admin-orders-page/admin-orders-page').then(m => m.AdminOrdersPage),
-      },
-      {
-        path: 'descuentos',
-        loadComponent: () =>
-          import('./promotions/presentation/admin/admin-promos-page/admin-promos-page').then(m => m.AdminPromosPage),
+          import('./layout/not-found-page/not-found-page').then(m => m.NotFoundPage),
       },
     ],
   },

@@ -9,7 +9,7 @@ Folders under `src/app/` map to bounded contexts from our event storming:
 - `orders/` — cart with drawer, checkout (delivery data → QR payment → confirmation), unpaid-orders section in cart, "Mis pedidos" at /pedidos with 4-dot tracking (DONE); admin: all orders at /admin/pedidos with payment status (Pagado/QR activo/QR vencido) and "Avanzar estado" driving the tracking (DONE)
 - `promotions/` — public name "Promos": discounted products page at /promos with catalog-style filters and promo-price sorting (DONE); admin: discount form + promo list with states at /admin/descuentos (DONE)
 - `identity/` — IAM: auth modal (login/register/Google) overlaid from store-layout on any page, account page at /cuenta with RedSport points and saved delivery info, roles customer|admin with adminGuard on /admin/* (simulated in AuthRepository; real Google Identity Services + backend auth pending). Demo admin: admin@redsport.pe / admin123.
-- `layout/` — store-layout (top navbar) and admin-layout (sidebar)
+- `layout/` — store-layout (top navbar), admin-layout (sidebar) and a shared 404 page rendered inside whichever layout the URL fell through ('**' wildcards). ROUTE ORDER MATTERS in app.routes.ts: 'admin' is declared BEFORE the store's '' route — the store matches as prefix and its '**' would swallow /admin/* otherwise.
 - Future contexts: inventory, payments, shipping, notifications, marketing
 
 Each context has: `domain/` (models + business rule functions), `application/` (signal stores), `infrastructure/` (repositories), `presentation/` (pages + components).
