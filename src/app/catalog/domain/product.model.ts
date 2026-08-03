@@ -12,7 +12,11 @@ export interface Product {
   description: string;
   category: string;
   price: number;            // in soles (PEN)
+  /** Cover image — always the first of `images` when the gallery exists */
   imageUrl: string;
+  /** Full gallery (admin-uploaded). Today they are data URLs in memory;
+   *  tomorrow the backend stores files and these become CDN URLs. */
+  images?: string[];
   published: boolean;
   featured: boolean;
   salesCount: number;

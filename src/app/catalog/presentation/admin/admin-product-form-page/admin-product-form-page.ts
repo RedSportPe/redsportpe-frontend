@@ -45,7 +45,9 @@ export class AdminProductFormPage implements OnInit {
   readonly description = signal('');
   readonly category = signal('');
   readonly price = signal(0);
-  readonly imageUrl = signal('');
+  /** Gallery: data URLs read from the admin's uploaded files. The FIRST one
+   *  is the cover shown on cards/cart. Real file storage comes with the backend. */
+  readonly images = signal<string[]>([]);
   readonly productCode = signal('');
   readonly published = signal(true);
   readonly featured = signal(false);
@@ -83,7 +85,9 @@ export class AdminProductFormPage implements OnInit {
     this.description.set(product.description);
     this.category.set(product.category);
     this.price.set(product.price);
-    this.imageUrl.set(product.imageUrl);
+    this.images.set(
+      product.images?.length ? [...product.images] : (product.imageUrl ? [product.imageUrl] : [])
+    );
     this.published.set(product.published);
     this.featured.set(product.featured);
     // The product code lives inside every SKU: RS-[CODE]-...
@@ -116,8 +120,38 @@ export class AdminProductFormPage implements OnInit {
     return skus.every(sku => isValidSku(sku)) && new Set(skus).size === skus.length;
   });
 
-  onText(field: 'name' | 'description' | 'category' | 'imageUrl' | 'productCode', event: Event): void {
+  onText(field: 'name' | 'description' | 'category' | 'productCode', event: Event): void {
     this[field].set((event.target as HTMLInputElement).value);
+  }
+
+  /** Reads every selected file as a data URL and appends it to the gallery */
+  onFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    for (const file of Array.from(input.files ?? [])) {
+      if (!file.type.startsWith('image/')) continue;
+      const reader = new FileReader();
+      reader.onload = () => {
+        const dataUrl = reader.result as string;
+        this.images.update(list => [...list, dataUrl]);
+      };
+      reader.readAsDataURL(file);
+    }
+    input.value = ''; // allow re-selecting the same file
+  }
+
+  removeImage(index: number): void {
+    this.images.update(list => list.filter((_, i) => i !== index));
+  }
+
+  /** The clicked image becomes the cover (first position) */
+  makeCover(index: number): void {
+    this.images.update(list => {
+      if (index === 0) return list;
+      const next = [...list];
+      const [img] = next.splice(index, 1);
+      next.unshift(img);
+      return next;
+    });
   }
 
   onPrice(event: Event): void {
@@ -160,12 +194,14 @@ export class AdminProductFormPage implements OnInit {
       return;
     }
 
+    const gallery = this.images();
     const data = {
       name: this.name().trim(),
       description: this.description().trim(),
       category: this.category().trim(),
       price: this.price(),
-      imageUrl: this.imageUrl().trim() || '/images/products/placeholder.jpg',
+      imageUrl: gallery[0] ?? '/images/products/placeholder.jpg',
+      images: gallery,
       published: this.published(),
       featured: this.featured(),
       variants: builtVariants,
