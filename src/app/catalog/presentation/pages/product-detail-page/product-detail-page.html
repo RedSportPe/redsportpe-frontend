@@ -13,7 +13,55 @@
 
     <div class="detail-body">
       <div class="gallery">
-        <img [src]="product.imageUrl" [alt]="product.name" />
+        @if (galleryImages().length > 1) {
+          <div class="thumbs-rail">
+            @if (hasThumbOverflow()) {
+              <button
+                type="button"
+                class="thumb-arrow"
+                [disabled]="!canScrollUp()"
+                (click)="scrollThumbs(-1)"
+                aria-label="Subir en la lista de imágenes"
+              >
+                <!-- Solid gray caret, rounded corners, pointing UP -->
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 16 L19 16 L12 6 Z" stroke-linejoin="round" stroke-width="4" />
+                </svg>
+              </button>
+            }
+
+            <div class="thumbs-list">
+              @for (thumb of visibleThumbs(); track thumb.index) {
+                <button
+                  type="button"
+                  class="thumb-btn"
+                  [class.active]="thumb.index === selectedImageIndex()"
+                  (click)="selectImage(thumb.index)"
+                  [attr.aria-label]="'Ver imagen ' + (thumb.index + 1)"
+                >
+                  <img [src]="thumb.src" [alt]="product.name + ' — imagen ' + (thumb.index + 1)" />
+                </button>
+              }
+            </div>
+
+            @if (hasThumbOverflow()) {
+              <button
+                type="button"
+                class="thumb-arrow"
+                [disabled]="!canScrollDown()"
+                (click)="scrollThumbs(1)"
+                aria-label="Bajar en la lista de imágenes"
+              >
+                <!-- Solid gray caret, rounded corners, pointing DOWN -->
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M5 8 L19 8 L12 18 Z" stroke-linejoin="round" stroke-width="4" />
+                </svg>
+              </button>
+            }
+          </div>
+        }
+
+        <img class="main-image" [src]="selectedImage()" [alt]="product.name" />
       </div>
 
       <div class="info">

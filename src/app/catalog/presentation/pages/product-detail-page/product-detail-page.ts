@@ -57,6 +57,45 @@ export class ProductDetailPage implements OnInit {
   readonly selectedSize = signal<string | null>(null);
   readonly selectedColor = signal<string | null>(null);
 
+  // ===== Image gallery =====
+  /** How many thumbnails fit beside the main image before arrows are needed */
+  readonly THUMB_WINDOW = 4;
+  readonly selectedImageIndex = signal(0);
+  private thumbStart = signal(0);
+
+  readonly galleryImages = computed(() => {
+    const product = this.store.selectedProduct();
+    if (!product) return [];
+    return product.images?.length ? product.images : [product.imageUrl];
+  });
+
+  readonly selectedImage = computed(
+    () => this.galleryImages()[this.selectedImageIndex()] ?? this.galleryImages()[0]
+  );
+
+  /** The sliding window of visible thumbnails (start index kept for selection) */
+  readonly visibleThumbs = computed(() =>
+    this.galleryImages()
+      .map((src, index) => ({ src, index }))
+      .slice(this.thumbStart(), this.thumbStart() + this.THUMB_WINDOW)
+  );
+
+  /** Arrows only exist when the admin uploaded more images than the window fits */
+  readonly hasThumbOverflow = computed(() => this.galleryImages().length > this.THUMB_WINDOW);
+  readonly canScrollUp = computed(() => this.thumbStart() > 0);
+  readonly canScrollDown = computed(
+    () => this.thumbStart() + this.THUMB_WINDOW < this.galleryImages().length
+  );
+
+  selectImage(index: number): void {
+    this.selectedImageIndex.set(index);
+  }
+
+  scrollThumbs(direction: 1 | -1): void {
+    const max = Math.max(0, this.galleryImages().length - this.THUMB_WINDOW);
+    this.thumbStart.update(start => Math.min(max, Math.max(0, start + direction)));
+  }
+
   /** Sizes available for this product (unique, from variants) */
   readonly availableSizes = computed(() => {
     const product = this.store.selectedProduct();
@@ -90,11 +129,17 @@ export class ProductDetailPage implements OnInit {
   });
 
   ngOnInit(): void {
-    // Reads the :id from the URL — this is what makes ONE route serve ALL products
-    const id = this.route.snapshot.paramMap.get('id');
-    if (id) {
+    // Subscribed (not snapshot): product→product navigation reuses this
+    // component, and every product change must reset gallery + selection
+    this.route.paramMap.subscribe(params => {
+      const id = params.get('id');
+      if (!id) return;
       this.store.loadProduct(id);
-    }
+      this.selectedImageIndex.set(0);
+      this.thumbStart.set(0);
+      this.selectedSize.set(null);
+      this.selectedColor.set(null);
+    });
     // Promos affect the price shown here, so this page needs them loaded too
     this.promotionsStore.loadPromos();
   }

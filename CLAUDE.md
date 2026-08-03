@@ -22,6 +22,7 @@ Full tactical DDD (aggregates, entities, VOs) is reserved for the BACKEND (not b
   Color codes in COLOR_LABELS (product-filtering.ts). Sizes: 8-16 kids, S-XXL adults (SIZE_ORDER).
 - SKU is the Published Language: cart items, orders, inventory all reference variants by SKU.
 - Product vs Variant: customers browse products; stock/cart/orders operate on variants.
+- Product detail gallery: vertical thumbnail rail LEFT of the main image (only when images > 1); window of 4 thumbs with solid-gray rounded caret arrows (up/down) when there are more. Detail page subscribes to paramMap (not snapshot) — product→product navigation resets gallery and size/color selection.
 - Relevance sorting: salesCount desc, tie-break by lower price.
 - Filters derive from actual product data (categories, colors, sizes appear/disappear automatically).
 - Favorites (catalog): NO anonymous favorites — hearting without a session opens the auth modal. In-memory Set in CatalogStore (account-linked persistence comes with the backend). Heart on product cards and detail page, /favoritos page lists them, "Favoritos" card in /cuenta links there with a count.
