@@ -55,6 +55,12 @@
   &:hover { background: var(--rs-red-dark); }
 }
 
+.scan-hint {
+  color: var(--rs-text-muted);
+  font-size: 0.78rem;
+  margin-bottom: 0.8rem;
+}
+
 .scan-error {
   color: #facc15;
   font-size: 0.88rem;

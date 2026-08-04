@@ -7,6 +7,7 @@ import { CartItem } from '../../../domain/cart-item.model';
 import { Order, PaymentMethod } from '../../../domain/order.model';
 import { promoPrice } from '../../../../promotions/domain/promotion-rules';
 import { colorLabel } from '../../../../catalog/domain/product-filtering';
+import { isValidSku } from '../../../../catalog/domain/sku.value-object';
 
 /** The in-store register: the cashier scans SKUs, the ticket fills up, and the
  *  sale confirms on the spot — cash (amount received → change) or instant QR. */
@@ -28,6 +29,10 @@ export class PosPage implements OnInit {
   // Scanning
   readonly skuCode = signal('');
   readonly scanError = signal<string | null>(null);
+  /** When the current entry started — a hardware scanner "types" in a burst */
+  private entryStartedAt = 0;
+  /** Human typing is ~150-300ms per char; scanners run under ~30ms per char */
+  private readonly SCANNER_MS_PER_CHAR = 40;
 
   // The ticket (local to the register — NOT the customer cart)
   readonly ticket = signal<CartItem[]>([]);
@@ -59,8 +64,28 @@ export class PosPage implements OnInit {
     this.promotionsStore.loadPromos();  // in-store sales honor active promos too
   }
 
-  onInput(field: 'skuCode' | 'customerName' | 'cashReceived', event: Event): void {
+  onInput(field: 'customerName' | 'cashReceived', event: Event): void {
     this[field].set((event.target as HTMLInputElement).value);
+  }
+
+  /** Scanner auto-detection: a USB scanner "types" the whole code in a burst
+   *  (<40ms per char). When a COMPLETE valid SKU arrives at that speed, it
+   *  registers itself — no Enter, no button. Manual (human-speed) typing
+   *  still needs Enter or "Agregar". */
+  onScanInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    if (this.skuCode() === '' && value !== '') {
+      this.entryStartedAt = Date.now();
+    }
+    this.skuCode.set(value);
+
+    const code = value.trim().toUpperCase();
+    if (!isValidSku(code)) return;
+
+    const elapsed = Date.now() - this.entryStartedAt;
+    if (elapsed <= value.length * this.SCANNER_MS_PER_CHAR) {
+      this.addBySku();
+    }
   }
 
   /** Enter (or the scanner's automatic Enter) adds the scanned SKU to the ticket */
@@ -102,12 +127,20 @@ export class PosPage implements OnInit {
               },
             ]
       );
-      this.skuCode.set('');
+      this.clearScanBox();
       this.scanError.set(null);
       this.focusScanner();
       return;
     }
     this.scanError.set(`SKU no encontrado: ${code}`);
+  }
+
+  /** Clears signal AND the DOM input: after signal '' → code → '' in one tick,
+   *  Angular sees no net change and won't rewrite the input on its own */
+  private clearScanBox(): void {
+    this.skuCode.set('');
+    const box = this.scanBox()?.nativeElement;
+    if (box) box.value = '';
   }
 
   changeQuantity(sku: string, delta: number): void {
@@ -159,7 +192,7 @@ export class PosPage implements OnInit {
     this.completedSale.set(null);
     this.customerName.set('');
     this.cashReceived.set('');
-    this.skuCode.set('');
+    this.clearScanBox();
     this.scanError.set(null);
     this.focusScanner();
   }

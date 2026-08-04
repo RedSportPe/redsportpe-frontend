@@ -43,11 +43,15 @@
             placeholder="Escanea o escribe el SKU (ej. RS-CAPP-U-M-ROJ) y presiona Enter"
             autofocus
             [value]="skuCode()"
-            (input)="onInput('skuCode', $event)"
+            (input)="onScanInput($event)"
             (keyup.enter)="addBySku()"
           />
           <button type="button" class="scan-btn" (click)="addBySku()">Agregar</button>
         </div>
+
+        <p class="scan-hint">
+          🔫 Con el escáner el producto se registra solo. Escribiendo a mano, presiona Enter o "Agregar".
+        </p>
 
         @if (scanError(); as error) {
           <p class="scan-error">⚠️ {{ error }}</p>
