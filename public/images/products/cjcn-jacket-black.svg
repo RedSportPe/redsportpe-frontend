@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600">
+  <rect width="600" height="600" fill="#171717"/>
+  <rect x="60" y="60" width="480" height="480" rx="24" fill="#2c2c2c"/>
+  <text x="300" y="270" font-family="Arial, sans-serif" font-size="40" font-weight="bold" fill="#fafafa" text-anchor="middle">CJCN JACKET</text>
+  <text x="300" y="320" font-family="Arial, sans-serif" font-size="24" fill="#a3a3a3" text-anchor="middle">Vista frontal · Negro</text>
+  <text x="300" y="500" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#b91c1c" text-anchor="middle" letter-spacing="4">REDSPORT</text>
+</svg>
