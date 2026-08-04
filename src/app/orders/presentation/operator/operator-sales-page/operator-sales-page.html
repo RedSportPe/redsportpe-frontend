@@ -1,0 +1,47 @@
+<section class="operator-sales">
+  <h1>Ventas</h1>
+  <p class="subtitle">
+    {{ sales().length }} venta(s) registrada(s) ·
+    Total cobrado: <strong>{{ totalCollected() | currency:'PEN':'S/ ' }}</strong>
+  </p>
+
+  @if (sales().length === 0) {
+    <p class="state-msg">Aún no registras ventas en esta sesión. Ve a la Caja para empezar.</p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Venta</th>
+            <th>Hora</th>
+            <th>Cliente</th>
+            <th>Items</th>
+            <th>Total</th>
+            <th>Medio de pago</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (sale of sales(); track sale.id) {
+            <tr>
+              <td class="code">{{ sale.code }}</td>
+              <td>{{ sale.paidAt | date:'dd/MM HH:mm' }}</td>
+              <td>{{ sale.shipping.fullName }}</td>
+              <td>{{ itemsCount(sale) }}</td>
+              <td class="total">{{ sale.total | currency:'PEN':'S/ ' }}</td>
+              <td>
+                @if (sale.paymentMethod === 'efectivo') {
+                  💵 Efectivo
+                  @if (sale.cashReceived != null) {
+                    <span class="cash-detail">(recibido {{ sale.cashReceived | currency:'PEN':'S/ ' }})</span>
+                  }
+                } @else {
+                  📱 QR Yape/Plin
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</section>

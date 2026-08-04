@@ -1,5 +1,5 @@
 <section class="checkout">
-  <h1>{{ isOperator() ? 'Venta en tienda' : 'Finalizar compra' }}</h1>
+  <h1>Finalizar compra</h1>
 
   @if (!authStore.isAuthenticated()) {
     <div class="state-msg">
@@ -9,118 +9,10 @@
         <button type="button" class="red-btn" (click)="authStore.openModal('register')">Registrarse</button>
       </div>
     </div>
-  } @else if (completedSale(); as sale) {
-    <!-- POS: sale registered, ready for the next customer -->
-    <div class="pos-success">
-      <div class="check">✓</div>
-      <h2>¡Venta registrada!</h2>
-      <p class="sale-code">Venta <strong>{{ sale.code }}</strong> · {{ sale.shipping.fullName }}</p>
-
-      <div class="detail-card">
-        <div class="row">
-          <span>Total</span>
-          <span>{{ sale.total | currency:'PEN':'S/ ' }}</span>
-        </div>
-        <div class="row">
-          <span>Medio de pago</span>
-          <span>{{ sale.paymentMethod === 'efectivo' ? 'Efectivo' : 'QR Yape/Plin' }}</span>
-        </div>
-        @if (sale.paymentMethod === 'efectivo') {
-          <div class="row">
-            <span>Recibido</span>
-            <span>{{ sale.cashReceived | currency:'PEN':'S/ ' }}</span>
-          </div>
-          <div class="row vuelto">
-            <span>Vuelto</span>
-            <span>{{ (sale.cashReceived ?? 0) - sale.total | currency:'PEN':'S/ ' }}</span>
-          </div>
-        }
-      </div>
-
-      <button type="button" class="red-btn" (click)="newSale()">Nueva venta</button>
-    </div>
   } @else if (cartStore.isEmpty()) {
     <div class="state-msg">
-      <p>{{ isOperator() ? 'No hay productos registrados — escanea/agrega productos desde el catálogo.' : 'Tu carrito está vacío — no hay nada que comprar todavía.' }}</p>
+      <p>Tu carrito está vacío — no hay nada que comprar todavía.</p>
       <a routerLink="/catalogo" class="red-btn">Ir al catálogo</a>
-    </div>
-  } @else if (isOperator()) {
-    <!-- Operator: no delivery data, direct payment (cash or instant QR) -->
-    <div class="checkout-body">
-      <div class="form-column" [class.rs-shake]="posBlocked()">
-        <h2>1. Cliente</h2>
-        <div class="fields">
-          <label class="field">
-            <span>Nombre del cliente (opcional, para el ticket)</span>
-            <input type="text" placeholder="Cliente en tienda" [value]="customerName()" (input)="onPosInput('customerName', $event)" />
-          </label>
-        </div>
-
-        <h2>2. Medio de pago</h2>
-        <div class="method-options">
-          <button
-            type="button"
-            class="method"
-            [class.selected]="posPayment() === 'efectivo'"
-            (click)="selectPosPayment('efectivo')"
-          >
-            <span class="method-icon">💵</span>
-            <span class="method-name">Efectivo</span>
-            <span class="method-desc">Ingresa el monto recibido</span>
-          </button>
-          <button
-            type="button"
-            class="method"
-            [class.selected]="posPayment() === 'qr'"
-            (click)="selectPosPayment('qr')"
-          >
-            <span class="method-icon">📱</span>
-            <span class="method-name">QR Yape/Plin</span>
-            <span class="method-desc">Confirmación inmediata</span>
-          </button>
-        </div>
-
-        @if (posPayment() === 'efectivo') {
-          <div class="fields cash-fields">
-            <label class="field">
-              <span>Monto recibido (S/)</span>
-              <input type="number" min="0" step="0.10" placeholder="0.00" [value]="cashReceived()" (input)="onPosInput('cashReceived', $event)" />
-            </label>
-            @if (cashReceived().trim() !== '') {
-              @if (cashValid()) {
-                <p class="change-line ok">Vuelto: <strong>{{ change() | currency:'PEN':'S/ ' }}</strong></p>
-              } @else {
-                <p class="change-line short">Faltan {{ -change() | currency:'PEN':'S/ ' }} para cubrir el total.</p>
-              }
-            }
-          </div>
-        } @else {
-          <p class="estimate">📱 El cliente escanea el QR del mostrador y tú verificas el pago en el momento — la venta se confirma de inmediato.</p>
-        }
-
-        @if (posBlocked()) {
-          <p class="pos-warn">Ingresa el monto recibido antes de confirmar la venta.</p>
-        }
-      </div>
-
-      <aside class="summary">
-        <h2>Resumen</h2>
-        @for (item of cartStore.items(); track item.sku) {
-          <div class="summary-item">
-            <span>{{ item.name }} × {{ item.quantity }}</span>
-            <span>{{ item.unitPrice * item.quantity | currency:'PEN':'S/ ' }}</span>
-          </div>
-        }
-        <div class="summary-row total">
-          <span>Total a cobrar</span>
-          <span>{{ cartStore.totalAmount() | currency:'PEN':'S/ ' }}</span>
-        </div>
-        <p class="points-note">🏬 Venta en tienda: entrega inmediata, no acumula Puntos RedSport.</p>
-        <button type="button" class="pay-btn" [class.rs-pulse]="posBlocked()" (click)="confirmPosSale()">
-          Confirmar venta
-        </button>
-        <a routerLink="/carrito" class="back-link">← Volver al carrito</a>
-      </aside>
     </div>
   } @else {
     <div class="checkout-body">

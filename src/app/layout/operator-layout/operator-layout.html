@@ -1,0 +1,21 @@
+<div class="operator-shell">
+  <aside class="sidebar">
+    <div class="sidebar-logo">RedSport <span>Caja</span></div>
+
+    <nav class="sidebar-nav">
+      <a routerLink="/operador/caja" routerLinkActive="active">🛒 Caja</a>
+      <a routerLink="/operador/ventas" routerLinkActive="active">🧾 Ventas</a>
+    </nav>
+
+    <footer class="sidebar-footer">
+      @if (authStore.currentUser(); as user) {
+        <p class="operator-user">👤 {{ user.name }}</p>
+      }
+      <a routerLink="/" class="back-store">← Volver a la tienda</a>
+    </footer>
+  </aside>
+
+  <main class="operator-content">
+    <router-outlet />
+  </main>
+</div>

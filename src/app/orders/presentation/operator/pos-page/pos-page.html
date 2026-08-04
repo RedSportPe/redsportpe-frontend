@@ -1,0 +1,143 @@
+<section class="pos">
+  @if (completedSale(); as sale) {
+    <!-- Sale registered: hand the bag (and the change) to the customer -->
+    <div class="pos-success">
+      <div class="check">✓</div>
+      <h1>¡Venta registrada!</h1>
+      <p class="sale-code">Venta <strong>{{ sale.code }}</strong> · {{ sale.shipping.fullName }}</p>
+
+      <div class="detail-card">
+        <div class="row">
+          <span>Total</span>
+          <span>{{ sale.total | currency:'PEN':'S/ ' }}</span>
+        </div>
+        <div class="row">
+          <span>Medio de pago</span>
+          <span>{{ sale.paymentMethod === 'efectivo' ? 'Efectivo' : 'QR Yape/Plin' }}</span>
+        </div>
+        @if (sale.paymentMethod === 'efectivo') {
+          <div class="row">
+            <span>Recibido</span>
+            <span>{{ sale.cashReceived | currency:'PEN':'S/ ' }}</span>
+          </div>
+          <div class="row vuelto">
+            <span>Vuelto</span>
+            <span>{{ (sale.cashReceived ?? 0) - sale.total | currency:'PEN':'S/ ' }}</span>
+          </div>
+        }
+      </div>
+
+      <button type="button" class="red-btn" (click)="newSale()">Nueva venta</button>
+    </div>
+  } @else {
+    <h1>Caja</h1>
+
+    <div class="pos-body">
+      <!-- Left: scanner + ticket -->
+      <div class="ticket-column">
+        <div class="scan-row">
+          <input
+            #scanBox
+            type="text"
+            class="scan-input"
+            placeholder="Escanea o escribe el SKU (ej. RS-CAPP-U-M-ROJ) y presiona Enter"
+            autofocus
+            [value]="skuCode()"
+            (input)="onInput('skuCode', $event)"
+            (keyup.enter)="addBySku()"
+          />
+          <button type="button" class="scan-btn" (click)="addBySku()">Agregar</button>
+        </div>
+
+        @if (scanError(); as error) {
+          <p class="scan-error">⚠️ {{ error }}</p>
+        }
+
+        @if (ticket().length === 0) {
+          <p class="empty-ticket">El ticket está vacío — escanea el primer producto.</p>
+        } @else {
+          <div class="ticket-lines">
+            @for (line of ticket(); track line.sku) {
+              <article class="line">
+                <img [src]="line.imageUrl" [alt]="line.name" />
+                <div class="line-info">
+                  <p class="line-name">{{ line.name }}</p>
+                  <p class="line-variant">Talla {{ line.size }} · {{ colorLabel(line.color) }} · {{ line.sku }}</p>
+                </div>
+                <label class="qty">
+                  <button type="button" (click)="changeQuantity(line.sku, -1)">−</button>
+                  <span>{{ line.quantity }}</span>
+                  <button type="button" (click)="changeQuantity(line.sku, 1)">+</button>
+                </label>
+                <p class="line-total">{{ line.unitPrice * line.quantity | currency:'PEN':'S/ ' }}</p>
+                <button type="button" class="remove" (click)="removeLine(line.sku)" aria-label="Quitar del ticket">✕</button>
+              </article>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Right: the register (totals + payment) -->
+      <aside class="register" [class.rs-shake]="posBlocked()">
+        <h2>Cobro</h2>
+
+        <div class="total-row">
+          <span>{{ itemsCount() }} producto(s)</span>
+          <span class="grand-total">{{ total() | currency:'PEN':'S/ ' }}</span>
+        </div>
+
+        <label class="field">
+          <span>Cliente (opcional, para el ticket)</span>
+          <input type="text" placeholder="Cliente en tienda" [value]="customerName()" (input)="onInput('customerName', $event)" />
+        </label>
+
+        <div class="pay-toggle">
+          <button
+            type="button"
+            [class.selected]="posPayment() === 'efectivo'"
+            (click)="selectPayment('efectivo')"
+          >
+            💵 Efectivo
+          </button>
+          <button
+            type="button"
+            [class.selected]="posPayment() === 'qr'"
+            (click)="selectPayment('qr')"
+          >
+            📱 QR
+          </button>
+        </div>
+
+        @if (posPayment() === 'efectivo') {
+          <label class="field">
+            <span>Paga con (S/)</span>
+            <input type="number" min="0" step="0.10" placeholder="0.00" [value]="cashReceived()" (input)="onInput('cashReceived', $event)" />
+          </label>
+          @if (cashReceived().trim() !== '') {
+            @if (cashValid()) {
+              <p class="change-line ok">Vuelto: <strong>{{ change() | currency:'PEN':'S/ ' }}</strong></p>
+            } @else {
+              <p class="change-line short">Faltan {{ -change() | currency:'PEN':'S/ ' }} para cubrir el total.</p>
+            }
+          }
+        } @else {
+          <p class="qr-note">📱 El cliente escanea el QR del mostrador; verificas el Yape/Plin y confirmas al instante.</p>
+        }
+
+        @if (posBlocked()) {
+          <p class="pos-warn">Ingresa con cuánto paga el cliente antes de confirmar.</p>
+        }
+
+        <button
+          type="button"
+          class="confirm-btn"
+          [class.rs-pulse]="posBlocked()"
+          [disabled]="ticket().length === 0"
+          (click)="confirmSale()"
+        >
+          Confirmar venta
+        </button>
+      </aside>
+    </div>
+  }
+</section>

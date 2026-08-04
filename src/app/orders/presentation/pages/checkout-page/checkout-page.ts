@@ -4,7 +4,7 @@ import { CurrencyPipe } from '@angular/common';
 import { CartStore } from '../../../application/cart.store';
 import { OrdersStore } from '../../../application/orders.store';
 import { AuthStore } from '../../../../identity/application/auth.store';
-import { Order, DeliveryMethod, PaymentMethod, DELIVERY_METHOD_LABELS } from '../../../domain/order.model';
+import { DeliveryMethod, DELIVERY_METHOD_LABELS } from '../../../domain/order.model';
 import { PAYMENT_CUTOFF_HOUR, isBeforeCutoff } from '../../../domain/delivery-rules';
 
 @Component({
@@ -21,64 +21,6 @@ export class CheckoutPage {
 
   readonly methodLabels = DELIVERY_METHOD_LABELS;
   readonly cutoffHour = PAYMENT_CUTOFF_HOUR;
-
-  // ===== Operator mode (in-store point of sale) =====
-  /** The cashier shops like a customer but confirms the sale right here */
-  readonly isOperator = computed(() => this.authStore.currentUser()?.role === 'operator');
-  readonly posPayment = signal<PaymentMethod>('efectivo');
-  readonly customerName = signal('');
-  readonly cashReceived = signal('');
-  /** Blocked-confirm feedback: the sale box shakes and the button pulses */
-  readonly posBlocked = signal(false);
-  readonly completedSale = signal<Order | null>(null);
-
-  readonly cashAmount = computed(() => Number(this.cashReceived()) || 0);
-  readonly change = computed(() =>
-    Math.round((this.cashAmount() - this.cartStore.totalAmount()) * 100) / 100
-  );
-  readonly cashValid = computed(
-    () => this.cashReceived().trim() !== '' && this.cashAmount() >= this.cartStore.totalAmount()
-  );
-
-  onPosInput(field: 'customerName' | 'cashReceived', event: Event): void {
-    this[field].set((event.target as HTMLInputElement).value);
-  }
-
-  selectPosPayment(method: PaymentMethod): void {
-    this.posPayment.set(method);
-  }
-
-  confirmPosSale(): void {
-    // Business rule: cash needs the received amount (>= total) BEFORE confirming
-    if (this.posPayment() === 'efectivo' && !this.cashValid()) {
-      if (!this.posBlocked()) {
-        this.posBlocked.set(true);
-        setTimeout(() => this.posBlocked.set(false), 1200);
-      }
-      return;
-    }
-    const order = this.ordersStore.registerPosSale(
-      this.cartStore.items(),
-      this.cartStore.totalAmount(),
-      this.customerName().trim(),
-      {
-        method: this.posPayment(),
-        cashReceived: this.posPayment() === 'efectivo' ? this.cashAmount() : undefined,
-      }
-    );
-    if (order) {
-      this.completedSale.set(order);
-      this.cartStore.clearCart();
-    }
-  }
-
-  /** Back to scanning: ready for the next customer in line */
-  newSale(): void {
-    this.completedSale.set(null);
-    this.customerName.set('');
-    this.cashReceived.set('');
-    this.router.navigate(['/catalogo']);
-  }
 
   readonly method = signal<DeliveryMethod>('motorizado');
   // Prefilled from the profile — saved data from a previous checkout (or its edit in Mi cuenta)

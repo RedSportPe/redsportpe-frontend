@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminGuard } from './identity/application/admin.guard';
+import { operatorGuard } from './identity/application/operator.guard';
 import { unsavedChangesGuard } from './layout/unsaved-changes.guard';
 
 export const routes: Routes = [
@@ -36,6 +37,32 @@ export const routes: Routes = [
       },
       {
         // 404 inside the panel: unknown /admin URLs keep the sidebar
+        path: '**',
+        loadComponent: () =>
+          import('./layout/not-found-page/not-found-page').then(m => m.NotFoundPage),
+      },
+    ],
+  },
+  {
+    // In-store POS panel: operator only. Declared before the store ('' prefix
+    // match) for the same route-order reason as /admin.
+    path: 'operador',
+    canActivate: [operatorGuard],
+    loadComponent: () =>
+      import('./layout/operator-layout/operator-layout').then(m => m.OperatorLayout),
+    children: [
+      { path: '', pathMatch: 'full', redirectTo: 'caja' },
+      {
+        path: 'caja',
+        loadComponent: () =>
+          import('./orders/presentation/operator/pos-page/pos-page').then(m => m.PosPage),
+      },
+      {
+        path: 'ventas',
+        loadComponent: () =>
+          import('./orders/presentation/operator/operator-sales-page/operator-sales-page').then(m => m.OperatorSalesPage),
+      },
+      {
         path: '**',
         loadComponent: () =>
           import('./layout/not-found-page/not-found-page').then(m => m.NotFoundPage),

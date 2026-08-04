@@ -28,6 +28,9 @@
           @if (user.role === 'admin') {
             <a routerLink="/admin" class="admin-link">⚙ Panel de administración →</a>
           }
+          @if (user.role === 'operator') {
+            <a routerLink="/operador" class="admin-link">🛒 Caja de tienda →</a>
+          }
         </div>
       </article>
 
