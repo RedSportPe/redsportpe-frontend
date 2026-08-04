@@ -1,11 +1,14 @@
 import { CartItem } from './cart-item.model';
 
-export type DeliveryMethod = 'motorizado' | 'shalom';
+export type DeliveryMethod = 'motorizado' | 'shalom' | 'tienda';
 
 export const DELIVERY_METHOD_LABELS: Record<DeliveryMethod, string> = {
   motorizado: 'Motorizado (delivery)',
   shalom: 'Shalom (recojo en agencia)',
+  tienda: 'Venta en tienda',
 };
+
+export type PaymentMethod = 'qr' | 'efectivo';
 
 export interface ShippingDetails {
   fullName: string;
@@ -31,4 +34,8 @@ export interface Order {
   paidAt?: string;        // ISO — absent while pending payment
   deliveryDate?: string;  // ISO date — motorizado: promised delivery; shalom: dispatch day
   trackingStep: number;   // 0..3 index into TRACKING_STEPS[method]
+  /** How it was paid — set when payment confirms (qr online; efectivo only in-store) */
+  paymentMethod?: PaymentMethod;
+  /** POS cash sales: amount handed by the customer (change = cashReceived - total) */
+  cashReceived?: number;
 }

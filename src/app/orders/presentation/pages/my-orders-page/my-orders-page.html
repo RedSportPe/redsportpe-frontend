@@ -31,9 +31,11 @@
             @if (order.method === 'motorizado') {
               🛵 Entrega estimada: <strong>{{ order.deliveryDate | date:'dd/MM/yyyy' }}</strong>
               — {{ order.shipping.address }}, {{ order.shipping.district }}
-            } @else {
+            } @else if (order.method === 'shalom') {
               📦 Se deja en Shalom el <strong>{{ order.deliveryDate | date:'dd/MM/yyyy' }}</strong>
               — recojo en {{ order.shipping.agency }}
+            } @else {
+              🏬 Venta en tienda — entregado el <strong>{{ order.deliveryDate | date:'dd/MM/yyyy' }}</strong>
             }
           </p>
 
@@ -54,7 +56,7 @@
 
             @if (isDelivered(order)) {
               <p class="delivered">
-                ✓ {{ order.method === 'motorizado' ? 'Entregado' : 'En destino — listo para recoger' }}
+                ✓ {{ order.method === 'shalom' ? 'En destino — listo para recoger' : 'Entregado' }}
               </p>
             } @else {
               <button type="button" class="consult-btn" (click)="ordersStore.refreshTracking(order.id)">
@@ -85,7 +87,10 @@
                 </div>
                 <div class="detail-row">
                   <span>Medio de pago</span>
-                  <span>QR Yape/Plin — {{ order.paidAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                  <span>
+                    {{ order.paymentMethod === 'efectivo' ? 'Efectivo' : 'QR Yape/Plin' }}
+                    — {{ order.paidAt | date:'dd/MM/yyyy HH:mm' }}
+                  </span>
                 </div>
               </div>
             </div>

@@ -22,6 +22,19 @@ export class AuthRepository {
       },
       password: 'admin123',
     }],
+    // Seeded store operator (demo) — the in-store cashier
+    ['operadora@redsport.pe', {
+      user: {
+        id: 'user-operator-demo',
+        name: 'Operadora Tienda',
+        email: 'operadora@redsport.pe',
+        provider: 'email',
+        role: 'operator',
+        points: 0,
+        createdAt: '2026-02-10T12:00:00.000Z',
+      },
+      password: 'operador123',
+    }],
   ]);
 
   register(name: string, email: string, password: string): Observable<User> {

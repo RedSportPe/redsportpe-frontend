@@ -1,9 +1,11 @@
 import { DeliveryMethod, Order } from './order.model';
 
-/** The 4-dot timeline each method walks, left to right. */
+/** The 4-dot timeline each method walks, left to right.
+ *  In-store sales are born at the last step: the customer walks out with the bag. */
 export const TRACKING_STEPS: Record<DeliveryMethod, string[]> = {
   motorizado: ['Preparando', 'Despachado', 'En camino', 'Entregado'],
   shalom: ['Almacén', 'En agencia', 'En tránsito', 'En destino'],
+  tienda: ['Registrado', 'Pagado', 'Empacado', 'Entregado'],
 };
 
 export const FINAL_TRACKING_STEP = 3;

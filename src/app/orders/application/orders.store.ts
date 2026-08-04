@@ -1,8 +1,8 @@
 import { Injectable, inject, signal, computed, effect } from '@angular/core';
 import { CartItem } from '../domain/cart-item.model';
-import { Order, DeliveryMethod, ShippingDetails } from '../domain/order.model';
+import { Order, DeliveryMethod, PaymentMethod, ShippingDetails } from '../domain/order.model';
 import { qrExpiry, motorizadoDeliveryDate, shalomDispatchDate } from '../domain/delivery-rules';
-import { nextTrackingStep } from '../domain/order-tracking';
+import { nextTrackingStep, FINAL_TRACKING_STEP } from '../domain/order-tracking';
 import { AuthStore } from '../../identity/application/auth.store';
 import { pointsForPurchase } from '../../identity/domain/redsport-points';
 
@@ -98,11 +98,50 @@ export class OrdersStore {
     this.update(
       this._orders().map(o =>
         o.id === orderId
-          ? { ...o, paidAt: paidAt.toISOString(), deliveryDate: deliveryDate.toISOString() }
+          ? {
+              ...o,
+              paidAt: paidAt.toISOString(),
+              deliveryDate: deliveryDate.toISOString(),
+              paymentMethod: 'qr' as PaymentMethod,
+            }
           : o
       )
     );
     this.authStore.creditPoints(pointsForPurchase(order.total));
+  }
+
+  /** Command (operator only): in-store sale. Born PAID and DELIVERED — the
+   *  customer pays at the counter (cash or instant QR) and leaves with the bag.
+   *  NO RedSport points: they belong to the buyer, and the buyer isn't the
+   *  logged-in operator (account-linked in-store points come with the backend). */
+  registerPosSale(
+    items: CartItem[],
+    total: number,
+    customerName: string,
+    payment: { method: PaymentMethod; cashReceived?: number }
+  ): Order | undefined {
+    const user = this.authStore.currentUser();
+    if (!user || user.role !== 'operator' || items.length === 0) return undefined;
+
+    const now = new Date();
+    const order: Order = {
+      id: `order-${now.getTime()}`,
+      code: `RS-${String(now.getTime()).slice(-4)}`,
+      userId: user.id,
+      items,
+      total,
+      method: 'tienda',
+      shipping: { fullName: customerName || 'Cliente en tienda', phone: '—' },
+      createdAt: now.toISOString(),
+      qrExpiresAt: now.toISOString(),   // never pending: paid on the spot
+      paidAt: now.toISOString(),
+      deliveryDate: now.toISOString(),
+      trackingStep: FINAL_TRACKING_STEP,
+      paymentMethod: payment.method,
+      cashReceived: payment.cashReceived,
+    };
+    this.update([order, ...this._orders()]);
+    return order;
   }
 
   /** Command: remove an unpaid order (the customer gave up on it) */

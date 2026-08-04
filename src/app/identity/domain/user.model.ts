@@ -2,9 +2,11 @@ import { DeliveryInfo } from './delivery-info.model';
 
 export type AuthProvider = 'email' | 'google';
 
-/** Business rule: only 'admin' users can enter /admin/*. Roles are assigned
- *  internally (never self-service); the backend will be the real authority. */
-export type UserRole = 'customer' | 'admin';
+/** Business rule: only 'admin' users can enter /admin/*. The 'operator' is the
+ *  in-store cashier: shops like a customer but confirms sales directly (cash or
+ *  instant QR). Roles are assigned internally (never self-service); the backend
+ *  will be the real authority. */
+export type UserRole = 'customer' | 'admin' | 'operator';
 
 export interface User {
   id: string;
