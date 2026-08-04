@@ -86,8 +86,14 @@
   margin-top: 0.8rem;
 }
 
-.create-btn {
+.create-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
   margin-top: 1.2rem;
+}
+
+.create-btn {
   background: var(--rs-red);
   color: #fff;
   border: none;
@@ -103,6 +109,26 @@
     color: var(--rs-text-muted);
     cursor: not-allowed;
   }
+}
+
+.clear-btn {
+  background: transparent;
+  border: 2px solid var(--rs-text-muted);
+  color: var(--rs-text);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  transition: border-color 0.2s, color 0.2s;
+
+  &:hover { border-color: var(--rs-red); color: var(--rs-red); }
+}
+
+.blocked-note {
+  color: #facc15;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.8rem;
 }
 
 // ===== Promos table =====

@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { unsavedChangesGuard } from '../layout/unsaved-changes.guard';
 
 /** Admin side of the catalog context — mounted at /admin/productos */
 export const CATALOG_ADMIN_ROUTES: Routes = [
@@ -9,11 +10,13 @@ export const CATALOG_ADMIN_ROUTES: Routes = [
   },
   {
     path: 'nuevo',
+    canDeactivate: [unsavedChangesGuard],
     loadComponent: () =>
       import('./presentation/admin/admin-product-form-page/admin-product-form-page').then(m => m.AdminProductFormPage),
   },
   {
     path: ':id',
+    canDeactivate: [unsavedChangesGuard],
     loadComponent: () =>
       import('./presentation/admin/admin-product-form-page/admin-product-form-page').then(m => m.AdminProductFormPage),
   },

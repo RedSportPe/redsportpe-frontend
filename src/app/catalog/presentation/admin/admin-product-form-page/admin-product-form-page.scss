@@ -276,11 +276,21 @@
     }
   }
 
-  .cancel-link {
-    color: var(--rs-text-muted);
-    font-size: 0.9rem;
+  // A real button with a visible outline — the explicit "discard and leave"
+  .cancel-btn {
+    background: transparent;
+    border: 2px solid var(--rs-text-muted);
+    color: var(--rs-text);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.65rem 1.5rem;
+    border-radius: 8px;
+    transition: border-color 0.2s, color 0.2s;
 
-    &:hover { color: var(--rs-red); }
+    &:hover {
+      border-color: var(--rs-red);
+      color: var(--rs-red);
+    }
   }
 }
 

@@ -4,6 +4,7 @@ import { CatalogStore } from '../../../application/catalog.store';
 import { Variant } from '../../../domain/product.model';
 import { buildSku, isValidSku } from '../../../domain/sku.value-object';
 import { COLOR_LABELS, SIZE_ORDER, sizeLabel } from '../../../domain/product-filtering';
+import { UnsavedChangesAware } from '../../../../layout/unsaved-changes.guard';
 
 /** One editable variant row; the SKU derives from code + gender + size + color */
 interface VariantRow {
@@ -27,10 +28,15 @@ const VARIANT_GENDERS: [Variant['gender'], string][] = [
   templateUrl: './admin-product-form-page.html',
   styleUrl: './admin-product-form-page.scss',
 })
-export class AdminProductFormPage implements OnInit {
+export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
   readonly store = inject(CatalogStore);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+
+  /** Blocked-exit feedback: the form shakes and the buttons pulse */
+  readonly blocked = signal(false);
+  private baseline = '';
+  private leaving = false;
 
   readonly genderOptions = VARIANT_GENDERS;
   readonly sizeOptions = SIZE_ORDER;
@@ -59,7 +65,10 @@ export class AdminProductFormPage implements OnInit {
   ngOnInit(): void {
     this.store.loadCatalog();
     const id = this.route.snapshot.paramMap.get('id');
-    if (!id) return;
+    if (!id) {
+      this.baseline = this.snapshot();
+      return;
+    }
 
     const product = this.store.allProducts().find(p => p.id === id);
     if (!product) {
@@ -68,6 +77,39 @@ export class AdminProductFormPage implements OnInit {
       return;
     }
     this.fillForm(id);
+  }
+
+  // ===== Unsaved-changes contract (blocks leaving mid-edit) =====
+
+  /** Serialized form state — dirty means it differs from the baseline */
+  private snapshot(): string {
+    return JSON.stringify({
+      name: this.name(),
+      description: this.description(),
+      category: this.category(),
+      price: this.price(),
+      images: this.images(),
+      code: this.productCode(),
+      published: this.published(),
+      featured: this.featured(),
+      variants: this.variants(),
+    });
+  }
+
+  hasUnsavedChanges(): boolean {
+    return !this.leaving && !this.notFound() && this.snapshot() !== this.baseline;
+  }
+
+  notifyBlockedNavigation(): void {
+    if (this.blocked()) return; // let the current animation finish
+    this.blocked.set(true);
+    setTimeout(() => this.blocked.set(false), 1200);
+  }
+
+  /** The explicit way out: cancelling discards the changes on purpose */
+  cancel(): void {
+    this.leaving = true;
+    this.router.navigate(['/admin/productos']);
   }
 
   private loadForEdit(id: string): void {
@@ -100,6 +142,7 @@ export class AdminProductFormPage implements OnInit {
         stock: v.totalStock,
       }))
     );
+    this.baseline = this.snapshot();
   }
 
   /** Live SKU preview per row ('—' while the parts are incomplete/invalid) */
@@ -213,6 +256,7 @@ export class AdminProductFormPage implements OnInit {
     } else {
       this.store.createProduct(data);
     }
+    this.leaving = true;   // saved: the guard lets us out
     this.router.navigate(['/admin/productos']);
   }
 }

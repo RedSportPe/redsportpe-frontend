@@ -6,7 +6,7 @@
   } @else {
     <h1>{{ editingId() ? 'Editar producto' : 'Nuevo producto' }}</h1>
 
-    <div class="form-layout">
+    <div class="form-layout" [class.rs-shake]="blocked()">
       <!-- Left column: product data + variants -->
       <div class="form-main">
         <div class="form-grid">
@@ -92,10 +92,12 @@
         }
 
         <div class="form-actions">
-          <button type="button" class="save-btn" [disabled]="!canSave()" (click)="save()">
+          <button type="button" class="save-btn" [class.rs-pulse]="blocked()" [disabled]="!canSave()" (click)="save()">
             {{ editingId() ? 'Guardar cambios' : 'Crear producto' }}
           </button>
-          <a routerLink="/admin/productos" class="cancel-link">Cancelar</a>
+          <button type="button" class="cancel-btn" [class.rs-pulse]="blocked()" (click)="cancel()">
+            Cancelar
+          </button>
         </div>
       </div>
 

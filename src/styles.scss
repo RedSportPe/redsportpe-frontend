@@ -28,3 +28,23 @@ h1, h2, h3 {
 a { color: inherit; text-decoration: none; }
 button { font-family: var(--font-body); cursor: pointer; }
 img { display: block; max-width: 100%; }
+
+// ===== Blocked-navigation feedback (admin unsaved changes) =====
+// .rs-shake: the container trembles right-to-left; .rs-pulse: buttons throb.
+@keyframes rs-shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-9px); }
+  30% { transform: translateX(8px); }
+  45% { transform: translateX(-6px); }
+  60% { transform: translateX(5px); }
+  75% { transform: translateX(-3px); }
+  90% { transform: translateX(2px); }
+}
+
+@keyframes rs-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(185, 28, 28, 0); }
+  50% { transform: scale(1.07); box-shadow: 0 0 0 5px rgba(185, 28, 28, 0.35); }
+}
+
+.rs-shake { animation: rs-shake 0.5s ease; }
+.rs-pulse { animation: rs-pulse 0.55s ease 2; }

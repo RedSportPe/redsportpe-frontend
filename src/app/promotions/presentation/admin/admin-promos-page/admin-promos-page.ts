@@ -10,6 +10,7 @@ import {
   discountPercent,
   remainingPromoUnits,
 } from '../../../domain/promotion-rules';
+import { UnsavedChangesAware } from '../../../../layout/unsaved-changes.guard';
 
 @Component({
   selector: 'app-admin-promos-page',
@@ -17,9 +18,28 @@ import {
   templateUrl: './admin-promos-page.html',
   styleUrl: './admin-promos-page.scss',
 })
-export class AdminPromosPage implements OnInit {
+export class AdminPromosPage implements OnInit, UnsavedChangesAware {
   readonly store = inject(PromotionsStore);
   readonly catalogStore = inject(CatalogStore);
+
+  /** Blocked-exit feedback: the create card shakes and its button pulses */
+  readonly blocked = signal(false);
+
+  /** Any half-filled field counts as work in progress */
+  hasUnsavedChanges(): boolean {
+    return (
+      this.productId() !== '' ||
+      this.discountAmount() > 0 ||
+      this.endsAt() !== '' ||
+      this.maxUnits().trim() !== ''
+    );
+  }
+
+  notifyBlockedNavigation(): void {
+    if (this.blocked()) return;
+    this.blocked.set(true);
+    setTimeout(() => this.blocked.set(false), 1200);
+  }
 
   readonly promoPrice = promoPrice;
   readonly discountPercent = discountPercent;
@@ -82,6 +102,14 @@ export class AdminPromosPage implements OnInit {
 
   onMaxUnits(event: Event): void {
     this.maxUnits.set((event.target as HTMLInputElement).value);
+  }
+
+  /** Explicit way out: empties the form so the guard lets you leave */
+  clearForm(): void {
+    this.productId.set('');
+    this.discountAmount.set(0);
+    this.endsAt.set('');
+    this.maxUnits.set('');
   }
 
   create(): void {

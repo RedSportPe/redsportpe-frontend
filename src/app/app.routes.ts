@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { adminGuard } from './identity/application/admin.guard';
+import { unsavedChangesGuard } from './layout/unsaved-changes.guard';
 
 export const routes: Routes = [
   {
@@ -18,6 +19,7 @@ export const routes: Routes = [
       },
       {
         path: 'inventario',
+        canDeactivate: [unsavedChangesGuard],
         loadComponent: () =>
           import('./catalog/presentation/admin/admin-inventory-page/admin-inventory-page').then(m => m.AdminInventoryPage),
       },
@@ -28,6 +30,7 @@ export const routes: Routes = [
       },
       {
         path: 'descuentos',
+        canDeactivate: [unsavedChangesGuard],
         loadComponent: () =>
           import('./promotions/presentation/admin/admin-promos-page/admin-promos-page').then(m => m.AdminPromosPage),
       },

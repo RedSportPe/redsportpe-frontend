@@ -1,4 +1,4 @@
-<section class="admin-inventory">
+<section class="admin-inventory" [class.rs-shake]="blocked()">
   <header class="page-header">
     <div>
       <h1>Inventario</h1>
@@ -22,8 +22,8 @@
     <div class="save-bar">
       <span>✏️ {{ pendingCount() }} cambio(s) sin guardar</span>
       <div class="save-actions">
-        <button type="button" class="apply" (click)="applyChanges()">Guardar cambios</button>
-        <button type="button" class="discard" (click)="discardChanges()">Descartar</button>
+        <button type="button" class="apply" [class.rs-pulse]="blocked()" (click)="applyChanges()">Guardar cambios</button>
+        <button type="button" class="discard" [class.rs-pulse]="blocked()" (click)="discardChanges()">Descartar</button>
       </div>
     </div>
   }

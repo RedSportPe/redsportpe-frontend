@@ -1,6 +1,7 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CatalogStore } from '../../../application/catalog.store';
 import { colorLabel, sizeLabel } from '../../../domain/product-filtering';
+import { UnsavedChangesAware } from '../../../../layout/unsaved-changes.guard';
 
 /** Flat inventory row: one variant = one SKU = one stock number */
 interface StockRow {
@@ -20,12 +21,25 @@ interface StockRow {
   templateUrl: './admin-inventory-page.html',
   styleUrl: './admin-inventory-page.scss',
 })
-export class AdminInventoryPage implements OnInit {
+export class AdminInventoryPage implements OnInit, UnsavedChangesAware {
   readonly store = inject(CatalogStore);
   readonly colorLabel = colorLabel;
   readonly sizeLabel = sizeLabel;
 
   readonly search = signal('');
+
+  /** Blocked-exit feedback: the page shakes and Guardar/Descartar pulse */
+  readonly blocked = signal(false);
+
+  hasUnsavedChanges(): boolean {
+    return this.pendingCount() > 0;
+  }
+
+  notifyBlockedNavigation(): void {
+    if (this.blocked()) return;
+    this.blocked.set(true);
+    setTimeout(() => this.blocked.set(false), 1200);
+  }
 
   /** DRAFT edits (sku → new stock). Nothing touches the catalog until
    *  "Guardar cambios" — a typo must never alter live stock. */
