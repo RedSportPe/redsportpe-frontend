@@ -48,3 +48,28 @@ img { display: block; max-width: 100%; }
 
 .rs-shake { animation: rs-shake 0.5s ease; }
 .rs-pulse { animation: rs-pulse 0.55s ease 2; }
+
+// ===== Thermal receipt printing (operator POS) =====
+// Prints ONLY the element with id="receipt-print"; everything else is hidden.
+// Default width is 80mm — for a 58mm Epson, change --receipt-width below.
+#receipt-print {
+  // Always off-screen on the live page; @media print repositions it
+  position: fixed;
+  left: -10000px;
+  top: 0;
+}
+
+@media print {
+  body * { visibility: hidden; }
+
+  #receipt-print, #receipt-print * { visibility: visible; }
+
+  #receipt-print {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: var(--receipt-width, 80mm);
+  }
+
+  @page { margin: 0; }
+}

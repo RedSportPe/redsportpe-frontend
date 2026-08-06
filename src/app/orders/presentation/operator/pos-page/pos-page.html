@@ -27,7 +27,38 @@
         }
       </div>
 
-      <button type="button" class="red-btn" (click)="newSale()">Nueva venta</button>
+      <div class="pos-success-actions">
+        <button type="button" class="red-btn" (click)="newSale()">Nueva venta</button>
+        <button type="button" class="ghost-btn" (click)="printReceiptAgain()">🖨️ Reimprimir boleta</button>
+      </div>
+    </div>
+
+    <!-- Print-only: hidden on screen, shown by the @media print rule in styles.scss -->
+    <div id="receipt-print" class="receipt">
+      <p class="r-center r-bold r-big">REDSPORT</p>
+      <p class="r-center">Boleta de venta</p>
+      <p class="r-line"></p>
+      <p>Venta: {{ sale.code }}</p>
+      <p>Fecha: {{ sale.paidAt | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p>Cliente: {{ sale.shipping.fullName }}</p>
+      <p class="r-line"></p>
+      @for (item of sale.items; track item.sku) {
+        <p class="r-item">{{ item.name }} — {{ colorLabel(item.color) }}, talla {{ item.size }}</p>
+        <p class="r-item-qty">
+          {{ item.quantity }} x {{ item.unitPrice | currency:'PEN':'S/ ' }}
+          = {{ item.quantity * item.unitPrice | currency:'PEN':'S/ ' }}
+        </p>
+      }
+      <p class="r-line"></p>
+      <p class="r-total">TOTAL: {{ sale.total | currency:'PEN':'S/ ' }}</p>
+      <p>Pago: {{ sale.paymentMethod === 'efectivo' ? 'Efectivo' : 'QR Yape/Plin' }}</p>
+      @if (sale.paymentMethod === 'efectivo') {
+        <p>Recibido: {{ sale.cashReceived | currency:'PEN':'S/ ' }}</p>
+        <p>Vuelto: {{ (sale.cashReceived ?? 0) - sale.total | currency:'PEN':'S/ ' }}</p>
+      }
+      <p class="r-line"></p>
+      <p class="r-center">¡Gracias por tu compra!</p>
+      <p class="r-center r-small">redsport.pe</p>
     </div>
   } @else {
     <h1>Caja</h1>

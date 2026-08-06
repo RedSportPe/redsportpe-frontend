@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, signal, computed, viewChild, ElementRef } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { CatalogStore } from '../../../../catalog/application/catalog.store';
 import { PromotionsStore } from '../../../../promotions/application/promotions.store';
 import { OrdersStore } from '../../../application/orders.store';
@@ -8,12 +8,13 @@ import { Order, PaymentMethod } from '../../../domain/order.model';
 import { promoPrice } from '../../../../promotions/domain/promotion-rules';
 import { colorLabel } from '../../../../catalog/domain/product-filtering';
 import { isValidSku } from '../../../../catalog/domain/sku.value-object';
+import { ScanDetector } from '../scan-detection';
 
 /** The in-store register: the cashier scans SKUs, the ticket fills up, and the
  *  sale confirms on the spot — cash (amount received → change) or instant QR. */
 @Component({
   selector: 'app-pos-page',
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, DatePipe],
   templateUrl: './pos-page.html',
   styleUrl: './pos-page.scss',
 })
@@ -25,14 +26,11 @@ export class PosPage implements OnInit {
   readonly colorLabel = colorLabel;
 
   private scanBox = viewChild<ElementRef<HTMLInputElement>>('scanBox');
+  private scanDetector = new ScanDetector();
 
   // Scanning
   readonly skuCode = signal('');
   readonly scanError = signal<string | null>(null);
-  /** When the current entry started — a hardware scanner "types" in a burst */
-  private entryStartedAt = 0;
-  /** Human typing is ~150-300ms per char; scanners run under ~30ms per char */
-  private readonly SCANNER_MS_PER_CHAR = 40;
 
   // The ticket (local to the register — NOT the customer cart)
   readonly ticket = signal<CartItem[]>([]);
@@ -68,22 +66,17 @@ export class PosPage implements OnInit {
     this[field].set((event.target as HTMLInputElement).value);
   }
 
-  /** Scanner auto-detection: a USB scanner "types" the whole code in a burst
-   *  (<40ms per char). When a COMPLETE valid SKU arrives at that speed, it
-   *  registers itself — no Enter, no button. Manual (human-speed) typing
-   *  still needs Enter or "Agregar". */
+  /** Scanner auto-detection: a USB scanner "types" the whole code in a burst.
+   *  When a COMPLETE valid SKU arrives at that speed, it registers itself —
+   *  no Enter, no button. Manual (human-speed) typing still needs Enter or
+   *  "Agregar" (see ScanDetector for the speed heuristic). */
   onScanInput(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
-    if (this.skuCode() === '' && value !== '') {
-      this.entryStartedAt = Date.now();
-    }
     this.skuCode.set(value);
 
+    const isScannerBurst = this.scanDetector.observe(value);
     const code = value.trim().toUpperCase();
-    if (!isValidSku(code)) return;
-
-    const elapsed = Date.now() - this.entryStartedAt;
-    if (elapsed <= value.length * this.SCANNER_MS_PER_CHAR) {
+    if (isScannerBurst && isValidSku(code)) {
       this.addBySku();
     }
   }
@@ -139,6 +132,7 @@ export class PosPage implements OnInit {
    *  Angular sees no net change and won't rewrite the input on its own */
   private clearScanBox(): void {
     this.skuCode.set('');
+    this.scanDetector.reset();
     const box = this.scanBox()?.nativeElement;
     if (box) box.value = '';
   }
@@ -184,7 +178,15 @@ export class PosPage implements OnInit {
     if (order) {
       this.completedSale.set(order);
       this.ticket.set([]);
+      // Let the receipt render, then open the print dialog for the thermal printer.
+      // True zero-click printing needs a local bridge (QZ Tray / Epson ePOS-Print) —
+      // outside what a browser can do on its own.
+      setTimeout(() => window.print(), 300);
     }
+  }
+
+  printReceiptAgain(): void {
+    window.print();
   }
 
   /** Ready for the next customer in line */

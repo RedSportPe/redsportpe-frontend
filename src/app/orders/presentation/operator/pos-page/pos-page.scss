@@ -328,6 +328,13 @@
     }
   }
 
+  .pos-success-actions {
+    display: flex;
+    justify-content: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+  }
+
   .red-btn {
     background: var(--rs-red);
     color: #fff;
@@ -338,6 +345,52 @@
     border-radius: 8px;
 
     &:hover { background: var(--rs-red-dark); }
+  }
+
+  .ghost-btn {
+    background: transparent;
+    border: 1px solid var(--rs-border);
+    color: var(--rs-text);
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 0.8rem 1.4rem;
+    border-radius: 8px;
+
+    &:hover { border-color: var(--rs-red); color: var(--rs-red); }
+  }
+}
+
+// ===== Thermal receipt (80mm) — invisible on screen, see #receipt-print
+// off-screen rule + @media print in styles.scss. Courier for a monospace,
+// "dot-matrix" look that reads well on thermal paper. =====
+.receipt {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #000;
+  background: #fff;
+  padding: 3mm;
+
+  p { margin: 0 0 2px; }
+
+  .r-center { text-align: center; }
+  .r-bold { font-weight: 700; }
+  .r-big { font-size: 15px; }
+  .r-small { font-size: 9px; color: #444; }
+
+  .r-line {
+    border-top: 1px dashed #000;
+    margin: 4px 0;
+    height: 0;
+  }
+
+  .r-item { margin-top: 4px; }
+  .r-item-qty { padding-left: 4px; font-size: 10px; }
+
+  .r-total {
+    font-weight: 700;
+    font-size: 13px;
+    margin-top: 4px;
   }
 }
 

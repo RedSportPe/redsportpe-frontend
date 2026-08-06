@@ -1,0 +1,60 @@
+<section class="price-check">
+  <h1>Consultar precio</h1>
+  <p class="subtitle">Escanea el producto o escribe el SKU y presiona Enter — no se registra ninguna venta.</p>
+
+  <div class="scan-row">
+    <input
+      #scanBox
+      type="text"
+      class="scan-input"
+      placeholder="Escanea o escribe el SKU (ej. RS-CAPP-U-M-ROJ)"
+      autofocus
+      [value]="skuCode()"
+      (input)="onScanInput($event)"
+      (keyup.enter)="lookup()"
+    />
+    <button type="button" class="scan-btn" (click)="lookup()">Consultar</button>
+  </div>
+
+  <p class="scan-hint">🔫 Con el escáner el precio aparece solo. Escribiendo a mano, presiona Enter o "Consultar".</p>
+
+  @if (notFoundCode(); as code) {
+    <p class="not-found">⚠️ SKU no encontrado: {{ code }}</p>
+  }
+
+  @if (result(); as r) {
+    <article class="result-card">
+      <img [src]="r.imageUrl" [alt]="r.productName" />
+      <div class="result-info">
+        <span class="category">{{ r.category }}</span>
+        <h2>{{ r.productName }}</h2>
+        <p class="variant">Talla {{ sizeLabel(r.size) }} · {{ colorLabel(r.color) }}</p>
+        <p class="sku">{{ r.sku }}</p>
+
+        @if (r.promoPrice !== null) {
+          <p class="price">
+            <span class="original">{{ r.regularPrice | currency:'PEN':'S/ ' }}</span>
+            <span class="promo">{{ r.promoPrice | currency:'PEN':'S/ ' }}</span>
+            <span class="badge">-{{ r.discountPercent }}%</span>
+          </p>
+        } @else {
+          <p class="price">
+            <span class="regular">{{ r.regularPrice | currency:'PEN':'S/ ' }}</span>
+          </p>
+        }
+
+        <p class="stock" [class.low]="r.stock > 0 && r.stock <= 5" [class.out]="r.stock === 0">
+          @if (r.stock === 0) {
+            Agotado
+          } @else if (r.stock <= 5) {
+            ¡Últimas {{ r.stock }} unidades!
+          } @else {
+            Stock: {{ r.stock }} unidades
+          }
+        </p>
+      </div>
+    </article>
+  } @else if (!notFoundCode()) {
+    <p class="empty-state">Aún no has consultado ningún producto.</p>
+  }
+</section>
