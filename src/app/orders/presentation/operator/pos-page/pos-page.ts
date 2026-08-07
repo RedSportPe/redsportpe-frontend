@@ -9,6 +9,7 @@ import { promoPrice } from '../../../../promotions/domain/promotion-rules';
 import { colorLabel } from '../../../../catalog/domain/product-filtering';
 import { isValidSku } from '../../../../catalog/domain/sku.value-object';
 import { ScanDetector } from '../scan-detection';
+import { ImpresionService } from '../../../../core/services/impresion.service';
 
 /** The in-store register: the cashier scans SKUs, the ticket fills up, and the
  *  sale confirms on the spot — cash (amount received → change) or instant QR. */
@@ -22,17 +23,16 @@ export class PosPage implements OnInit {
   private catalogStore = inject(CatalogStore);
   private promotionsStore = inject(PromotionsStore);
   private ordersStore = inject(OrdersStore);
+  private impresionService = inject(ImpresionService);
 
   readonly colorLabel = colorLabel;
 
   private scanBox = viewChild<ElementRef<HTMLInputElement>>('scanBox');
   private scanDetector = new ScanDetector();
 
-  // Scanning
   readonly skuCode = signal('');
   readonly scanError = signal<string | null>(null);
 
-  // The ticket (local to the register — NOT the customer cart)
   readonly ticket = signal<CartItem[]>([]);
   readonly total = computed(() =>
     this.ticket().reduce((sum, line) => sum + line.unitPrice * line.quantity, 0)
@@ -41,11 +41,9 @@ export class PosPage implements OnInit {
     this.ticket().reduce((sum, line) => sum + line.quantity, 0)
   );
 
-  // Payment
   readonly customerName = signal('');
   readonly posPayment = signal<PaymentMethod>('efectivo');
   readonly cashReceived = signal('');
-  /** Blocked-confirm feedback: the register shakes and the button pulses */
   readonly posBlocked = signal(false);
   readonly completedSale = signal<Order | null>(null);
 
@@ -59,17 +57,13 @@ export class PosPage implements OnInit {
 
   ngOnInit(): void {
     this.catalogStore.loadCatalog();
-    this.promotionsStore.loadPromos();  // in-store sales honor active promos too
+    this.promotionsStore.loadPromos();
   }
 
   onInput(field: 'customerName' | 'cashReceived', event: Event): void {
     this[field].set((event.target as HTMLInputElement).value);
   }
 
-  /** Scanner auto-detection: a USB scanner "types" the whole code in a burst.
-   *  When a COMPLETE valid SKU arrives at that speed, it registers itself —
-   *  no Enter, no button. Manual (human-speed) typing still needs Enter or
-   *  "Agregar" (see ScanDetector for the speed heuristic). */
   onScanInput(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.skuCode.set(value);
@@ -81,7 +75,6 @@ export class PosPage implements OnInit {
     }
   }
 
-  /** Enter (or the scanner's automatic Enter) adds the scanned SKU to the ticket */
   addBySku(): void {
     const code = this.skuCode().trim().toUpperCase();
     if (!code) return;
@@ -103,22 +96,22 @@ export class PosPage implements OnInit {
       this.ticket.update(lines =>
         existing
           ? lines.map(line =>
-              line.sku === code ? { ...line, quantity: line.quantity + 1 } : line
-            )
+            line.sku === code ? { ...line, quantity: line.quantity + 1 } : line
+          )
           : [
-              ...lines,
-              {
-                sku: variant.sku,
-                productId: product.id,
-                name: product.name,
-                imageUrl: product.imageUrl,
-                size: variant.size,
-                color: variant.color,
-                unitPrice,
-                quantity: 1,
-                maxStock: variant.totalStock,
-              },
-            ]
+            ...lines,
+            {
+              sku: variant.sku,
+              productId: product.id,
+              name: product.name,
+              imageUrl: product.imageUrl,
+              size: variant.size,
+              color: variant.color,
+              unitPrice,
+              quantity: 1,
+              maxStock: variant.totalStock,
+            },
+          ]
       );
       this.clearScanBox();
       this.scanError.set(null);
@@ -128,8 +121,6 @@ export class PosPage implements OnInit {
     this.scanError.set(`SKU no encontrado: ${code}`);
   }
 
-  /** Clears signal AND the DOM input: after signal '' → code → '' in one tick,
-   *  Angular sees no net change and won't rewrite the input on its own */
   private clearScanBox(): void {
     this.skuCode.set('');
     this.scanDetector.reset();
@@ -158,7 +149,6 @@ export class PosPage implements OnInit {
 
   confirmSale(): void {
     if (this.ticket().length === 0) return;
-    // Business rule: cash needs the received amount (>= total) BEFORE confirming
     if (this.posPayment() === 'efectivo' && !this.cashValid()) {
       if (!this.posBlocked()) {
         this.posBlocked.set(true);
@@ -178,18 +168,24 @@ export class PosPage implements OnInit {
     if (order) {
       this.completedSale.set(order);
       this.ticket.set([]);
-      // Let the receipt render, then open the print dialog for the thermal printer.
-      // True zero-click printing needs a local bridge (QZ Tray / Epson ePOS-Print) —
-      // outside what a browser can do on its own.
-      setTimeout(() => window.print(), 300);
+      this.imprimirBoleta(order);
     }
   }
 
   printReceiptAgain(): void {
-    window.print();
+    const order = this.completedSale();
+    if (order) this.imprimirBoleta(order);
   }
 
-  /** Ready for the next customer in line */
+  private async imprimirBoleta(order: Order): Promise<void> {
+    try {
+      await this.impresionService.imprimirBoleta(order);
+    } catch (e) {
+      console.warn('Print bridge no disponible, usando window.print()', e);
+      window.print();
+    }
+  }
+
   newSale(): void {
     this.completedSale.set(null);
     this.customerName.set('');
