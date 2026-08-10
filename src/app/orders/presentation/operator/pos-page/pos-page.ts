@@ -10,6 +10,7 @@ import { colorLabel } from '../../../../catalog/domain/product-filtering';
 import { isValidSku } from '../../../../catalog/domain/sku.value-object';
 import { ScanDetector } from '../scan-detection';
 import { ImpresionService } from '../../../../core/services/impresion.service';
+import { montoEnLetras } from '../../../domain/amount-in-words';
 
 /** The in-store register: the cashier scans SKUs, the ticket fills up, and the
  *  sale confirms on the spot — cash (amount received → change) or instant QR. */
@@ -26,44 +27,106 @@ export class PosPage implements OnInit {
   private impresionService = inject(ImpresionService);
 
   readonly colorLabel = colorLabel;
+  readonly montoEnLetras = montoEnLetras;
 
   private scanBox = viewChild<ElementRef<HTMLInputElement>>('scanBox');
   private scanDetector = new ScanDetector();
 
+  // Scanning
   readonly skuCode = signal('');
   readonly scanError = signal<string | null>(null);
 
+  // The ticket (local to the register — NOT the customer cart)
   readonly ticket = signal<CartItem[]>([]);
+  /** Sum of unitPrice × qty — reflects any per-line "regateo" already applied */
   readonly total = computed(() =>
     this.ticket().reduce((sum, line) => sum + line.unitPrice * line.quantity, 0)
+  );
+  /** Sum of catalogPrice × qty — the untouched "precio de lista", used to show the discount */
+  readonly subtotal = computed(() =>
+    this.ticket().reduce((sum, line) => sum + line.catalogPrice * line.quantity, 0)
   );
   readonly itemsCount = computed(() =>
     this.ticket().reduce((sum, line) => sum + line.quantity, 0)
   );
 
+  // Per-line price editing ("te dejo este buso a S/70")
+  readonly editingSku = signal<string | null>(null);
+  readonly editPriceValue = signal('');
+
+  // Whole-ticket price override ("todo por S/150")
+  readonly totalAdjustmentInput = signal('');
+
+  /** What actually gets charged: the total-level override if the operator set one,
+   *  otherwise the line-adjusted total. Layers on top — never replaces line edits. */
+  readonly finalTotal = computed(() => {
+    const override = this.totalAdjustmentInput().trim();
+    if (override !== '') {
+      const parsed = Number(override);
+      if (!isNaN(parsed) && parsed >= 0) return Math.round(parsed * 100) / 100;
+    }
+    return this.total();
+  });
+
+  readonly discountAmount = computed(() =>
+    Math.round((this.subtotal() - this.finalTotal()) * 100) / 100
+  );
+  readonly hasDiscount = computed(() => this.discountAmount() > 0.009);
+  readonly discountReason = signal('');
+  /** True once we tried to confirm without a reason for an active discount */
+  readonly reasonMissing = signal(false);
+
+  // Payment
   readonly customerName = signal('');
   readonly posPayment = signal<PaymentMethod>('efectivo');
   readonly cashReceived = signal('');
+  /** 'mixto' only: how much of the total the customer pays in cash — the rest goes to QR */
+  readonly mixedCashInput = signal('');
+  /** Blocked-confirm feedback: the register shakes and the button pulses */
   readonly posBlocked = signal(false);
   readonly completedSale = signal<Order | null>(null);
 
   readonly cashAmount = computed(() => Number(this.cashReceived()) || 0);
   readonly change = computed(() =>
-    Math.round((this.cashAmount() - this.total()) * 100) / 100
+    Math.round((this.cashAmount() - this.finalTotal()) * 100) / 100
   );
   readonly cashValid = computed(
-    () => this.cashReceived().trim() !== '' && this.cashAmount() >= this.total()
+    () => this.cashReceived().trim() !== '' && this.cashAmount() >= this.finalTotal()
   );
+
+  /** 'mixto': cash portion the operator typed in */
+  readonly mixedCashAmount = computed(() => {
+    const n = Number(this.mixedCashInput());
+    return isNaN(n) || n < 0 ? 0 : Math.min(n, this.finalTotal());
+  });
+  /** 'mixto': whatever isn't covered by cash goes through QR/Yape/Plin */
+  readonly mixedQrAmount = computed(() =>
+    Math.round((this.finalTotal() - this.mixedCashAmount()) * 100) / 100
+  );
+  readonly mixedValid = computed(() => {
+    const cash = this.mixedCashAmount();
+    return cash > 0 && cash < this.finalTotal();
+  });
+
+  readonly amountInWords = computed(() => montoEnLetras(this.finalTotal()));
 
   ngOnInit(): void {
     this.catalogStore.loadCatalog();
-    this.promotionsStore.loadPromos();
+    this.promotionsStore.loadPromos();  // in-store sales honor active promos too
   }
 
   onInput(field: 'customerName' | 'cashReceived', event: Event): void {
     this[field].set((event.target as HTMLInputElement).value);
   }
 
+  onMixedCashInput(event: Event): void {
+    this.mixedCashInput.set((event.target as HTMLInputElement).value);
+  }
+
+  /** Scanner auto-detection: a USB scanner "types" the whole code in a burst.
+   *  When a COMPLETE valid SKU arrives at that speed, it registers itself —
+   *  no Enter, no button. Manual (human-speed) typing still needs Enter or
+   *  "Agregar" (see ScanDetector for the speed heuristic). */
   onScanInput(event: Event): void {
     const value = (event.target as HTMLInputElement).value;
     this.skuCode.set(value);
@@ -75,6 +138,7 @@ export class PosPage implements OnInit {
     }
   }
 
+  /** Enter (or the scanner's automatic Enter) adds the scanned SKU to the ticket */
   addBySku(): void {
     const code = this.skuCode().trim().toUpperCase();
     if (!code) return;
@@ -107,6 +171,7 @@ export class PosPage implements OnInit {
               imageUrl: product.imageUrl,
               size: variant.size,
               color: variant.color,
+              catalogPrice: unitPrice,
               unitPrice,
               quantity: 1,
               maxStock: variant.totalStock,
@@ -121,6 +186,8 @@ export class PosPage implements OnInit {
     this.scanError.set(`SKU no encontrado: ${code}`);
   }
 
+  /** Clears signal AND the DOM input: after signal '' → code → '' in one tick,
+   *  Angular sees no net change and won't rewrite the input on its own */
   private clearScanBox(): void {
     this.skuCode.set('');
     this.scanDetector.reset();
@@ -138,9 +205,58 @@ export class PosPage implements OnInit {
     );
   }
 
+  /** Typing the quantity directly, instead of only +/− */
+  setQuantity(sku: string, event: Event): void {
+    const raw = Number((event.target as HTMLInputElement).value);
+    this.ticket.update(lines =>
+      lines.map(line =>
+        line.sku === sku
+          ? { ...line, quantity: Math.max(1, Math.min(isNaN(raw) ? 1 : Math.trunc(raw), line.maxStock)) }
+          : line
+      )
+    );
+  }
+
   removeLine(sku: string): void {
     this.ticket.update(lines => lines.filter(line => line.sku !== sku));
     this.focusScanner();
+  }
+
+  /** Opens the inline price editor for one line ("este buso a S/70") */
+  startEditPrice(line: CartItem): void {
+    this.editingSku.set(line.sku);
+    this.editPriceValue.set(line.unitPrice.toFixed(2));
+  }
+
+  cancelEditPrice(): void {
+    this.editingSku.set(null);
+    this.editPriceValue.set('');
+  }
+
+  onEditPriceInput(event: Event): void {
+    this.editPriceValue.set((event.target as HTMLInputElement).value);
+  }
+
+  /** Confirms the new unit price for ONE line — catalogPrice stays untouched,
+   *  so the discount is still visible/traceable afterwards. */
+  applyEditPrice(sku: string): void {
+    const parsed = Number(this.editPriceValue());
+    if (!isNaN(parsed) && parsed >= 0) {
+      this.ticket.update(lines =>
+        lines.map(line => (line.sku === sku ? { ...line, unitPrice: parsed } : line))
+      );
+    }
+    this.cancelEditPrice();
+  }
+
+  onTotalAdjustmentInput(event: Event): void {
+    this.totalAdjustmentInput.set((event.target as HTMLInputElement).value);
+    this.reasonMissing.set(false);
+  }
+
+  onDiscountReasonInput(event: Event): void {
+    this.discountReason.set((event.target as HTMLInputElement).value);
+    this.reasonMissing.set(false);
   }
 
   selectPayment(method: PaymentMethod): void {
@@ -149,6 +265,7 @@ export class PosPage implements OnInit {
 
   confirmSale(): void {
     if (this.ticket().length === 0) return;
+    // Business rule: cash needs the received amount (>= total) BEFORE confirming
     if (this.posPayment() === 'efectivo' && !this.cashValid()) {
       if (!this.posBlocked()) {
         this.posBlocked.set(true);
@@ -156,18 +273,43 @@ export class PosPage implements OnInit {
       }
       return;
     }
+    // Business rule: mixed payment needs a valid cash portion (between 0 and the total)
+    if (this.posPayment() === 'mixto' && !this.mixedValid()) {
+      if (!this.posBlocked()) {
+        this.posBlocked.set(true);
+        setTimeout(() => this.posBlocked.set(false), 1200);
+      }
+      return;
+    }
+    // Business rule: any discount (line-level or total-level) needs a written reason
+    if (this.hasDiscount() && this.discountReason().trim() === '') {
+      this.reasonMissing.set(true);
+      return;
+    }
     const order = this.ordersStore.registerPosSale(
       this.ticket(),
-      this.total(),
+      this.finalTotal(),
       this.customerName().trim(),
       {
         method: this.posPayment(),
-        cashReceived: this.posPayment() === 'efectivo' ? this.cashAmount() : undefined,
-      }
+        cashReceived:
+          this.posPayment() === 'efectivo' ? this.cashAmount()
+            : this.posPayment() === 'mixto' ? this.mixedCashAmount()
+              : undefined,
+        qrAmount: this.posPayment() === 'mixto' ? this.mixedQrAmount() : undefined,
+      },
+      this.hasDiscount()
+        ? { subtotal: this.subtotal(), reason: this.discountReason().trim() }
+        : undefined
     );
     if (order) {
       this.completedSale.set(order);
       this.ticket.set([]);
+      this.totalAdjustmentInput.set('');
+      this.discountReason.set('');
+      this.mixedCashInput.set('');
+      // Zero-click printing via the local print bridge (ESC/POS over USB).
+      // Falls back to window.print() if the bridge isn't running.
       this.imprimirBoleta(order);
     }
   }
@@ -186,10 +328,15 @@ export class PosPage implements OnInit {
     }
   }
 
+  /** Ready for the next customer in line */
   newSale(): void {
     this.completedSale.set(null);
     this.customerName.set('');
     this.cashReceived.set('');
+    this.mixedCashInput.set('');
+    this.totalAdjustmentInput.set('');
+    this.discountReason.set('');
+    this.reasonMissing.set(false);
     this.clearScanBox();
     this.scanError.set(null);
     this.focusScanner();

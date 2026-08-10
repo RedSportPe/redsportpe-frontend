@@ -8,7 +8,7 @@ export const DELIVERY_METHOD_LABELS: Record<DeliveryMethod, string> = {
   tienda: 'Venta en tienda',
 };
 
-export type PaymentMethod = 'qr' | 'efectivo';
+export type PaymentMethod = 'qr' | 'efectivo' | 'mixto';
 
 export interface ShippingDetails {
   fullName: string;
@@ -36,6 +36,16 @@ export interface Order {
   trackingStep: number;   // 0..3 index into TRACKING_STEPS[method]
   /** How it was paid — set when payment confirms (qr online; efectivo only in-store) */
   paymentMethod?: PaymentMethod;
-  /** POS cash sales: amount handed by the customer (change = cashReceived - total) */
+  /** POS cash sales: amount handed by the customer (change = cashReceived - total).
+   *  For 'mixto' this is only the CASH portion; the rest was paid via qrAmount. */
   cashReceived?: number;
+  /** 'mixto' only: the portion paid via QR/Yape/Plin (cashReceived + qrAmount = total) */
+  qrAmount?: number;
+  /** Operator who ran the register — printed as "Vendedor" on the receipt */
+  sellerName?: string;
+  /** POS "regateo": sum of catalogPrice × qty, before any negotiation.
+   *  Present only on in-store sales that used price editing. total < subtotal when discounted. */
+  subtotal?: number;
+  /** Required whenever subtotal !== total — why the price was negotiated down */
+  discountReason?: string;
 }

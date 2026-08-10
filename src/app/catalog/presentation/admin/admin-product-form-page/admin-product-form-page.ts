@@ -1,8 +1,10 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CatalogStore } from '../../../application/catalog.store';
+import { GarmentTypesStore } from '../../../application/garment-types.store';
 import { Variant } from '../../../domain/product.model';
 import { buildSku, isValidSku } from '../../../domain/sku.value-object';
+import { splitProductCode } from '../../../domain/garment-type.model';
 import { COLOR_LABELS, SIZE_ORDER, sizeLabel } from '../../../domain/product-filtering';
 import { UnsavedChangesAware } from '../../../../layout/unsaved-changes.guard';
 
@@ -30,6 +32,7 @@ const VARIANT_GENDERS: [Variant['gender'], string][] = [
 })
 export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
   readonly store = inject(CatalogStore);
+  readonly garmentTypesStore = inject(GarmentTypesStore);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -42,6 +45,7 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
   readonly sizeOptions = SIZE_ORDER;
   readonly colorOptions = Object.entries(COLOR_LABELS);
   readonly sizeLabel = sizeLabel;
+  readonly garmentTypes = this.garmentTypesStore.types;
 
   readonly editingId = signal<string | null>(null);
   readonly notFound = signal(false);
@@ -54,7 +58,19 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
   /** Gallery: data URLs read from the admin's uploaded files. The FIRST one
    *  is the cover shown on cards/cart. Real file storage comes with the backend. */
   readonly images = signal<string[]>([]);
-  readonly productCode = signal('');
+  /** SKU code = garmentType (e.g. 'CJ') + modelCode (e.g. 'TP') = 'CJTP' */
+  readonly garmentType = signal('');
+  readonly modelCode = signal('');
+  readonly productCode = computed(() => `${this.garmentType()}${this.modelCode()}`.toUpperCase());
+  /** Legacy codes that don't start with a known type code — shown as a hint, not blocking */
+  readonly unresolvedLegacyCode = signal(false);
+
+  // "+ Agregar tipo nuevo" inline mini-form
+  readonly addingType = signal(false);
+  readonly newTypeCode = signal('');
+  readonly newTypeLabel = signal('');
+  readonly newTypeError = signal<string | null>(null);
+
   readonly published = signal(true);
   readonly featured = signal(false);
   readonly variants = signal<VariantRow[]>([
@@ -133,7 +149,19 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
     this.published.set(product.published);
     this.featured.set(product.featured);
     // The product code lives inside every SKU: RS-[CODE]-...
-    this.productCode.set(product.variants[0]?.sku.split('-')[1] ?? '');
+    const fullCode = product.variants[0]?.sku.split('-')[1] ?? '';
+    const split = splitProductCode(fullCode, this.garmentTypes());
+    if (split) {
+      this.garmentType.set(split.typeCode);
+      this.modelCode.set(split.modelCode);
+      this.unresolvedLegacyCode.set(false);
+    } else {
+      // Older/manual code that doesn't start with a known type — keep it
+      // editable as the "model" part so nothing breaks, just flag it.
+      this.garmentType.set('');
+      this.modelCode.set(fullCode);
+      this.unresolvedLegacyCode.set(fullCode.length > 0);
+    }
     this.variants.set(
       product.variants.map(v => ({
         gender: v.gender,
@@ -156,6 +184,7 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
 
   readonly canSave = computed(() => {
     if (!this.name().trim() || !this.category().trim() || this.price() <= 0) return false;
+    if (!this.garmentType().trim() && !this.unresolvedLegacyCode()) return false;
     if (!/^[A-Za-z0-9]{2,6}$/.test(this.productCode())) return false;
     const rows = this.variants();
     if (rows.length === 0 || rows.some(r => r.stock < 0)) return false;
@@ -163,8 +192,44 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
     return skus.every(sku => isValidSku(sku)) && new Set(skus).size === skus.length;
   });
 
-  onText(field: 'name' | 'description' | 'category' | 'productCode', event: Event): void {
+  onText(field: 'name' | 'description' | 'category' | 'modelCode', event: Event): void {
     this[field].set((event.target as HTMLInputElement).value);
+  }
+
+  onGarmentTypeChange(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    if (value === '__new__') {
+      this.addingType.set(true);
+      return;
+    }
+    this.garmentType.set(value);
+    this.unresolvedLegacyCode.set(false);
+  }
+
+  onNewTypeCode(event: Event): void {
+    this.newTypeCode.set((event.target as HTMLInputElement).value);
+  }
+
+  onNewTypeLabel(event: Event): void {
+    this.newTypeLabel.set((event.target as HTMLInputElement).value);
+  }
+
+  confirmNewType(): void {
+    const err = this.garmentTypesStore.addType(this.newTypeCode(), this.newTypeLabel());
+    if (err) {
+      this.newTypeError.set(err);
+      return;
+    }
+    this.garmentType.set(this.newTypeCode().trim().toUpperCase());
+    this.unresolvedLegacyCode.set(false);
+    this.cancelNewType();
+  }
+
+  cancelNewType(): void {
+    this.addingType.set(false);
+    this.newTypeCode.set('');
+    this.newTypeLabel.set('');
+    this.newTypeError.set(null);
   }
 
   /** Reads every selected file as a data URL and appends it to the gallery */

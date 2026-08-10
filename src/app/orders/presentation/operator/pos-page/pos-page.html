@@ -7,13 +7,20 @@
       <p class="sale-code">Venta <strong>{{ sale.code }}</strong> · {{ sale.shipping.fullName }}</p>
 
       <div class="detail-card">
+        @if (sale.subtotal && sale.subtotal !== sale.total) {
+          <div class="row"><span>Subtotal</span><span>{{ sale.subtotal | currency:'PEN':'S/ ' }}</span></div>
+          <div class="row discount"><span>Descuento</span><span>−{{ sale.subtotal - sale.total | currency:'PEN':'S/ ' }}</span></div>
+          <div class="row"><span>Motivo</span><span>{{ sale.discountReason }}</span></div>
+        }
         <div class="row">
           <span>Total</span>
           <span>{{ sale.total | currency:'PEN':'S/ ' }}</span>
         </div>
         <div class="row">
           <span>Medio de pago</span>
-          <span>{{ sale.paymentMethod === 'efectivo' ? 'Efectivo' : 'QR Yape/Plin' }}</span>
+          <span>
+            {{ sale.paymentMethod === 'efectivo' ? 'Efectivo' : sale.paymentMethod === 'mixto' ? 'Mixto' : 'QR Yape/Plin' }}
+          </span>
         </div>
         @if (sale.paymentMethod === 'efectivo') {
           <div class="row">
@@ -25,7 +32,19 @@
             <span>{{ (sale.cashReceived ?? 0) - sale.total | currency:'PEN':'S/ ' }}</span>
           </div>
         }
+        @if (sale.paymentMethod === 'mixto') {
+          <div class="row">
+            <span>Efectivo</span>
+            <span>{{ sale.cashReceived | currency:'PEN':'S/ ' }}</span>
+          </div>
+          <div class="row">
+            <span>QR/Yape</span>
+            <span>{{ sale.qrAmount | currency:'PEN':'S/ ' }}</span>
+          </div>
+        }
       </div>
+
+      <p class="amount-words">Son: {{ montoEnLetras(sale.total) }}</p>
 
       <div class="pos-success-actions">
         <button type="button" class="red-btn" (click)="newSale()">Nueva venta</button>
@@ -40,6 +59,8 @@
       <p class="r-line"></p>
       <p>Venta: {{ sale.code }}</p>
       <p>Fecha: {{ sale.paidAt | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p>Vendedor: {{ sale.sellerName }}</p>
+      <p class="r-line"></p>
       <p>Cliente: {{ sale.shipping.fullName }}</p>
       <p class="r-line"></p>
       @for (item of sale.items; track item.sku) {
@@ -50,11 +71,28 @@
         </p>
       }
       <p class="r-line"></p>
+      @if (sale.subtotal && sale.subtotal !== sale.total) {
+        <p>Subtotal: {{ sale.subtotal | currency:'PEN':'S/ ' }}</p>
+        <p>Descuento: −{{ sale.subtotal - sale.total | currency:'PEN':'S/ ' }}</p>
+        <p>Motivo: {{ sale.discountReason }}</p>
+      }
       <p class="r-total">TOTAL: {{ sale.total | currency:'PEN':'S/ ' }}</p>
-      <p>Pago: {{ sale.paymentMethod === 'efectivo' ? 'Efectivo' : 'QR Yape/Plin' }}</p>
+      <p class="r-line"></p>
       @if (sale.paymentMethod === 'efectivo') {
+        <p>Efectivo</p>
+        <p>Son: {{ montoEnLetras(sale.total) }}</p>
+        <p class="r-line"></p>
         <p>Recibido: {{ sale.cashReceived | currency:'PEN':'S/ ' }}</p>
         <p>Vuelto: {{ (sale.cashReceived ?? 0) - sale.total | currency:'PEN':'S/ ' }}</p>
+      } @else if (sale.paymentMethod === 'mixto') {
+        <p>Pago mixto</p>
+        <p>Son: {{ montoEnLetras(sale.total) }}</p>
+        <p class="r-line"></p>
+        <p>Efectivo: {{ sale.cashReceived | currency:'PEN':'S/ ' }}</p>
+        <p>QR/Yape: {{ sale.qrAmount | currency:'PEN':'S/ ' }}</p>
+      } @else {
+        <p>Pago: QR Yape/Plin</p>
+        <p>Son: {{ montoEnLetras(sale.total) }}</p>
       }
       <p class="r-line"></p>
       <p class="r-center">¡Gracias por tu compra!</p>
@@ -99,12 +137,49 @@
                   <p class="line-name">{{ line.name }}</p>
                   <p class="line-variant">Talla {{ line.size }} · {{ colorLabel(line.color) }} · {{ line.sku }}</p>
                 </div>
+
                 <label class="qty">
                   <button type="button" (click)="changeQuantity(line.sku, -1)">−</button>
-                  <span>{{ line.quantity }}</span>
+                  <input
+                    type="number"
+                    class="qty-input"
+                    min="1"
+                    [max]="line.maxStock"
+                    [value]="line.quantity"
+                    (change)="setQuantity(line.sku, $event)"
+                    (keyup.enter)="setQuantity(line.sku, $event)"
+                  />
                   <button type="button" (click)="changeQuantity(line.sku, 1)">+</button>
                 </label>
+
+                <div class="unit-price">
+                  @if (editingSku() === line.sku) {
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.10"
+                      class="price-edit-input"
+                      [value]="editPriceValue()"
+                      (input)="onEditPriceInput($event)"
+                      (keyup.enter)="applyEditPrice(line.sku)"
+                      (blur)="applyEditPrice(line.sku)"
+                      autofocus
+                    />
+                  } @else {
+                    <button type="button" class="price-edit-btn" (click)="startEditPrice(line)" title="Editar precio unitario">
+                      @if (line.unitPrice !== line.catalogPrice) {
+                        <span class="price-original">{{ line.catalogPrice | currency:'PEN':'S/ ' }}</span>
+                      }
+                      <span>{{ line.unitPrice | currency:'PEN':'S/ ' }}</span>
+                      <svg class="edit-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                        <path d="M16.474 5.408a2.5 2.5 0 0 1 3.536 3.536L7.5 21.454 3 22l.546-4.5L16.474 5.408Z" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  }
+                </div>
+
                 <p class="line-total">{{ line.unitPrice * line.quantity | currency:'PEN':'S/ ' }}</p>
+
                 <button type="button" class="remove" (click)="removeLine(line.sku)" aria-label="Quitar del ticket">✕</button>
               </article>
             }
@@ -118,12 +193,49 @@
 
         <div class="total-row">
           <span>{{ itemsCount() }} producto(s)</span>
-          <span class="grand-total">{{ total() | currency:'PEN':'S/ ' }}</span>
+          <span class="grand-total">{{ subtotal() | currency:'PEN':'S/ ' }}</span>
         </div>
 
         <label class="field">
+          <span>Ajustar total de venta (opcional)</span>
+          <input
+            type="number"
+            min="0"
+            step="0.10"
+            [placeholder]="total() | currency:'PEN':'S/ '"
+            [value]="totalAdjustmentInput()"
+            (input)="onTotalAdjustmentInput($event)"
+          />
+        </label>
+
+        @if (hasDiscount()) {
+          <div class="discount-summary">
+            <div class="row"><span>Subtotal</span><span>{{ subtotal() | currency:'PEN':'S/ ' }}</span></div>
+            <div class="row discount"><span>Descuento</span><span>−{{ discountAmount() | currency:'PEN':'S/ ' }}</span></div>
+            <div class="row total"><span>Total final</span><span>{{ finalTotal() | currency:'PEN':'S/ ' }}</span></div>
+          </div>
+
+          <label class="field">
+            <span>Motivo del descuento</span>
+            <select
+              class="discount-reason-select"
+              [value]="discountReason()"
+              (change)="onDiscountReasonInput($event)"
+            >
+              <option value="" disabled>Selecciona un motivo</option>
+              <option value="Mayorista">Mayorista</option>
+              <option value="Rebaja">Rebaja</option>
+              <option value="Frecuente">Frecuente</option>
+            </select>
+          </label>
+          @if (reasonMissing()) {
+            <p class="pos-warn">Escribe el motivo del descuento antes de confirmar.</p>
+          }
+        }
+
+        <label class="field">
           <span>Cliente (opcional, para el ticket)</span>
-          <input type="text" placeholder="Cliente en tienda" [value]="customerName()" (input)="onInput('customerName', $event)" />
+          <input type="text" placeholder="Clientes Varios" [value]="customerName()" (input)="onInput('customerName', $event)" />
         </label>
 
         <div class="pay-toggle">
@@ -141,6 +253,13 @@
           >
             📱 QR
           </button>
+          <button
+            type="button"
+            [class.selected]="posPayment() === 'mixto'"
+            (click)="selectPayment('mixto')"
+          >
+            💵📱 Mixto
+          </button>
         </div>
 
         @if (posPayment() === 'efectivo') {
@@ -154,6 +273,14 @@
             } @else {
               <p class="change-line short">Faltan {{ -change() | currency:'PEN':'S/ ' }} para cubrir el total.</p>
             }
+          }
+        } @else if (posPayment() === 'mixto') {
+          <label class="field">
+            <span>Monto en efectivo (S/)</span>
+            <input type="number" min="0" step="0.10" placeholder="0.00" [value]="mixedCashInput()" (input)="onMixedCashInput($event)" />
+          </label>
+          @if (mixedCashInput().trim() !== '') {
+            <p class="change-line ok">Resto por QR/Yape: <strong>{{ mixedQrAmount() | currency:'PEN':'S/ ' }}</strong></p>
           }
         } @else {
           <p class="qr-note">📱 El cliente escanea el QR del mostrador; verificas el Yape/Plin y confirmas al instante.</p>

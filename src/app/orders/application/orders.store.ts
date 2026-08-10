@@ -99,11 +99,11 @@ export class OrdersStore {
       this._orders().map(o =>
         o.id === orderId
           ? {
-              ...o,
-              paidAt: paidAt.toISOString(),
-              deliveryDate: deliveryDate.toISOString(),
-              paymentMethod: 'qr' as PaymentMethod,
-            }
+            ...o,
+            paidAt: paidAt.toISOString(),
+            deliveryDate: deliveryDate.toISOString(),
+            paymentMethod: 'qr' as PaymentMethod,
+          }
           : o
       )
     );
@@ -118,7 +118,8 @@ export class OrdersStore {
     items: CartItem[],
     total: number,
     customerName: string,
-    payment: { method: PaymentMethod; cashReceived?: number }
+    payment: { method: PaymentMethod; cashReceived?: number; qrAmount?: number },
+    discount?: { subtotal: number; reason: string }
   ): Order | undefined {
     const user = this.authStore.currentUser();
     if (!user || user.role !== 'operator' || items.length === 0) return undefined;
@@ -131,7 +132,7 @@ export class OrdersStore {
       items,
       total,
       method: 'tienda',
-      shipping: { fullName: customerName || 'Cliente en tienda', phone: '—' },
+      shipping: { fullName: customerName || 'Clientes Varios', phone: '—' },
       createdAt: now.toISOString(),
       qrExpiresAt: now.toISOString(),   // never pending: paid on the spot
       paidAt: now.toISOString(),
@@ -139,6 +140,10 @@ export class OrdersStore {
       trackingStep: FINAL_TRACKING_STEP,
       paymentMethod: payment.method,
       cashReceived: payment.cashReceived,
+      qrAmount: payment.qrAmount,
+      sellerName: user.name,
+      subtotal: discount?.subtotal,
+      discountReason: discount?.reason,
     };
     this.update([order, ...this._orders()]);
     return order;

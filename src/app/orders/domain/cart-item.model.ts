@@ -7,7 +7,8 @@ export interface CartItem {
   imageUrl: string;       // snapshot for display
   size: string;
   color: string;
-  unitPrice: number;      // snapshot: price when added
+  catalogPrice: number;   // snapshot: list/catalog price at add-time (the ceiling — never edited)
+  unitPrice: number;      // snapshot: price actually charged (editable in-store via "regateo")
   quantity: number;
   maxStock: number;       // UX limit: can't order more than available
 }

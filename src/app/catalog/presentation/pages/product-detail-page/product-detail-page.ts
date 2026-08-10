@@ -167,6 +167,7 @@ export class ProductDetailPage implements OnInit {
       imageUrl: product.imageUrl,
       size: variant.size,
       color: variant.color,
+      catalogPrice: this.effectivePrice(),  // online store: no negotiation, same as unitPrice
       unitPrice: this.effectivePrice(),  // snapshot: promo price if one is active
       maxStock: variant.totalStock,
     });
