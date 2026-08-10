@@ -1,7 +1,7 @@
 /** An item in the cart references an exact variant by SKU (the Published Language
  *  between Catalog and Orders) plus a snapshot of display data at add-time. */
 export interface CartItem {
-  sku: string;            // 'RS-CJCN-H-S-NEG' — the exact variant
+  sku: string;            // 'RS-CJCN-H-S-NEG-T1' — the exact variant (in its store)
   productId: string;
   name: string;           // snapshot for display
   imageUrl: string;       // snapshot for display

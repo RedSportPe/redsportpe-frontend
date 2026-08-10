@@ -2,10 +2,11 @@ import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CatalogStore } from '../../../application/catalog.store';
 import { GarmentTypesStore } from '../../../application/garment-types.store';
+import { ColorsStore } from '../../../application/colors.store';
 import { Variant } from '../../../domain/product.model';
-import { buildSku, isValidSku } from '../../../domain/sku.value-object';
+import { buildSku, isValidSku, sizesForGender, BRAND_CODES, STORES } from '../../../domain/sku.value-object';
 import { splitProductCode } from '../../../domain/garment-type.model';
-import { COLOR_LABELS, SIZE_ORDER, sizeLabel } from '../../../domain/product-filtering';
+import { sizeLabel } from '../../../domain/product-filtering';
 import { UnsavedChangesAware } from '../../../../layout/unsaved-changes.guard';
 
 /** One editable variant row; the SKU derives from code + gender + size + color */
@@ -33,6 +34,7 @@ const VARIANT_GENDERS: [Variant['gender'], string][] = [
 export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
   readonly store = inject(CatalogStore);
   readonly garmentTypesStore = inject(GarmentTypesStore);
+  readonly colorsStore = inject(ColorsStore);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -42,9 +44,11 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
   private leaving = false;
 
   readonly genderOptions = VARIANT_GENDERS;
-  readonly sizeOptions = SIZE_ORDER;
-  readonly colorOptions = Object.entries(COLOR_LABELS);
+  readonly brandOptions = Object.entries(BRAND_CODES);
+  readonly storeOptions = STORES;
+  readonly colorOptions = this.colorsStore.colors;
   readonly sizeLabel = sizeLabel;
+  readonly sizesForGender = sizesForGender;
   readonly garmentTypes = this.garmentTypesStore.types;
 
   readonly editingId = signal<string | null>(null);
@@ -58,6 +62,10 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
   /** Gallery: data URLs read from the admin's uploaded files. The FIRST one
    *  is the cover shown on cards/cart. Real file storage comes with the backend. */
   readonly images = signal<string[]>([]);
+  /** SKU brand prefix: RS (RedSport), AD (Adidas), NK (Nike) */
+  readonly brand = signal('RS');
+  /** SKU store suffix: which tienda holds this stock (T1 = Tienda 1) */
+  readonly storeCode = signal('T1');
   /** SKU code = garmentType (e.g. 'CJ') + modelCode (e.g. 'TP') = 'CJTP' */
   readonly garmentType = signal('');
   readonly modelCode = signal('');
@@ -70,6 +78,12 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
   readonly newTypeCode = signal('');
   readonly newTypeLabel = signal('');
   readonly newTypeError = signal<string | null>(null);
+
+  // "+ Agregar color nuevo" inline mini-form (opened from a variant row's select)
+  readonly addingColorForRow = signal<number | null>(null);
+  readonly newColorCode = signal('');
+  readonly newColorLabel = signal('');
+  readonly newColorError = signal<string | null>(null);
 
   readonly published = signal(true);
   readonly featured = signal(false);
@@ -105,6 +119,8 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
       category: this.category(),
       price: this.price(),
       images: this.images(),
+      brand: this.brand(),
+      storeCode: this.storeCode(),
       code: this.productCode(),
       published: this.published(),
       featured: this.featured(),
@@ -148,8 +164,11 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
     );
     this.published.set(product.published);
     this.featured.set(product.featured);
-    // The product code lives inside every SKU: RS-[CODE]-...
-    const fullCode = product.variants[0]?.sku.split('-')[1] ?? '';
+    // SKU segments: [BRAND]-[CODE]-[GENDER]-[SIZE]-[COLOR]-[STORE]
+    const segments = product.variants[0]?.sku.split('-') ?? [];
+    this.brand.set(segments[0] || 'RS');
+    this.storeCode.set(segments[5] || 'T1');
+    const fullCode = segments[1] ?? '';
     const split = splitProductCode(fullCode, this.garmentTypes());
     if (split) {
       this.garmentType.set(split.typeCode);
@@ -176,7 +195,7 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
   /** Live SKU preview per row ('—' while the parts are incomplete/invalid) */
   skuFor(row: VariantRow): string {
     try {
-      return buildSku(this.productCode(), row.gender, row.size, row.color);
+      return buildSku(this.brand(), this.productCode(), row.gender, row.size, row.color, this.storeCode());
     } catch {
       return '—';
     }
@@ -188,12 +207,22 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
     if (!/^[A-Za-z0-9]{2,6}$/.test(this.productCode())) return false;
     const rows = this.variants();
     if (rows.length === 0 || rows.some(r => r.stock < 0)) return false;
-    const skus = rows.map(r => `RS-${this.productCode()}-${r.gender}-${r.size}-${r.color}`.toUpperCase());
+    const skus = rows.map(r =>
+      `${this.brand()}-${this.productCode()}-${r.gender}-${r.size}-${r.color}-${this.storeCode()}`.toUpperCase()
+    );
     return skus.every(sku => isValidSku(sku)) && new Set(skus).size === skus.length;
   });
 
   onText(field: 'name' | 'description' | 'category' | 'modelCode', event: Event): void {
     this[field].set((event.target as HTMLInputElement).value);
+  }
+
+  onBrandChange(event: Event): void {
+    this.brand.set((event.target as HTMLSelectElement).value);
+  }
+
+  onStoreChange(event: Event): void {
+    this.storeCode.set((event.target as HTMLSelectElement).value);
   }
 
   onGarmentTypeChange(event: Event): void {
@@ -268,13 +297,59 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
 
   updateRow(index: number, field: keyof VariantRow, event: Event): void {
     const value = (event.target as HTMLInputElement | HTMLSelectElement).value;
+
+    // The color select has a "+ Agregar color nuevo…" entry
+    if (field === 'color' && value === '__new__') {
+      this.addingColorForRow.set(index);
+      return;
+    }
+
     this.variants.update(rows =>
-      rows.map((row, i) =>
-        i === index
-          ? { ...row, [field]: field === 'stock' ? Math.max(0, Number(value) || 0) : value }
-          : row
-      )
+      rows.map((row, i) => {
+        if (i !== index) return row;
+        const next = {
+          ...row,
+          [field]: field === 'stock' ? Math.max(0, Number(value) || 0) : value,
+        };
+        // Business rule: kids (NO/NA) wear even 4-16, adults wear S-XXL —
+        // switching gender snaps the size into the right table
+        if (field === 'gender' && !sizesForGender(next.gender).includes(next.size)) {
+          next.size = sizesForGender(next.gender)[0];
+        }
+        return next;
+      })
     );
+  }
+
+  onNewColorCode(event: Event): void {
+    this.newColorCode.set((event.target as HTMLInputElement).value);
+  }
+
+  onNewColorLabel(event: Event): void {
+    this.newColorLabel.set((event.target as HTMLInputElement).value);
+  }
+
+  confirmNewColor(): void {
+    const row = this.addingColorForRow();
+    const err = this.colorsStore.addColor(this.newColorCode(), this.newColorLabel());
+    if (err) {
+      this.newColorError.set(err);
+      return;
+    }
+    const code = this.newColorCode().trim().toUpperCase();
+    if (row !== null) {
+      this.variants.update(rows =>
+        rows.map((r, i) => (i === row ? { ...r, color: code } : r))
+      );
+    }
+    this.cancelNewColor();
+  }
+
+  cancelNewColor(): void {
+    this.addingColorForRow.set(null);
+    this.newColorCode.set('');
+    this.newColorLabel.set('');
+    this.newColorError.set(null);
   }
 
   addRow(): void {
@@ -291,7 +366,7 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
     let builtVariants: Variant[];
     try {
       builtVariants = this.variants().map(row => ({
-        sku: buildSku(this.productCode(), row.gender, row.size, row.color),
+        sku: buildSku(this.brand(), this.productCode(), row.gender, row.size, row.color, this.storeCode()),
         gender: row.gender,
         size: row.size,
         color: row.color,

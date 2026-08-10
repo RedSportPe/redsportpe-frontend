@@ -16,9 +16,9 @@
     "salesCount": 22,
     "createdAt": "2026-03-15",
     "variants": [
-      { "sku": "RS-CJCN-H-S-NEG", "gender": "H", "size": "S", "color": "NEG", "totalStock": 12 },
-      { "sku": "RS-CJCN-H-M-NEG", "gender": "H", "size": "M", "color": "NEG", "totalStock": 8 },
-      { "sku": "RS-CJCN-M-S-ROJ", "gender": "M", "size": "S", "color": "ROJ", "totalStock": 6 }
+      { "sku": "RS-CJCN-H-S-NEG-T1", "gender": "H", "size": "S", "color": "NEG", "totalStock": 12 },
+      { "sku": "RS-CJCN-H-M-NEG-T1", "gender": "H", "size": "M", "color": "NEG", "totalStock": 8 },
+      { "sku": "RS-CJCN-M-S-ROJ-T1", "gender": "M", "size": "S", "color": "ROJ", "totalStock": 6 }
     ]
   },
   {
@@ -33,9 +33,9 @@
     "salesCount": 35,
     "createdAt": "2026-02-10",
     "variants": [
-      { "sku": "RS-PDRF-U-M-ROJ", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 25 },
-      { "sku": "RS-PDRF-U-L-BLA", "gender": "U", "size": "L", "color": "BLA", "totalStock": 15 },
-      { "sku": "RS-PDRF-NO-12-ROJ", "gender": "NO", "size": "12", "color": "ROJ", "totalStock": 10 }
+      { "sku": "RS-PDRF-U-M-ROJ-T1", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 25 },
+      { "sku": "RS-PDRF-U-L-BLA-T1", "gender": "U", "size": "L", "color": "BLA", "totalStock": 15 },
+      { "sku": "RS-PDRF-NO-12-ROJ-T1", "gender": "NO", "size": "12", "color": "ROJ", "totalStock": 10 }
     ]
   },
   {
@@ -50,9 +50,9 @@
     "salesCount": 22,
     "createdAt": "2026-04-05",
     "variants": [
-      { "sku": "RS-SHRT-H-M-NEG", "gender": "H", "size": "M", "color": "NEG", "totalStock": 18 },
-      { "sku": "RS-SHRT-H-L-NEG", "gender": "H", "size": "L", "color": "NEG", "totalStock": 10 },
-      { "sku": "RS-SHRT-NO-10-AZU", "gender": "NO", "size": "10", "color": "AZU", "totalStock": 7 }
+      { "sku": "RS-SHRT-H-M-NEG-T1", "gender": "H", "size": "M", "color": "NEG", "totalStock": 18 },
+      { "sku": "RS-SHRT-H-L-NEG-T1", "gender": "H", "size": "L", "color": "NEG", "totalStock": 10 },
+      { "sku": "RS-SHRT-NO-10-AZU-T1", "gender": "NO", "size": "10", "color": "AZU", "totalStock": 7 }
     ]
   },
   {
@@ -67,9 +67,9 @@
     "salesCount": 18,
     "createdAt": "2026-05-12",
     "variants": [
-      { "sku": "RS-LEGG-M-S-ROJ", "gender": "M", "size": "S", "color": "ROJ", "totalStock": 15 },
-      { "sku": "RS-LEGG-M-M-NEG", "gender": "M", "size": "M", "color": "NEG", "totalStock": 20 },
-      { "sku": "RS-LEGG-M-XL-NEG", "gender": "M", "size": "XL", "color": "NEG", "totalStock": 5 }
+      { "sku": "RS-LEGG-M-S-ROJ-T1", "gender": "M", "size": "S", "color": "ROJ", "totalStock": 15 },
+      { "sku": "RS-LEGG-M-M-NEG-T1", "gender": "M", "size": "M", "color": "NEG", "totalStock": 20 },
+      { "sku": "RS-LEGG-M-XL-NEG-T1", "gender": "M", "size": "XL", "color": "NEG", "totalStock": 5 }
     ]
   },
   {
@@ -88,9 +88,9 @@
     "salesCount": 27,
     "createdAt": "2026-03-28",
     "variants": [
-      { "sku": "RS-HOOD-U-M-NEG", "gender": "U", "size": "M", "color": "NEG", "totalStock": 14 },
-      { "sku": "RS-HOOD-U-L-GRI", "gender": "U", "size": "L", "color": "GRI", "totalStock": 9 },
-      { "sku": "RS-HOOD-U-XXL-NEG", "gender": "U", "size": "XXL", "color": "NEG", "totalStock": 4 }
+      { "sku": "RS-HOOD-U-M-NEG-T1", "gender": "U", "size": "M", "color": "NEG", "totalStock": 14 },
+      { "sku": "RS-HOOD-U-L-GRI-T1", "gender": "U", "size": "L", "color": "GRI", "totalStock": 9 },
+      { "sku": "RS-HOOD-U-XXL-NEG-T1", "gender": "U", "size": "XXL", "color": "NEG", "totalStock": 4 }
     ]
   },
   {
@@ -105,8 +105,8 @@
     "salesCount": 40,
     "createdAt": "2026-07-20",
     "variants": [
-      { "sku": "RS-CAPP-U-M-ROJ", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 30 },
-      { "sku": "RS-CAPP-U-M-BLA", "gender": "U", "size": "M", "color": "BLA", "totalStock": 22 }
+      { "sku": "RS-CAPP-U-M-ROJ-T1", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 30 },
+      { "sku": "RS-CAPP-U-M-BLA-T1", "gender": "U", "size": "M", "color": "BLA", "totalStock": 22 }
     ]
   },
   {
@@ -121,7 +121,7 @@
     "salesCount": 12,
     "createdAt": "2026-04-10",
     "variants": [
-      { "sku": "RS-GBAG-U-M-NEG", "gender": "U", "size": "M", "color": "NEG", "totalStock": 0 }
+      { "sku": "RS-GBAG-U-M-NEG-T1", "gender": "U", "size": "M", "color": "NEG", "totalStock": 0 }
     ]
   },
   {
@@ -136,7 +136,7 @@
     "salesCount": 8,
     "createdAt": "2026-07-25",
     "variants": [
-      { "sku": "RS-SOCK-U-M-BLA", "gender": "U", "size": "M", "color": "BLA", "totalStock": 3 }
+      { "sku": "RS-SOCK-U-M-BLA-T1", "gender": "U", "size": "M", "color": "BLA", "totalStock": 3 }
     ]
   }
 ]

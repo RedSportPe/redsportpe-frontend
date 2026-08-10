@@ -11,6 +11,8 @@ export const DEFAULT_GARMENT_TYPES: GarmentType[] = [
   { code: 'CJ', label: 'Conjunto' },
   { code: 'C', label: 'Casaca' },
   { code: 'P', label: 'Pantalón' },
+  { code: 'T', label: 'Polo' },
+  { code: 'S', label: 'Short' },
 ];
 
 const GARMENT_TYPE_PATTERN = /^[A-Z]{1,3}$/;

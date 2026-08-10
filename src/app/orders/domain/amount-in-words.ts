@@ -22,7 +22,7 @@ function dosDigitos(n: number): string {
   const d = Math.floor(n / 10);
   const u = n % 10;
   if (n === 20) return 'VEINTE';
-  if (d === 2) return 'VEINTI' + UNIDADES[u].toLowerCase().replace(/^\w/, c => c.toUpperCase());
+  if (d === 2) return 'VEINTI' + UNIDADES[u];
   return u === 0 ? DECENAS[d] : `${DECENAS[d]} Y ${UNIDADES[u]}`;
 }
 

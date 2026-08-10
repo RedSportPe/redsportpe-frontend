@@ -11,7 +11,8 @@ export const GENDER_LABELS: Record<GenderFilter, string> = {
 };
 
 /** Official SKU color codes table (part of the ubiquitous language).
- *  Add new colors here when the business starts selling them. */
+ *  Extensible at runtime: the admin can add colors (JAD = Jade) from the
+ *  product form via ColorsStore, which calls registerColor below. */
 export const COLOR_LABELS: Record<string, string> = {
   'NEG': 'Negro',
   'ROJ': 'Rojo',
@@ -20,6 +21,11 @@ export const COLOR_LABELS: Record<string, string> = {
   'AZU': 'Azul',
   'BEI': 'Beige',
 };
+
+/** Runtime extension point — keeps colorLabel() working app-wide for new colors */
+export function registerColor(code: string, label: string): void {
+  COLOR_LABELS[code] = label;
+}
 
 /** Translates a SKU color code to its display name (falls back to the code) */
 export function colorLabel(code: string): string {
@@ -50,11 +56,11 @@ export function filterByColor(products: Product[], colorCode: string | 'all'): P
   return products.filter(p => p.variants.some(v => v.color === colorCode));
 }
 /** Official size order (part of the ubiquitous language):
- *  numeric kids sizes first (8-16), then adult sizes S to XXL */
-export const SIZE_ORDER: string[] = ['8', '10', '12', '14', '16', 'S', 'M', 'L', 'XL', 'XXL'];
+ *  kids EVEN sizes first (4-16, for NO/NA), then adult sizes S to XXL */
+export const SIZE_ORDER: string[] = ['4', '6', '8', '10', '12', '14', '16', 'S', 'M', 'L', 'XL', 'XXL'];
 
 export const SIZE_LABELS: Record<string, string> = {
-  '8': '8', '10': '10', '12': '12', '14': '14', '16': '16',
+  '4': '4', '6': '6', '8': '8', '10': '10', '12': '12', '14': '14', '16': '16',
   'S': 'S (Small)',
   'M': 'M (Medium)',
   'L': 'L (Large)',

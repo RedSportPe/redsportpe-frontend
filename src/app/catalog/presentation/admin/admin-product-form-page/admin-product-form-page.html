@@ -31,6 +31,24 @@
           </label>
 
           <label class="field">
+            <span>Marca</span>
+            <select [value]="brand()" (change)="onBrandChange($event)">
+              @for (option of brandOptions; track option[0]) {
+                <option [value]="option[0]" [selected]="option[0] === brand()">{{ option[1] }} ({{ option[0] }})</option>
+              }
+            </select>
+          </label>
+
+          <label class="field">
+            <span>Tienda (stock)</span>
+            <select [value]="storeCode()" (change)="onStoreChange($event)">
+              @for (option of storeOptions; track option.code) {
+                <option [value]="option.code" [selected]="option.code === storeCode()">{{ option.label }} ({{ option.code }})</option>
+              }
+            </select>
+          </label>
+
+          <label class="field">
             <span>Tipo de prenda</span>
             <select [value]="garmentType()" (change)="onGarmentTypeChange($event)">
               <option value="" disabled>Selecciona un tipo</option>
@@ -87,7 +105,7 @@
         </div>
 
         <h2>Variantes</h2>
-        <p class="hint">El SKU se genera solo: RS-[código]-[género]-[talla]-[color]</p>
+        <p class="hint">El SKU se genera solo: [marca]-[código]-[género]-[talla]-[color]-[tienda]</p>
 
         <div class="variants">
           @for (row of variants(); track $index) {
@@ -98,16 +116,18 @@
                 }
               </select>
 
+              <!-- Kids (NO/NA): even 4-16 · Adults (H/M/U): S-XXL -->
               <select [value]="row.size" (change)="updateRow($index, 'size', $event)">
-                @for (size of sizeOptions; track size) {
+                @for (size of sizesForGender(row.gender); track size) {
                   <option [value]="size" [selected]="size === row.size">{{ sizeLabel(size) }}</option>
                 }
               </select>
 
               <select [value]="row.color" (change)="updateRow($index, 'color', $event)">
-                @for (color of colorOptions; track color[0]) {
-                  <option [value]="color[0]" [selected]="color[0] === row.color">{{ color[1] }}</option>
+                @for (color of colorOptions(); track color.code) {
+                  <option [value]="color.code" [selected]="color.code === row.color">{{ color.label }}</option>
                 }
+                <option value="__new__">+ Agregar color nuevo…</option>
               </select>
 
               <input
@@ -124,6 +144,26 @@
             </div>
           }
         </div>
+
+        @if (addingColorForRow() !== null) {
+          <div class="new-type-inline new-color-inline">
+            <label class="field">
+              <span>Abreviatura (3 letras)</span>
+              <input type="text" placeholder="JAD" maxlength="3" [value]="newColorCode()" (input)="onNewColorCode($event)" />
+            </label>
+            <label class="field">
+              <span>Nombre del color</span>
+              <input type="text" placeholder="Jade" [value]="newColorLabel()" (input)="onNewColorLabel($event)" />
+            </label>
+            <div class="new-type-actions">
+              <button type="button" class="ghost-btn" (click)="confirmNewColor()">Agregar</button>
+              <button type="button" class="ghost-btn" (click)="cancelNewColor()">Cancelar</button>
+            </div>
+            @if (newColorError()) {
+              <p class="form-error">{{ newColorError() }}</p>
+            }
+          </div>
+        }
 
         <button type="button" class="add-row" (click)="addRow()">＋ Agregar variante</button>
 

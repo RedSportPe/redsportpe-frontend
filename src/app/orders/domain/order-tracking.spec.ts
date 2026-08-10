@@ -50,8 +50,8 @@ describe('order-tracking', () => {
 
   describe('productHasActiveOrders (delete-product rule)', () => {
     const item = {
-      sku: 'RS-CJCN-H-S-NEG', productId: 'p-1', name: 'Jacket', imageUrl: '',
-      size: 'S', color: 'NEG', unitPrice: 100, quantity: 1, maxStock: 5,
+      sku: 'RS-CJCN-H-S-NEG-T1', productId: 'p-1', name: 'Jacket', imageUrl: '',
+      size: 'S', color: 'NEG', catalogPrice: 100, unitPrice: 100, quantity: 1, maxStock: 5,
     };
 
     it('blocks deletion while an undelivered order references the product', () => {
