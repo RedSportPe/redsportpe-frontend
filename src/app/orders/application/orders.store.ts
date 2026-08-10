@@ -4,6 +4,7 @@ import { Order, DeliveryMethod, PaymentMethod, ShippingDetails } from '../domain
 import { qrExpiry, motorizadoDeliveryDate, shalomDispatchDate } from '../domain/delivery-rules';
 import { nextTrackingStep, FINAL_TRACKING_STEP } from '../domain/order-tracking';
 import { AuthStore } from '../../identity/application/auth.store';
+import { AgentsStore } from '../../identity/application/agents.store';
 import { pointsForPurchase } from '../../identity/domain/redsport-points';
 
 /** Orders DO persist in sessionStorage (unlike the cart): "Mis pedidos" would be
@@ -12,6 +13,7 @@ import { pointsForPurchase } from '../../identity/domain/redsport-points';
 export class OrdersStore {
   private readonly STORAGE_KEY = 'redsport_orders';
   private authStore = inject(AuthStore);
+  private agentsStore = inject(AgentsStore);
 
   private _orders = signal<Order[]>(this.loadFromSession());
 
@@ -119,10 +121,20 @@ export class OrdersStore {
     total: number,
     customerName: string,
     payment: { method: PaymentMethod; cashReceived?: number; qrAmount?: number },
-    discount?: { subtotal: number; reason: string }
+    discount?: { subtotal: number; reason: string },
+    customerDoc?: string
   ): Order | undefined {
     const user = this.authStore.currentUser();
     if (!user || user.role !== 'operator' || items.length === 0) return undefined;
+
+    // Boleta number: the operator's tienda gives the serie; the correlativo is
+    // derived from already-persisted sales (SIMULATED — the real one will come
+    // from the facturación provider through the backend).
+    const storeCode = user.storeCode ?? 'T1';
+    const serie = this.agentsStore.byCode(storeCode)?.boletaSerie ?? 'B001';
+    const correlativo =
+      this._orders().filter(o => o.boletaNumber?.startsWith(serie)).length + 1;
+    const boletaNumber = `${serie}-${String(correlativo).padStart(8, '0')}`;
 
     const now = new Date();
     const order: Order = {
@@ -142,6 +154,9 @@ export class OrdersStore {
       cashReceived: payment.cashReceived,
       qrAmount: payment.qrAmount,
       sellerName: user.name,
+      storeCode,
+      boletaNumber,
+      customerDoc: customerDoc?.trim() || '00000001',   // Clientes Varios
       subtotal: discount?.subtotal,
       discountReason: discount?.reason,
     };

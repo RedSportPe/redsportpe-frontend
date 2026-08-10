@@ -11,6 +11,9 @@ import { isValidSku } from '../../../../catalog/domain/sku.value-object';
 import { ScanDetector } from '../scan-detection';
 import { ImpresionService } from '../../../../core/services/impresion.service';
 import { montoEnLetras } from '../../../domain/amount-in-words';
+import { AuthStore } from '../../../../identity/application/auth.store';
+import { AgentsStore } from '../../../../identity/application/agents.store';
+import { COMPANY } from '../../../../core/company-info';
 
 /** The in-store register: the cashier scans SKUs, the ticket fills up, and the
  *  sale confirms on the spot — cash (amount received → change) or instant QR. */
@@ -25,9 +28,17 @@ export class PosPage implements OnInit {
   private promotionsStore = inject(PromotionsStore);
   private ordersStore = inject(OrdersStore);
   private impresionService = inject(ImpresionService);
+  private authStore = inject(AuthStore);
+  private agentsStore = inject(AgentsStore);
 
   readonly colorLabel = colorLabel;
   readonly montoEnLetras = montoEnLetras;
+  readonly company = COMPANY;
+
+  /** The tienda running this register — feeds the boleta header */
+  readonly agent = computed(() =>
+    this.agentsStore.byCode(this.authStore.currentUser()?.storeCode ?? 'T1')
+  );
 
   private scanBox = viewChild<ElementRef<HTMLInputElement>>('scanBox');
   private scanDetector = new ScanDetector();
@@ -78,6 +89,8 @@ export class PosPage implements OnInit {
 
   // Payment
   readonly customerName = signal('');
+  /** Customer DNI for the boleta — empty prints the generic 00000001 */
+  readonly customerDoc = signal('');
   readonly posPayment = signal<PaymentMethod>('efectivo');
   readonly cashReceived = signal('');
   /** 'mixto' only: how much of the total the customer pays in cash — the rest goes to QR */
@@ -115,7 +128,7 @@ export class PosPage implements OnInit {
     this.promotionsStore.loadPromos();  // in-store sales honor active promos too
   }
 
-  onInput(field: 'customerName' | 'cashReceived', event: Event): void {
+  onInput(field: 'customerName' | 'customerDoc' | 'cashReceived', event: Event): void {
     this[field].set((event.target as HTMLInputElement).value);
   }
 
@@ -300,7 +313,8 @@ export class PosPage implements OnInit {
       },
       this.hasDiscount()
         ? { subtotal: this.subtotal(), reason: this.discountReason().trim() }
-        : undefined
+        : undefined,
+      this.customerDoc()
     );
     if (order) {
       this.completedSale.set(order);
@@ -332,6 +346,7 @@ export class PosPage implements OnInit {
   newSale(): void {
     this.completedSale.set(null);
     this.customerName.set('');
+    this.customerDoc.set('');
     this.cashReceived.set('');
     this.mixedCashInput.set('');
     this.totalAdjustmentInput.set('');

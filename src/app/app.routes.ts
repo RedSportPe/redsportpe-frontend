@@ -36,6 +36,12 @@ export const routes: Routes = [
           import('./promotions/presentation/admin/admin-promos-page/admin-promos-page').then(m => m.AdminPromosPage),
       },
       {
+        path: 'agentes',
+        canDeactivate: [unsavedChangesGuard],
+        loadComponent: () =>
+          import('./identity/presentation/admin/admin-agents-page/admin-agents-page').then(m => m.AdminAgentsPage),
+      },
+      {
         // 404 inside the panel: unknown /admin URLs keep the sidebar
         path: '**',
         loadComponent: () =>

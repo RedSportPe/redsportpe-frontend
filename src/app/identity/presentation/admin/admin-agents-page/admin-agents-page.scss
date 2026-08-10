@@ -1,0 +1,162 @@
+.page-header {
+  margin-bottom: 1.5rem;
+
+  h1 {
+    font-size: 1.7rem;
+
+    &::after {
+      content: '';
+      display: block;
+      width: 50px;
+      height: 4px;
+      background: var(--rs-red);
+      margin-top: 0.4rem;
+    }
+  }
+
+  .subtitle {
+    color: var(--rs-text-muted);
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
+  }
+}
+
+// ===== Create/edit card (mirrors Descuentos) =====
+.create-card {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-left: 3px solid var(--rs-red);
+  border-radius: 10px;
+  padding: 1.4rem;
+  margin-bottom: 1.5rem;
+
+  h2 { font-size: 1.05rem; margin-bottom: 1rem; }
+}
+
+.create-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--rs-text-muted);
+
+  input {
+    background: var(--rs-black);
+    color: var(--rs-text);
+    border: 1px solid var(--rs-border);
+    border-radius: 7px;
+    padding: 0.6rem 0.8rem;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+
+    &::placeholder { color: var(--rs-text-muted); }
+    &:hover, &:focus { border-color: var(--rs-red); outline: none; }
+  }
+}
+
+.form-warn {
+  color: #facc15;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-top: 0.8rem;
+}
+
+.create-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 1.2rem;
+}
+
+.create-btn {
+  background: var(--rs-red);
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+
+  &:hover:not(:disabled) { background: var(--rs-red-dark); }
+
+  &:disabled {
+    background: var(--rs-border);
+    color: var(--rs-text-muted);
+    cursor: not-allowed;
+  }
+}
+
+.clear-btn {
+  background: transparent;
+  border: 2px solid var(--rs-text-muted);
+  color: var(--rs-text);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  transition: border-color 0.2s, color 0.2s;
+
+  &:hover { border-color: var(--rs-red); color: var(--rs-red); }
+}
+
+// ===== Agents table =====
+.table-wrap {
+  overflow-x: auto;
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+
+  th {
+    text-align: left;
+    padding: 0.8rem 1rem;
+    color: var(--rs-text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--rs-border);
+  }
+
+  td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--rs-border);
+    vertical-align: middle;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .code { font-weight: 700; }
+  .name { font-weight: 600; }
+  .serie { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; }
+
+  .missing {
+    color: #facc15;
+    font-size: 0.8rem;
+  }
+}
+
+.edit-btn {
+  background: transparent;
+  border: 1px solid var(--rs-border);
+  color: var(--rs-text-muted);
+  font-size: 0.78rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 6px;
+
+  &:hover { border-color: var(--rs-red); color: var(--rs-text); }
+}
+
+@media (max-width: 768px) {
+  .create-grid { grid-template-columns: 1fr; }
+}

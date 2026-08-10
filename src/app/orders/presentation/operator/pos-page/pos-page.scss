@@ -453,6 +453,14 @@
     height: 0;
   }
 
+  .r-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+
+    span:last-child { white-space: nowrap; }
+  }
+
   .r-item { margin-top: 4px; }
   .r-item-qty { padding-left: 4px; font-size: 10px; }
 

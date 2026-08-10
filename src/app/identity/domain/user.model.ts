@@ -19,4 +19,6 @@ export interface User {
   createdAt: string;   // ISO date — "miembro desde"
   /** Saved on the first checkout; editable from "Mi cuenta" */
   deliveryInfo?: DeliveryInfo;
+  /** Operators only: which tienda (commercial agent) runs their register */
+  storeCode?: string;
 }

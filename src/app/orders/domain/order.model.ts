@@ -43,6 +43,13 @@ export interface Order {
   qrAmount?: number;
   /** Operator who ran the register — printed as "Vendedor" on the receipt */
   sellerName?: string;
+  /** POS: which tienda sold it (resolves address/serie for the boleta header) */
+  storeCode?: string;
+  /** POS: serie-correlativo of the printed boleta, e.g. B001-00000042.
+   *  SIMULATED counter until the backend/facturación provider assigns real ones. */
+  boletaNumber?: string;
+  /** POS: customer's DNI for the boleta ('00000001' = Clientes Varios) */
+  customerDoc?: string;
   /** POS "regateo": sum of catalogPrice × qty, before any negotiation.
    *  Present only on in-store sales that used price editing. total < subtotal when discounted. */
   subtotal?: number;

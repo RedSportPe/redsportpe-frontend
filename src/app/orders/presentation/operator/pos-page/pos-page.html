@@ -4,7 +4,9 @@
     <div class="pos-success">
       <div class="check">✓</div>
       <h1>¡Venta registrada!</h1>
-      <p class="sale-code">Venta <strong>{{ sale.code }}</strong> · {{ sale.shipping.fullName }}</p>
+      <p class="sale-code">
+        Boleta <strong>{{ sale.boletaNumber }}</strong> · Venta {{ sale.code }} · {{ sale.shipping.fullName }}
+      </p>
 
       <div class="detail-card">
         @if (sale.subtotal && sale.subtotal !== sale.total) {
@@ -54,14 +56,25 @@
 
     <!-- Print-only: hidden on screen, shown by the @media print rule in styles.scss -->
     <div id="receipt-print" class="receipt">
-      <p class="r-center r-bold r-big">REDSPORT</p>
-      <p class="r-center">Boleta de venta</p>
+      <!-- Legal header (SUNAT registry data) + the selling tienda's address -->
+      <p class="r-center r-bold r-big">{{ company.nombreComercial }}</p>
+      <p class="r-center r-small">{{ company.razonSocial }}</p>
+      @if (agent()?.address) {
+        <p class="r-center r-small">{{ agent()?.address }}</p>
+      }
+      <p class="r-center">RUC: {{ company.ruc }}</p>
       <p class="r-line"></p>
-      <p>Venta: {{ sale.code }}</p>
-      <p>Fecha: {{ sale.paidAt | date:'dd/MM/yyyy HH:mm' }}</p>
+      <p class="r-center r-bold">BOLETA DE VENTA</p>
+      <p class="r-center">{{ sale.boletaNumber }}</p>
+      <p class="r-line"></p>
+      <p>{{ agent()?.name ?? 'Tienda' }} ({{ sale.storeCode }}) · Caja: 1</p>
+      <p>Fecha: {{ sale.paidAt | date:'dd/MM/yyyy' }} · Hora: {{ sale.paidAt | date:'HH:mm' }}</p>
+      <p>Ticket: {{ sale.code }}</p>
       <p>Vendedor: {{ sale.sellerName }}</p>
       <p class="r-line"></p>
-      <p>Cliente: {{ sale.shipping.fullName }}</p>
+      <p class="r-bold">Cliente</p>
+      <p>Nombre: {{ sale.shipping.fullName }}</p>
+      <p>Número de Documento: {{ sale.customerDoc }}</p>
       <p class="r-line"></p>
       @for (item of sale.items; track item.sku) {
         <p class="r-item">{{ item.name }} — {{ colorLabel(item.color) }}, talla {{ item.size }}</p>
@@ -72,31 +85,30 @@
       }
       <p class="r-line"></p>
       @if (sale.subtotal && sale.subtotal !== sale.total) {
-        <p>Subtotal: {{ sale.subtotal | currency:'PEN':'S/ ' }}</p>
-        <p>Descuento: −{{ sale.subtotal - sale.total | currency:'PEN':'S/ ' }}</p>
-        <p>Motivo: {{ sale.discountReason }}</p>
+        <p class="r-row"><span>SUBTOTAL</span><span>{{ sale.subtotal | currency:'PEN':'S/ ' }}</span></p>
+        <p class="r-row"><span>TOTAL DCTO. ({{ sale.discountReason }})</span><span>-{{ sale.subtotal - sale.total | currency:'PEN':'S/ ' }}</span></p>
       }
-      <p class="r-total">TOTAL: {{ sale.total | currency:'PEN':'S/ ' }}</p>
+      <p class="r-row r-total"><span>TOTAL A PAGAR</span><span>{{ sale.total | currency:'PEN':'S/ ' }}</span></p>
+      <p class="r-line"></p>
+      <p>Son: {{ montoEnLetras(sale.total) }}</p>
       <p class="r-line"></p>
       @if (sale.paymentMethod === 'efectivo') {
-        <p>Efectivo</p>
-        <p>Son: {{ montoEnLetras(sale.total) }}</p>
-        <p class="r-line"></p>
-        <p>Recibido: {{ sale.cashReceived | currency:'PEN':'S/ ' }}</p>
-        <p>Vuelto: {{ (sale.cashReceived ?? 0) - sale.total | currency:'PEN':'S/ ' }}</p>
+        <p class="r-row"><span>Efectivo</span><span>{{ sale.cashReceived | currency:'PEN':'S/ ' }}</span></p>
+        <p class="r-row"><span>Cambio</span><span>-{{ (sale.cashReceived ?? 0) - sale.total | currency:'PEN':'S/ ' }}</span></p>
       } @else if (sale.paymentMethod === 'mixto') {
-        <p>Pago mixto</p>
-        <p>Son: {{ montoEnLetras(sale.total) }}</p>
-        <p class="r-line"></p>
-        <p>Efectivo: {{ sale.cashReceived | currency:'PEN':'S/ ' }}</p>
-        <p>QR/Yape: {{ sale.qrAmount | currency:'PEN':'S/ ' }}</p>
+        <p class="r-row"><span>Efectivo</span><span>{{ sale.cashReceived | currency:'PEN':'S/ ' }}</span></p>
+        <p class="r-row"><span>QR Yape/Plin</span><span>{{ sale.qrAmount | currency:'PEN':'S/ ' }}</span></p>
       } @else {
-        <p>Pago: QR Yape/Plin</p>
-        <p>Son: {{ montoEnLetras(sale.total) }}</p>
+        <p class="r-row"><span>QR Yape/Plin</span><span>{{ sale.total | currency:'PEN':'S/ ' }}</span></p>
       }
       <p class="r-line"></p>
-      <p class="r-center">¡Gracias por tu compra!</p>
-      <p class="r-center r-small">redsport.pe</p>
+      <p class="r-center r-bold">GRACIAS POR COMPRAR EN {{ company.nombreComercial }}</p>
+      <p class="r-center r-small">Entérate de la política de cambios y devoluciones en redsport.pe/cambios</p>
+      <p class="r-line"></p>
+      <p class="r-center r-small">Copia de cliente</p>
+      <p class="r-small">
+        LEYENDA: ESTA ES UNA REPRESENTACIÓN IMPRESA DE LA BOLETA DE VENTA.
+      </p>
     </div>
   } @else {
     <h1>Caja</h1>
@@ -236,6 +248,11 @@
         <label class="field">
           <span>Cliente (opcional, para el ticket)</span>
           <input type="text" placeholder="Clientes Varios" [value]="customerName()" (input)="onInput('customerName', $event)" />
+        </label>
+
+        <label class="field">
+          <span>DNI del cliente (opcional)</span>
+          <input type="text" placeholder="00000001" maxlength="12" [value]="customerDoc()" (input)="onInput('customerDoc', $event)" />
         </label>
 
         <div class="pay-toggle">

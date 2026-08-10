@@ -4,7 +4,8 @@ import { CatalogStore } from '../../../application/catalog.store';
 import { GarmentTypesStore } from '../../../application/garment-types.store';
 import { ColorsStore } from '../../../application/colors.store';
 import { Variant } from '../../../domain/product.model';
-import { buildSku, isValidSku, sizesForGender, BRAND_CODES, STORES } from '../../../domain/sku.value-object';
+import { buildSku, isValidSku, sizesForGender, BRAND_CODES } from '../../../domain/sku.value-object';
+import { AgentsStore } from '../../../../identity/application/agents.store';
 import { splitProductCode } from '../../../domain/garment-type.model';
 import { sizeLabel } from '../../../domain/product-filtering';
 import { UnsavedChangesAware } from '../../../../layout/unsaved-changes.guard';
@@ -35,6 +36,7 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
   readonly store = inject(CatalogStore);
   readonly garmentTypesStore = inject(GarmentTypesStore);
   readonly colorsStore = inject(ColorsStore);
+  readonly agentsStore = inject(AgentsStore);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -45,7 +47,8 @@ export class AdminProductFormPage implements OnInit, UnsavedChangesAware {
 
   readonly genderOptions = VARIANT_GENDERS;
   readonly brandOptions = Object.entries(BRAND_CODES);
-  readonly storeOptions = STORES;
+  /** Tiendas come from the admin's Agentes Comerciales registry (T1…TN) */
+  readonly storeOptions = this.agentsStore.agents;
   readonly colorOptions = this.colorsStore.colors;
   readonly sizeLabel = sizeLabel;
   readonly sizesForGender = sizesForGender;

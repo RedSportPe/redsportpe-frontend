@@ -42,8 +42,8 @@
           <label class="field">
             <span>Tienda (stock)</span>
             <select [value]="storeCode()" (change)="onStoreChange($event)">
-              @for (option of storeOptions; track option.code) {
-                <option [value]="option.code" [selected]="option.code === storeCode()">{{ option.label }} ({{ option.code }})</option>
+              @for (option of storeOptions(); track option.storeCode) {
+                <option [value]="option.storeCode" [selected]="option.storeCode === storeCode()">{{ option.name }} ({{ option.storeCode }})</option>
               }
             </select>
           </label>

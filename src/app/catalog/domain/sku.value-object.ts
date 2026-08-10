@@ -16,10 +16,9 @@ export const BRAND_CODES: Record<string, string> = {
   NK: 'Nike',
 };
 
-export const STORES: { code: string; label: string }[] = [
-  { code: 'T1', label: 'Tienda 1' },
-  { code: 'T2', label: 'Tienda 2' },
-];
+// NOTE: the tienda list itself (T1…TN, addresses, boleta series) lives in
+// identity/domain/commercial-agent.model.ts — the admin manages it at
+// /admin/agentes. The SKU only validates the T\d+ shape.
 
 export const ADULT_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 /** Kids sizes are EVEN numbers only, 4 through 16 */

@@ -32,6 +32,7 @@ export class AuthRepository {
         role: 'operator',
         points: 0,
         createdAt: '2026-02-10T12:00:00.000Z',
+        storeCode: 'T1',
       },
       password: 'operador123',
     }],

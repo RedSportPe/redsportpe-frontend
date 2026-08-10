@@ -1,0 +1,85 @@
+<section class="admin-agents">
+  <header class="page-header">
+    <div>
+      <h1>Agentes Comerciales</h1>
+      <p class="subtitle">{{ store.count() }} tienda(s) registrada(s) — su información alimenta la boleta de venta</p>
+    </div>
+  </header>
+
+  <!-- Create / edit card -->
+  <article class="create-card" [class.rs-shake]="blocked()">
+    <h2>{{ isEditing() ? 'Editar ' + editingCode() : 'Nueva tienda' }}</h2>
+
+    <div class="create-grid">
+      <label class="field">
+        <span>Nombre {{ isEditing() ? '' : '(opcional — por defecto "Tienda N")' }}</span>
+        <input type="text" placeholder="Tienda 3" [value]="name()" (input)="onInput('name', $event)" />
+      </label>
+
+      <label class="field">
+        <span>Encargada/o de la caja</span>
+        <input type="text" placeholder="Nombre de la operadora" [value]="managerName()" (input)="onInput('managerName', $event)" />
+      </label>
+
+      <label class="field">
+        <span>Dirección física (va en la boleta)</span>
+        <input type="text" placeholder="Av. Ejemplo 123, Lima" [value]="address()" (input)="onInput('address', $event)" />
+      </label>
+
+      <label class="field">
+        <span>Teléfono (opcional)</span>
+        <input type="tel" placeholder="9 dígitos" [value]="phone()" (input)="onInput('phone', $event)" />
+      </label>
+    </div>
+
+    @if (blocked()) {
+      <p class="form-warn">Tienes datos sin guardar — guarda o limpia el formulario antes de salir.</p>
+    }
+
+    <div class="create-actions">
+      <button type="button" class="create-btn" [class.rs-pulse]="blocked()" [disabled]="!canSave()" (click)="save()">
+        {{ isEditing() ? 'Guardar cambios' : 'Crear tienda' }}
+      </button>
+      <button type="button" class="clear-btn" [class.rs-pulse]="blocked()" (click)="clearForm()">
+        {{ isEditing() ? 'Cancelar' : 'Limpiar' }}
+      </button>
+    </div>
+  </article>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th>Encargada/o</th>
+          <th>Dirección</th>
+          <th>Teléfono</th>
+          <th>Serie boleta</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (agent of store.agents(); track agent.storeCode) {
+          <tr>
+            <td class="code">{{ agent.storeCode }}</td>
+            <td class="name">{{ agent.name }}</td>
+            <td>{{ agent.managerName || '—' }}</td>
+            <td>
+              @if (agent.address) {
+                {{ agent.address }}
+              } @else {
+                <span class="missing">Sin configurar — la boleta la omite</span>
+              }
+            </td>
+            <td>{{ agent.phone ?? '—' }}</td>
+            <td class="serie">{{ agent.boletaSerie }}</td>
+            <td>
+              <button type="button" class="edit-btn" (click)="startEdit(agent)">Editar</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>
