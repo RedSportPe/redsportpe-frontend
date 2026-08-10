@@ -146,15 +146,35 @@ table {
   }
 }
 
-.edit-btn {
+.ubigeo {
+  display: block;
+  color: var(--rs-text-muted);
+  font-size: 0.75rem;
+  margin-top: 0.15rem;
+}
+
+.actions { white-space: nowrap; }
+
+.edit-btn,
+.view-btn {
+  display: inline-block;
   background: transparent;
   border: 1px solid var(--rs-border);
   color: var(--rs-text-muted);
   font-size: 0.78rem;
   padding: 0.35rem 0.8rem;
   border-radius: 6px;
+  margin-right: 0.35rem;
 
   &:hover { border-color: var(--rs-red); color: var(--rs-text); }
+}
+
+.view-btn {
+  border-color: var(--rs-red);
+  color: var(--rs-red);
+  font-weight: 600;
+
+  &:hover { background: var(--rs-red); color: #fff; }
 }
 
 @media (max-width: 768px) {

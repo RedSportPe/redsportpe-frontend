@@ -42,6 +42,11 @@ export const routes: Routes = [
           import('./identity/presentation/admin/admin-agents-page/admin-agents-page').then(m => m.AdminAgentsPage),
       },
       {
+        path: 'agentes/:storeCode',
+        loadComponent: () =>
+          import('./identity/presentation/admin/admin-agent-dashboard-page/admin-agent-dashboard-page').then(m => m.AdminAgentDashboardPage),
+      },
+      {
         // 404 inside the panel: unknown /admin URLs keep the sidebar
         path: '**',
         loadComponent: () =>

@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { Order } from '../../orders/domain/order.model';
 import { montoEnLetras } from '../../orders/domain/amount-in-words';
 import { AgentsStore } from '../../identity/application/agents.store';
+import { ubigeoLine } from '../../identity/domain/commercial-agent.model';
 import { COMPANY } from '../company-info';
 
 /** Talks to the local print bridge (ESC/POS over USB) running on
@@ -26,11 +27,14 @@ export class ImpresionService {
         codigo: order.storeCode,
         nombre: agent?.name,
         direccion: agent?.address || undefined,
+        ubigeo: agent ? ubigeoLine(agent) || undefined : undefined,  // "Cercado de Lima - Lima - Lima"
       },
       boleta: order.boletaNumber,
       fecha: order.paidAt,
       caja: 1,
       ticket: order.code,
+      // Kept for backward compatibility: older bridge templates print "Venta: {codigo}"
+      codigo: order.code,
       vendedor: order.sellerName,
       cliente: order.shipping.fullName,
       documentoCliente: order.customerDoc,

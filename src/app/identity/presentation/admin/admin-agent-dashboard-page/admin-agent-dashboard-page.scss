@@ -1,0 +1,159 @@
+.agent-dashboard {
+  max-width: 900px;
+}
+
+.back-link {
+  color: var(--rs-text-muted);
+  font-size: 0.88rem;
+
+  &:hover { color: var(--rs-red); }
+}
+
+.state-msg {
+  padding: 2rem 0;
+  color: var(--rs-text-muted);
+}
+
+.page-header {
+  margin: 0.8rem 0 1.5rem;
+
+  h1 {
+    font-size: 1.7rem;
+
+    &::after {
+      content: '';
+      display: block;
+      width: 50px;
+      height: 4px;
+      background: var(--rs-red);
+      margin-top: 0.4rem;
+    }
+  }
+
+  .subtitle {
+    color: var(--rs-text-muted);
+    font-size: 0.88rem;
+    margin-top: 0.5rem;
+    line-height: 1.5;
+  }
+}
+
+// ===== Summary cards =====
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+
+.card {
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 10px;
+  padding: 1.1rem 1.3rem;
+
+  &.highlight { border-top: 3px solid var(--rs-red); }
+
+  .card-label {
+    color: var(--rs-text-muted);
+    font-size: 0.8rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .card-value {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 700;
+  }
+
+  .card-sub {
+    color: var(--rs-text-muted);
+    font-size: 0.78rem;
+    margin-top: 0.2rem;
+  }
+}
+
+// ===== Filter chips =====
+.filter-chips {
+  display: flex;
+  gap: 0.6rem;
+  margin-bottom: 0.5rem;
+
+  button {
+    background: var(--rs-surface);
+    border: 1px solid var(--rs-border);
+    color: var(--rs-text-muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.5rem 1.1rem;
+    border-radius: 999px;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+
+    &:hover { border-color: var(--rs-red); color: var(--rs-text); }
+
+    &.active {
+      background: var(--rs-red-dark);
+      border-color: var(--rs-red);
+      color: var(--rs-text);
+    }
+  }
+}
+
+.online-note {
+  color: var(--rs-text-muted);
+  font-size: 0.78rem;
+  margin-bottom: 1rem;
+}
+
+// ===== Sales table =====
+.table-wrap {
+  overflow-x: auto;
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 10px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+
+  th {
+    text-align: left;
+    padding: 0.8rem 1rem;
+    color: var(--rs-text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    border-bottom: 1px solid var(--rs-border);
+  }
+
+  td {
+    padding: 0.7rem 1rem;
+    border-bottom: 1px solid var(--rs-border);
+    white-space: nowrap;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  .code { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; }
+  .total { font-weight: 700; }
+}
+
+.type {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.2rem 0.55rem;
+  border-radius: 5px;
+  background: #14532d;
+  color: #86efac;
+
+  &.online {
+    background: #1e3a8a;
+    color: #bfdbfe;
+  }
+}
+
+@media (max-width: 768px) {
+  .cards { grid-template-columns: 1fr; }
+}

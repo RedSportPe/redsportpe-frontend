@@ -23,12 +23,27 @@
 
       <label class="field">
         <span>Dirección física (va en la boleta)</span>
-        <input type="text" placeholder="Av. Ejemplo 123, Lima" [value]="address()" (input)="onInput('address', $event)" />
+        <input type="text" placeholder="Jr. Ejemplo NRO 123 INT. 45" [value]="address()" (input)="onInput('address', $event)" />
       </label>
 
       <label class="field">
         <span>Teléfono (opcional)</span>
         <input type="tel" placeholder="9 dígitos" [value]="phone()" (input)="onInput('phone', $event)" />
+      </label>
+
+      <label class="field">
+        <span>Departamento</span>
+        <input type="text" placeholder="Lima" [value]="department()" (input)="onInput('department', $event)" />
+      </label>
+
+      <label class="field">
+        <span>Provincia</span>
+        <input type="text" placeholder="Lima" [value]="province()" (input)="onInput('province', $event)" />
+      </label>
+
+      <label class="field">
+        <span>Distrito</span>
+        <input type="text" placeholder="Cercado de Lima" [value]="district()" (input)="onInput('district', $event)" />
       </label>
     </div>
 
@@ -68,14 +83,18 @@
             <td>
               @if (agent.address) {
                 {{ agent.address }}
+                @if (agent.district) {
+                  <span class="ubigeo">{{ agent.district }}, {{ agent.province }} — {{ agent.department }}</span>
+                }
               } @else {
                 <span class="missing">Sin configurar — la boleta la omite</span>
               }
             </td>
             <td>{{ agent.phone ?? '—' }}</td>
             <td class="serie">{{ agent.boletaSerie }}</td>
-            <td>
+            <td class="actions">
               <button type="button" class="edit-btn" (click)="startEdit(agent)">Editar</button>
+              <a [routerLink]="['/admin/agentes', agent.storeCode]" class="view-btn">Ver</a>
             </td>
           </tr>
         }

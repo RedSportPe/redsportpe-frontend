@@ -62,6 +62,9 @@
       @if (agent()?.address) {
         <p class="r-center r-small">{{ agent()?.address }}</p>
       }
+      @if (agentUbigeo()) {
+        <p class="r-center r-small">{{ agentUbigeo() }}</p>
+      }
       <p class="r-center">RUC: {{ company.ruc }}</p>
       <p class="r-line"></p>
       <p class="r-center r-bold">BOLETA DE VENTA</p>

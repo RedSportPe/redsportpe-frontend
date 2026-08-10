@@ -1,0 +1,85 @@
+<section class="agent-dashboard">
+  <a routerLink="/admin/agentes" class="back-link">← Volver a Agentes Comerciales</a>
+
+  @if (!agent()) {
+    <p class="state-msg">Tienda no encontrada.</p>
+  } @else {
+    @let tienda = agent()!;
+
+    <header class="page-header">
+      <h1>{{ tienda.name }} ({{ tienda.storeCode }})</h1>
+      <p class="subtitle">
+        {{ tienda.managerName || 'Sin encargada/o' }} · Serie {{ tienda.boletaSerie }}
+        @if (tienda.address) {
+          <br />{{ tienda.address }}@if (ubigeoLine(tienda)) {, {{ ubigeoLine(tienda) }}}
+        }
+      </p>
+    </header>
+
+    <!-- Summary cards -->
+    <div class="cards">
+      <article class="card">
+        <p class="card-label">🏬 Ventas en tienda física</p>
+        <p class="card-value">{{ fisicaTotal() | currency:'PEN':'S/ ' }}</p>
+        <p class="card-sub">{{ fisicaSales().length }} venta(s)</p>
+      </article>
+      <article class="card">
+        <p class="card-label">🌐 Ventas online</p>
+        <p class="card-value">{{ onlineTotal() | currency:'PEN':'S/ ' }}</p>
+        <p class="card-sub">{{ onlineSales().length }} pedido(s) pagado(s)</p>
+      </article>
+      <article class="card highlight">
+        <p class="card-label">Σ Total (filtro actual)</p>
+        <p class="card-value">{{ filteredTotal() | currency:'PEN':'S/ ' }}</p>
+        <p class="card-sub">{{ sales().length }} operación(es)</p>
+      </article>
+    </div>
+
+    <!-- Filter chips -->
+    <div class="filter-chips">
+      <button type="button" [class.active]="filter() === 'todas'" (click)="setFilter('todas')">Todas</button>
+      <button type="button" [class.active]="filter() === 'fisica'" (click)="setFilter('fisica')">🏬 Tienda física</button>
+      <button type="button" [class.active]="filter() === 'online'" (click)="setFilter('online')">🌐 Online</button>
+    </div>
+
+    <p class="online-note">
+      Las ventas online aún no se asignan por tienda — cada tienda ve la lista completa
+      hasta que llegue el despacho de pedidos online.
+    </p>
+
+    @if (sales().length === 0) {
+      <p class="state-msg">No hay ventas para este filtro. (Las ventas viven en sessionStorage de este navegador hasta el backend.)</p>
+    } @else {
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Fecha</th>
+              <th>Documento</th>
+              <th>Tipo</th>
+              <th>Cliente</th>
+              <th>Pago</th>
+              <th>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (sale of sales(); track sale.id) {
+              <tr>
+                <td>{{ sale.paidAt | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td class="code">{{ sale.boletaNumber ?? sale.code }}</td>
+                <td>
+                  <span class="type" [class.online]="isOnline(sale)">
+                    {{ isOnline(sale) ? '🌐 ' + methodLabels[sale.method] : '🏬 Tienda física' }}
+                  </span>
+                </td>
+                <td>{{ sale.shipping.fullName }}</td>
+                <td>{{ paymentLabel(sale) }}</td>
+                <td class="total">{{ sale.total | currency:'PEN':'S/ ' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+</section>

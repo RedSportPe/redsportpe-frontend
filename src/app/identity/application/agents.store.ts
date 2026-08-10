@@ -21,13 +21,24 @@ export class AgentsStore {
 
   /** Command: the admin opens a new tienda — code and boleta serie are assigned
    *  automatically (T3 → B003). Returns the created agent. */
-  addAgent(data: { name?: string; managerName: string; address: string; phone?: string }): CommercialAgent {
+  addAgent(data: {
+    name?: string;
+    managerName: string;
+    address: string;
+    district?: string;
+    province?: string;
+    department?: string;
+    phone?: string;
+  }): CommercialAgent {
     const storeCode = nextStoreCode(this._agents());
     const agent: CommercialAgent = {
       storeCode,
       name: data.name?.trim() || `Tienda ${storeCode.replace(/\D/g, '')}`,
       managerName: data.managerName.trim(),
       address: data.address.trim(),
+      district: data.district?.trim() ?? '',
+      province: data.province?.trim() ?? '',
+      department: data.department?.trim() ?? '',
       phone: data.phone?.trim() || undefined,
       boletaSerie: serieForStore(storeCode),
     };
@@ -38,7 +49,15 @@ export class AgentsStore {
   /** Command: edit a tienda's basic info (code and serie never change) */
   updateAgent(
     storeCode: string,
-    changes: { name?: string; managerName?: string; address?: string; phone?: string }
+    changes: {
+      name?: string;
+      managerName?: string;
+      address?: string;
+      district?: string;
+      province?: string;
+      department?: string;
+      phone?: string;
+    }
   ): void {
     this._agents.update(list =>
       list.map(agent =>
@@ -48,6 +67,9 @@ export class AgentsStore {
               name: changes.name?.trim() || agent.name,
               managerName: changes.managerName?.trim() ?? agent.managerName,
               address: changes.address?.trim() ?? agent.address,
+              district: changes.district?.trim() ?? agent.district,
+              province: changes.province?.trim() ?? agent.province,
+              department: changes.department?.trim() ?? agent.department,
               phone: changes.phone?.trim() || undefined,
             }
           : agent

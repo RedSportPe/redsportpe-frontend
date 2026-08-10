@@ -6,8 +6,16 @@ export interface CommercialAgent {
   name: string;         // 'Tienda 1'
   managerName: string;  // encargada de la caja
   address: string;      // physical address printed on the boleta ('' = not configured yet)
+  district: string;     // distrito (Cercado de Lima)
+  province: string;     // provincia (Lima)
+  department: string;   // departamento (Lima)
   phone?: string;
   boletaSerie: string;  // 'B001' — boleta series for this store's sales
+}
+
+/** "Cercado de Lima - Lima - Lima" for the boleta ('' when nothing configured) */
+export function ubigeoLine(agent: CommercialAgent): string {
+  return [agent.district, agent.province, agent.department].filter(Boolean).join(' - ');
 }
 
 /** Seed stores — extensible from /admin/agentes (in-memory until the backend) */
@@ -15,8 +23,11 @@ export const DEFAULT_AGENTS: CommercialAgent[] = [
   {
     storeCode: 'T1',
     name: 'Tienda 1',
-    managerName: 'Operadora Tienda',
-    address: '',
+    managerName: 'Shadea Sandoval',
+    address: 'Jr. Montevideo NRO 776 INT. 286 FILA C1 GALERIA FRONTERAS UNIDAS DE GRAU',
+    district: 'Cercado de Lima',
+    province: 'Lima',
+    department: 'Lima',
     boletaSerie: 'B001',
   },
   {
@@ -24,6 +35,9 @@ export const DEFAULT_AGENTS: CommercialAgent[] = [
     name: 'Tienda 2',
     managerName: '',
     address: '',
+    district: '',
+    province: '',
+    department: '',
     boletaSerie: 'B002',
   },
 ];

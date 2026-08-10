@@ -13,6 +13,7 @@ import { ImpresionService } from '../../../../core/services/impresion.service';
 import { montoEnLetras } from '../../../domain/amount-in-words';
 import { AuthStore } from '../../../../identity/application/auth.store';
 import { AgentsStore } from '../../../../identity/application/agents.store';
+import { ubigeoLine } from '../../../../identity/domain/commercial-agent.model';
 import { COMPANY } from '../../../../core/company-info';
 
 /** The in-store register: the cashier scans SKUs, the ticket fills up, and the
@@ -39,6 +40,12 @@ export class PosPage implements OnInit {
   readonly agent = computed(() =>
     this.agentsStore.byCode(this.authStore.currentUser()?.storeCode ?? 'T1')
   );
+
+  /** "Cercado de Lima - Lima - Lima" under the address on the boleta */
+  readonly agentUbigeo = computed(() => {
+    const agent = this.agent();
+    return agent ? ubigeoLine(agent) : '';
+  });
 
   private scanBox = viewChild<ElementRef<HTMLInputElement>>('scanBox');
   private scanDetector = new ScanDetector();

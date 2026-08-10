@@ -1,4 +1,5 @@
 import { Component, inject, signal, computed } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { AgentsStore } from '../../../application/agents.store';
 import { CommercialAgent } from '../../../domain/commercial-agent.model';
 import { UnsavedChangesAware } from '../../../../layout/unsaved-changes.guard';
@@ -7,6 +8,7 @@ import { UnsavedChangesAware } from '../../../../layout/unsaved-changes.guard';
  *  Each agent's data (address, encargada, boleta serie) feeds the POS boleta. */
 @Component({
   selector: 'app-admin-agents-page',
+  imports: [RouterLink],
   templateUrl: './admin-agents-page.html',
   styleUrl: './admin-agents-page.scss',
 })
@@ -21,6 +23,9 @@ export class AdminAgentsPage implements UnsavedChangesAware {
   readonly name = signal('');
   readonly managerName = signal('');
   readonly address = signal('');
+  readonly district = signal('');
+  readonly province = signal('');
+  readonly department = signal('');
   readonly phone = signal('');
 
   readonly isEditing = computed(() => this.editingCode() !== null);
@@ -32,6 +37,9 @@ export class AdminAgentsPage implements UnsavedChangesAware {
         this.name().trim() !== '' ||
         this.managerName().trim() !== '' ||
         this.address().trim() !== '' ||
+        this.district().trim() !== '' ||
+        this.province().trim() !== '' ||
+        this.department().trim() !== '' ||
         this.phone().trim() !== ''
       );
     }
@@ -41,6 +49,9 @@ export class AdminAgentsPage implements UnsavedChangesAware {
       this.name().trim() !== agent.name ||
       this.managerName().trim() !== agent.managerName ||
       this.address().trim() !== agent.address ||
+      this.district().trim() !== agent.district ||
+      this.province().trim() !== agent.province ||
+      this.department().trim() !== agent.department ||
       this.phone().trim() !== (agent.phone ?? '')
     );
   });
@@ -57,7 +68,10 @@ export class AdminAgentsPage implements UnsavedChangesAware {
     setTimeout(() => this.blocked.set(false), 1200);
   }
 
-  onInput(field: 'name' | 'managerName' | 'address' | 'phone', event: Event): void {
+  onInput(
+    field: 'name' | 'managerName' | 'address' | 'district' | 'province' | 'department' | 'phone',
+    event: Event
+  ): void {
     this[field].set((event.target as HTMLInputElement).value);
   }
 
@@ -66,6 +80,9 @@ export class AdminAgentsPage implements UnsavedChangesAware {
     this.name.set(agent.name);
     this.managerName.set(agent.managerName);
     this.address.set(agent.address);
+    this.district.set(agent.district);
+    this.province.set(agent.province);
+    this.department.set(agent.department);
     this.phone.set(agent.phone ?? '');
   }
 
@@ -76,6 +93,9 @@ export class AdminAgentsPage implements UnsavedChangesAware {
       name: this.name(),
       managerName: this.managerName(),
       address: this.address(),
+      district: this.district(),
+      province: this.province(),
+      department: this.department(),
       phone: this.phone(),
     };
     if (code !== null) {
@@ -92,6 +112,9 @@ export class AdminAgentsPage implements UnsavedChangesAware {
     this.name.set('');
     this.managerName.set('');
     this.address.set('');
+    this.district.set('');
+    this.province.set('');
+    this.department.set('');
     this.phone.set('');
   }
 }
