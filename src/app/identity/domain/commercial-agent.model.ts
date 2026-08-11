@@ -11,6 +11,9 @@ export interface CommercialAgent {
   department: string;   // departamento (Lima)
   phone?: string;
   boletaSerie: string;  // 'B001' — boleta series for this store's sales
+  /** Login email of this tienda's cashier account (one account per tienda,
+   *  provisioned by the admin — the operator logs in and lands on HER caja) */
+  operatorEmail?: string;
 }
 
 /** "Cercado de Lima - Lima - Lima" for the boleta ('' when nothing configured) */
@@ -29,6 +32,7 @@ export const DEFAULT_AGENTS: CommercialAgent[] = [
     province: 'Lima',
     department: 'Lima',
     boletaSerie: 'B001',
+    operatorEmail: 'operadora@redsport.pe',   // seeded demo account (example address)
   },
   {
     storeCode: 'T2',

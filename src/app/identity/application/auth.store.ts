@@ -87,6 +87,20 @@ export class AuthStore {
     this._currentUser.set({ ...user, points: addPoints(user.points, earned) });
   }
 
+  /** Command (admin only, from Agentes Comerciales): create the cashier login
+   *  for a tienda. Returns an error message to display, or null on success. */
+  provisionOperator(email: string, password: string, name: string, storeCode: string): string | null {
+    return this.repository.createOperator(email, password, name, storeCode);
+  }
+
+  /** Command (admin only): update a tienda's cashier account */
+  updateOperatorAccount(
+    storeCode: string,
+    changes: { email?: string; password?: string; name?: string }
+  ): string | null {
+    return this.repository.updateOperator(storeCode, changes);
+  }
+
   /** Command: save/update the customer's delivery data (first checkout or "Mi cuenta" edit) */
   saveDeliveryInfo(deliveryInfo: DeliveryInfo): void {
     const user = this._currentUser();

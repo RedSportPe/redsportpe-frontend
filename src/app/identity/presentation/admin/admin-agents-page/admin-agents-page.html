@@ -45,7 +45,21 @@
         <span>Distrito</span>
         <input type="text" placeholder="Cercado de Lima" [value]="district()" (input)="onInput('district', $event)" />
       </label>
+
+      <label class="field">
+        <span>Correo de acceso de la caja {{ isEditing() ? '' : '(con este correo se loguea la operadora)' }}</span>
+        <input type="email" placeholder="tienda2@redsport.pe" [value]="operatorEmail()" (input)="onInput('operatorEmail', $event)" />
+      </label>
+
+      <label class="field">
+        <span>Contraseña {{ isEditing() ? '(vacío = no cambiar)' : '(mínimo 6 caracteres)' }}</span>
+        <input type="password" placeholder="••••••" [value]="operatorPassword()" (input)="onInput('operatorPassword', $event)" />
+      </label>
     </div>
+
+    @if (accountError(); as error) {
+      <p class="account-error">⚠️ {{ error }}</p>
+    }
 
     @if (blocked()) {
       <p class="form-warn">Tienes datos sin guardar — guarda o limpia el formulario antes de salir.</p>
@@ -68,6 +82,7 @@
           <th>Código</th>
           <th>Nombre</th>
           <th>Encargada/o</th>
+          <th>Correo de acceso</th>
           <th>Dirección</th>
           <th>Teléfono</th>
           <th>Serie boleta</th>
@@ -80,6 +95,13 @@
             <td class="code">{{ agent.storeCode }}</td>
             <td class="name">{{ agent.name }}</td>
             <td>{{ agent.managerName || '—' }}</td>
+            <td>
+              @if (agent.operatorEmail) {
+                <span class="email">{{ agent.operatorEmail }}</span>
+              } @else {
+                <span class="missing">Sin cuenta — edita para crearla</span>
+              }
+            </td>
             <td>
               @if (agent.address) {
                 {{ agent.address }}

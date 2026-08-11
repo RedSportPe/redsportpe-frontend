@@ -29,6 +29,7 @@ export class AgentsStore {
     province?: string;
     department?: string;
     phone?: string;
+    operatorEmail?: string;
   }): CommercialAgent {
     const storeCode = nextStoreCode(this._agents());
     const agent: CommercialAgent = {
@@ -41,6 +42,7 @@ export class AgentsStore {
       department: data.department?.trim() ?? '',
       phone: data.phone?.trim() || undefined,
       boletaSerie: serieForStore(storeCode),
+      operatorEmail: data.operatorEmail?.trim().toLowerCase() || undefined,
     };
     this._agents.update(list => [...list, agent]);
     return agent;
@@ -57,6 +59,7 @@ export class AgentsStore {
       province?: string;
       department?: string;
       phone?: string;
+      operatorEmail?: string;
     }
   ): void {
     this._agents.update(list =>
@@ -71,6 +74,7 @@ export class AgentsStore {
               province: changes.province?.trim() ?? agent.province,
               department: changes.department?.trim() ?? agent.department,
               phone: changes.phone?.trim() || undefined,
+              operatorEmail: changes.operatorEmail?.trim().toLowerCase() || agent.operatorEmail,
             }
           : agent
       )
