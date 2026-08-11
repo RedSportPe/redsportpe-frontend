@@ -9,6 +9,7 @@ import { promoPrice } from '../../../../promotions/domain/promotion-rules';
 import { colorLabel } from '../../../../catalog/domain/product-filtering';
 import { isValidSku } from '../../../../catalog/domain/sku.value-object';
 import { ScanDetector } from '../scan-detection';
+import { code39Bars } from '../code39-barcode';
 import { ImpresionService } from '../../../../core/services/impresion.service';
 import { montoEnLetras } from '../../../domain/amount-in-words';
 import { AuthStore } from '../../../../identity/application/auth.store';
@@ -45,6 +46,13 @@ export class PosPage implements OnInit {
   readonly agentUbigeo = computed(() => {
     const agent = this.agent();
     return agent ? ubigeoLine(agent) : '';
+  });
+
+  /** Code 39 barcode of the boleta number (B001-00000001) — printed at the
+   *  bottom so the receipt itself can be scanned later (returns, lookups) */
+  readonly boletaBarcode = computed(() => {
+    const boletaNumber = this.completedSale()?.boletaNumber;
+    return boletaNumber ? code39Bars(boletaNumber) : null;
   });
 
   private scanBox = viewChild<ElementRef<HTMLInputElement>>('scanBox');

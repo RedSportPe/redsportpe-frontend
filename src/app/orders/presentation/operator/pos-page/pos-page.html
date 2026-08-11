@@ -107,6 +107,16 @@
       <p class="r-line"></p>
       <p class="r-center r-bold">GRACIAS POR COMPRAR EN {{ company.nombreComercial }}</p>
       <p class="r-center r-small">Entérate de la política de cambios y devoluciones en redsport.pe/cambios</p>
+      @if (boletaBarcode(); as barcode) {
+        <div class="r-barcode">
+          <svg [attr.viewBox]="'0 0 ' + barcode.totalWidth + ' 40'" preserveAspectRatio="none" aria-label="Código de barras de la boleta">
+            @for (bar of barcode.bars; track $index) {
+              <rect [attr.x]="bar.x" y="0" [attr.width]="bar.width" height="40" />
+            }
+          </svg>
+          <p class="r-center r-small">{{ sale.boletaNumber }}</p>
+        </div>
+      }
       <p class="r-line"></p>
       <p class="r-center r-small">Copia de cliente</p>
       <p class="r-small">

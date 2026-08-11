@@ -1,18 +1,49 @@
 <section class="operator-sales">
   <h1>Ventas</h1>
   <p class="subtitle">
-    {{ sales().length }} venta(s) registrada(s) ·
-    Total cobrado: <strong>{{ totalCollected() | currency:'PEN':'S/ ' }}</strong>
+    {{ sales().length }} de {{ allCount() }} venta(s) ·
+    Total cobrado (filtro actual): <strong>{{ totalCollected() | currency:'PEN':'S/ ' }}</strong>
   </p>
 
-  @if (sales().length === 0) {
+  <!-- Filters: date interval + customer name -->
+  <div class="filters-bar">
+    <label class="filter">
+      <span>Desde</span>
+      <input type="date" [value]="dateFrom()" (input)="onFilter('dateFrom', $event)" />
+    </label>
+    <label class="filter">
+      <span>Hasta</span>
+      <input type="date" [value]="dateTo()" (input)="onFilter('dateTo', $event)" />
+    </label>
+    <label class="filter grow">
+      <span>Cliente</span>
+      <input type="search" placeholder="Buscar por nombre..." [value]="customerQuery()" (input)="onFilter('customerQuery', $event)" />
+    </label>
+    <label class="filter grow">
+      <span>Boleta / SKU 🔫</span>
+      <input
+        type="search"
+        class="code-search"
+        placeholder="Escanea la boleta o un SKU..."
+        [value]="codeQuery()"
+        (input)="onFilter('codeQuery', $event)"
+      />
+    </label>
+    @if (hasActiveFilters()) {
+      <button type="button" class="clear-filters" (click)="clearFilters()">✕ Limpiar</button>
+    }
+  </div>
+
+  @if (allCount() === 0) {
     <p class="state-msg">Aún no registras ventas en esta sesión. Ve a la Caja para empezar.</p>
+  } @else if (sales().length === 0) {
+    <p class="state-msg">Ninguna venta coincide con los filtros.</p>
   } @else {
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>Venta</th>
+            <th>Boleta</th>
             <th>Hora</th>
             <th>Cliente</th>
             <th>Items</th>
@@ -23,7 +54,12 @@
         <tbody>
           @for (sale of sales(); track sale.id) {
             <tr>
-              <td class="code">{{ sale.code }}</td>
+              <td class="code">
+                {{ sale.boletaNumber ?? sale.code }}
+                @if (sale.boletaNumber) {
+                  <span class="venta-code">{{ sale.code }}</span>
+                }
+              </td>
               <td>{{ sale.paidAt | date:'dd/MM HH:mm' }}</td>
               <td>{{ sale.shipping.fullName }}</td>
               <td>{{ itemsCount(sale) }}</td>
@@ -34,6 +70,9 @@
                   @if (sale.cashReceived != null) {
                     <span class="cash-detail">(recibido {{ sale.cashReceived | currency:'PEN':'S/ ' }})</span>
                   }
+                } @else if (sale.paymentMethod === 'mixto') {
+                  💵📱 Mixto
+                  <span class="cash-detail">({{ sale.cashReceived | currency:'PEN':'S/ ' }} + QR {{ sale.qrAmount | currency:'PEN':'S/ ' }})</span>
                 } @else {
                   📱 QR Yape/Plin
                 }

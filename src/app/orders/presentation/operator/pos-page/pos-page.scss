@@ -461,6 +461,18 @@
     span:last-child { white-space: nowrap; }
   }
 
+  .r-barcode {
+    margin: 6px 0 2px;
+
+    svg {
+      display: block;
+      width: 100%;
+      height: 34px;
+
+      rect { fill: #000; }
+    }
+  }
+
   .r-item { margin-top: 4px; }
   .r-item-qty { padding-left: 4px; font-size: 10px; }
 

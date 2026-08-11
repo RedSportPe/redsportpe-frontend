@@ -26,6 +26,57 @@
   color: var(--rs-text-muted);
 }
 
+// ===== Filters bar =====
+.filters-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 10px;
+  padding: 0.9rem 1.1rem;
+  margin-bottom: 1.2rem;
+}
+
+.filter {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.78rem;
+  color: var(--rs-text-muted);
+
+  &.grow { flex: 1; min-width: 180px; }
+
+  input {
+    background: var(--rs-black);
+    color: var(--rs-text);
+    border: 1px solid var(--rs-border);
+    border-radius: 7px;
+    padding: 0.5rem 0.7rem;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+
+    &::placeholder { color: var(--rs-text-muted); }
+    &:hover, &:focus { border-color: var(--rs-red); outline: none; }
+  }
+
+  input[type='date'] { color-scheme: dark; }
+
+  .code-search { font-family: 'IBM Plex Mono', monospace; }
+}
+
+.clear-filters {
+  background: transparent;
+  border: 1px solid var(--rs-border);
+  color: var(--rs-text-muted);
+  padding: 0.5rem 0.9rem;
+  border-radius: 7px;
+  font-size: 0.82rem;
+
+  &:hover { border-color: var(--rs-red); color: var(--rs-text); }
+}
+
 .table-wrap {
   overflow-x: auto;
   background: var(--rs-surface);
@@ -56,8 +107,15 @@ table {
 
   tr:last-child td { border-bottom: none; }
 
-  .code { font-weight: 700; }
+  .code { font-weight: 700; white-space: nowrap; }
   .total { font-weight: 700; }
+
+  .venta-code {
+    display: block;
+    font-weight: 400;
+    font-size: 0.75rem;
+    color: var(--rs-text-muted);
+  }
 
   .cash-detail {
     color: var(--rs-text-muted);
