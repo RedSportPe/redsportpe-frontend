@@ -92,8 +92,42 @@ export class AdminInventoryPage implements OnInit, UnsavedChangesAware {
   onStockInput(row: StockRow, event: Event): void {
     const raw = (event.target as HTMLInputElement).value;
     if (raw === '') return; // still typing
-    const value = Math.max(0, Number(raw) || 0);
+    this.setDraft(row, Math.max(0, Number(raw) || 0));
+  }
 
+  // ===== Quick +/- adjustment ("llegaron 25") =====
+  // The +/- buttons swap into one wide field with an inline ✓; confirming does
+  // the math against the CURRENT (draft-aware) stock and feeds the same draft —
+  // Guardar cambios / Descartar keep working exactly as before.
+  readonly adjustingSku = signal<string | null>(null);
+  readonly adjustSign = signal<1 | -1>(1);
+  readonly adjustValue = signal('');
+
+  startAdjust(row: StockRow, sign: 1 | -1): void {
+    this.adjustingSku.set(row.sku);
+    this.adjustSign.set(sign);
+    this.adjustValue.set('');
+  }
+
+  onAdjustInput(event: Event): void {
+    this.adjustValue.set((event.target as HTMLInputElement).value);
+  }
+
+  applyAdjust(row: StockRow): void {
+    const amount = Math.trunc(Number(this.adjustValue()));
+    if (!isNaN(amount) && amount > 0) {
+      this.setDraft(row, Math.max(0, row.stock + this.adjustSign() * amount));
+    }
+    this.cancelAdjust();
+  }
+
+  cancelAdjust(): void {
+    this.adjustingSku.set(null);
+    this.adjustValue.set('');
+  }
+
+  /** Single entry point into the draft (manual edits and +/- adjustments alike) */
+  private setDraft(row: StockRow, value: number): void {
     const pending = new Map(this._pending());
     if (value === row.originalStock) {
       pending.delete(row.sku);

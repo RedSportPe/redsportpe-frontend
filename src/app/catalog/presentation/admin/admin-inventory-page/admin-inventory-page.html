@@ -63,6 +63,33 @@
                   [value]="row.stock"
                   (input)="onStockInput(row, $event)"
                 />
+
+                @if (adjustingSku() === row.sku) {
+                  <!-- The +/- pair swapped into one wide field with the ✓ inside -->
+                  <span class="adjust-field" [class.minus]="adjustSign() === -1">
+                    <span class="adjust-sign">{{ adjustSign() === 1 ? '+' : '−' }}</span>
+                    <input
+                      type="number"
+                      min="1"
+                      class="adjust-input"
+                      [placeholder]="adjustSign() === 1 ? 'cantidad que llegó' : 'cantidad a restar'"
+                      autofocus
+                      [value]="adjustValue()"
+                      (input)="onAdjustInput($event)"
+                      (keyup.enter)="applyAdjust(row)"
+                      (keyup.escape)="cancelAdjust()"
+                    />
+                    <button type="button" class="adjust-confirm" (click)="applyAdjust(row)" aria-label="Confirmar ajuste">
+                      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M4 12.5 9.5 18 20 6.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                      </svg>
+                    </button>
+                  </span>
+                } @else {
+                  <button type="button" class="adjust-btn" (click)="startAdjust(row, -1)" aria-label="Restar stock">−</button>
+                  <button type="button" class="adjust-btn" (click)="startAdjust(row, 1)" aria-label="Sumar stock">+</button>
+                }
+
                 @if (row.modified) {
                   <span class="was">antes: {{ row.originalStock }}</span>
                 }

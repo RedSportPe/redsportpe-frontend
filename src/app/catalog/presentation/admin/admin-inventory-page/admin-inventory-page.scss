@@ -158,6 +158,83 @@ table {
   }
 }
 
+// Square bordered +/- buttons ("llegaron 25" quick math)
+.adjust-btn {
+  width: 34px;
+  height: 34px;
+  margin-left: 0.4rem;
+  background: transparent;
+  border: 2px solid var(--rs-border);
+  border-radius: 8px;
+  color: var(--rs-text);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: middle;
+  transition: border-color 0.2s, background 0.2s;
+
+  &:hover {
+    border-color: var(--rs-red);
+    background: var(--rs-red-dark);
+  }
+}
+
+// Both buttons swapped into one wide field with the ✓ inside
+.adjust-field {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.4rem;
+  background: var(--rs-black);
+  border: 2px solid #16a34a;
+  border-radius: 8px;
+  overflow: hidden;
+  vertical-align: middle;
+
+  &.minus { border-color: #ca8a04; }
+
+  .adjust-sign {
+    padding: 0 0.2rem 0 0.6rem;
+    font-weight: 700;
+    color: var(--rs-text-muted);
+  }
+
+  .adjust-input {
+    width: 130px;
+    background: transparent;
+    color: var(--rs-text);
+    border: none;
+    padding: 0.4rem 0.3rem;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+
+    &::placeholder { color: var(--rs-text-muted); font-size: 0.78rem; }
+    &:focus { outline: none; }
+
+    // hide number spinners
+    -moz-appearance: textfield;
+    &::-webkit-outer-spin-button,
+    &::-webkit-inner-spin-button { -webkit-appearance: none; }
+  }
+
+  .adjust-confirm {
+    background: transparent;
+    border: none;
+    color: #16a34a;
+    padding: 0.3rem 0.5rem;
+    line-height: 0;
+
+    svg { width: 18px; height: 18px; }
+
+    &:hover { color: #4ade80; }
+  }
+
+  &.minus .adjust-confirm {
+    color: #ca8a04;
+
+    &:hover { color: #facc15; }
+  }
+}
+
 .stock-input {
   width: 80px;
   background: var(--rs-black);
