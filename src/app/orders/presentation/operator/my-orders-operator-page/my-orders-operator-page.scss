@@ -1,0 +1,108 @@
+.online-orders { padding: 2rem; }
+
+.page-header {
+  margin-bottom: 1.5rem;
+
+  h1 { font-size: 1.8rem; }
+  .subtitle { color: var(--rs-text-muted); }
+}
+
+.empty-ticket { color: var(--rs-text-muted); }
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.order-row {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr auto 1.2fr;
+  align-items: center;
+  gap: 1.2rem;
+  background: var(--rs-surface);
+  border: 1px solid var(--rs-border);
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+
+  &.delivered { opacity: 0.6; }
+}
+
+.order-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+
+  .method-badge {
+    font-size: 0.7rem;
+    background: var(--rs-bg);
+    border: 1px solid var(--rs-border);
+    padding: 0.15rem 0.5rem;
+    border-radius: 5px;
+    color: var(--rs-text-muted);
+  }
+}
+
+.customer, .destination {
+  font-size: 0.8rem;
+  color: var(--rs-text-muted);
+}
+
+.items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+
+  img { width: 32px; height: 32px; object-fit: cover; border-radius: 4px; }
+}
+
+.order-total { font-weight: 700; white-space: nowrap; }
+
+.tracking-block { display: flex; flex-direction: column; gap: 0.4rem; align-items: flex-end; }
+
+.tracking {
+  display: flex;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+
+  .dot {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    background: var(--rs-bg);
+    color: var(--rs-text-muted);
+    border: 1px solid var(--rs-border);
+
+    &.done { background: var(--rs-red-dark); color: #fff; border-color: var(--rs-red); }
+  }
+}
+
+.advance-btn {
+  padding: 0.45rem 1rem;
+  background: var(--rs-red);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  white-space: nowrap;
+
+  &:hover { background: var(--rs-red-dark); }
+}
+
+.done-label { color: #16a34a; font-weight: 600; font-size: 0.8rem; }
+
+@media (max-width: 900px) {
+  .order-row { grid-template-columns: 1fr; }
+  .tracking-block { align-items: flex-start; }
+  .tracking { justify-content: flex-start; }
+}

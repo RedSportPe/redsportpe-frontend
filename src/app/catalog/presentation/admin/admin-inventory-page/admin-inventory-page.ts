@@ -41,6 +41,19 @@ export class AdminInventoryPage implements OnInit, UnsavedChangesAware {
     setTimeout(() => this.blocked.set(false), 1200);
   }
 
+  // ===== Store filter — the SKU's last segment IS the store code (T1, T2...) =====
+  readonly selectedStore = signal<string>('T1');
+
+  readonly availableStores = computed(() =>
+    [...new Set(
+      this.store.allProducts().flatMap(p => p.variants.map(v => v.sku.split('-').at(-1)!))
+    )].sort()
+  );
+
+  selectStore(code: string): void {
+    this.selectedStore.set(code);
+  }
+
   /** DRAFT edits (sku → new stock). Nothing touches the catalog until
    *  "Guardar cambios" — a typo must never alter live stock. */
   private _pending = signal<Map<string, number>>(new Map());
@@ -69,9 +82,10 @@ export class AdminInventoryPage implements OnInit, UnsavedChangesAware {
         })
       )
       .filter(row =>
-        !query ||
-        row.sku.toLowerCase().includes(query) ||
-        row.productName.toLowerCase().includes(query)
+        row.sku.endsWith(`-${this.selectedStore()}`) &&
+        (!query ||
+          row.sku.toLowerCase().includes(query) ||
+          row.productName.toLowerCase().includes(query))
       );
   });
 
@@ -96,9 +110,6 @@ export class AdminInventoryPage implements OnInit, UnsavedChangesAware {
   }
 
   // ===== Quick +/- adjustment ("llegaron 25") =====
-  // The +/- buttons swap into one wide field with an inline ✓; confirming does
-  // the math against the CURRENT (draft-aware) stock and feeds the same draft —
-  // Guardar cambios / Descartar keep working exactly as before.
   readonly adjustingSku = signal<string | null>(null);
   readonly adjustSign = signal<1 | -1>(1);
   readonly adjustValue = signal('');

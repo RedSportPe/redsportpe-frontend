@@ -79,6 +79,22 @@ export const routes: Routes = [
           import('./orders/presentation/operator/operator-sales-page/operator-sales-page').then(m => m.OperatorSalesPage),
       },
       {
+        path: 'stickers',
+        loadComponent: () =>
+          import('./orders/presentation/operator/label-print-page/label-print-page').then(m => m.LabelPrintPage),
+      },
+      {
+        path: 'online',
+        loadComponent: () =>
+          import('./orders/presentation/operator/online-orders-page/online-orders-page').then(m => m.OnlineOrdersPage),
+      },
+      {
+        path: 'mis-pedidos',
+        loadComponent: () =>
+          import('./orders/presentation/operator/my-orders-operator-page/my-orders-operator-page').then(m => m.MyOrdersOperatorPage),
+      },
+      {
+        // 404 inside the panel: MUST stay last — it's a catch-all
         path: '**',
         loadComponent: () =>
           import('./layout/not-found-page/not-found-page').then(m => m.NotFoundPage),

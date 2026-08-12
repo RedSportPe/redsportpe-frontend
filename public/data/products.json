@@ -18,7 +18,8 @@
     "variants": [
       { "sku": "RS-CJCN-H-S-NEG-T1", "gender": "H", "size": "S", "color": "NEG", "totalStock": 12 },
       { "sku": "RS-CJCN-H-M-NEG-T1", "gender": "H", "size": "M", "color": "NEG", "totalStock": 8 },
-      { "sku": "RS-CJCN-M-S-ROJ-T1", "gender": "M", "size": "S", "color": "ROJ", "totalStock": 6 }
+      { "sku": "RS-CJCN-M-S-ROJ-T1", "gender": "M", "size": "S", "color": "ROJ", "totalStock": 6 },
+      { "sku": "RS-CJCN-H-S-NEG-T2", "gender": "H", "size": "S", "color": "NEG", "totalStock": 6 }
     ]
   },
   {
@@ -52,7 +53,8 @@
     "variants": [
       { "sku": "RS-SHRT-H-M-NEG-T1", "gender": "H", "size": "M", "color": "NEG", "totalStock": 18 },
       { "sku": "RS-SHRT-H-L-NEG-T1", "gender": "H", "size": "L", "color": "NEG", "totalStock": 10 },
-      { "sku": "RS-SHRT-NO-10-AZU-T1", "gender": "NO", "size": "10", "color": "AZU", "totalStock": 7 }
+      { "sku": "RS-SHRT-NO-10-AZU-T1", "gender": "NO", "size": "10", "color": "AZU", "totalStock": 7 },
+      { "sku": "RS-SHRT-H-M-NEG-T2", "gender": "H", "size": "M", "color": "NEG", "totalStock": 9 }
     ]
   },
   {
@@ -90,7 +92,8 @@
     "variants": [
       { "sku": "RS-HOOD-U-M-NEG-T1", "gender": "U", "size": "M", "color": "NEG", "totalStock": 14 },
       { "sku": "RS-HOOD-U-L-GRI-T1", "gender": "U", "size": "L", "color": "GRI", "totalStock": 9 },
-      { "sku": "RS-HOOD-U-XXL-NEG-T1", "gender": "U", "size": "XXL", "color": "NEG", "totalStock": 4 }
+      { "sku": "RS-HOOD-U-XXL-NEG-T1", "gender": "U", "size": "XXL", "color": "NEG", "totalStock": 4 },
+      { "sku": "RS-HOOD-U-M-NEG-T2", "gender": "U", "size": "M", "color": "NEG", "totalStock": 5 }
     ]
   },
   {
@@ -106,7 +109,8 @@
     "createdAt": "2026-07-20",
     "variants": [
       { "sku": "RS-CAPP-U-M-ROJ-T1", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 30 },
-      { "sku": "RS-CAPP-U-M-BLA-T1", "gender": "U", "size": "M", "color": "BLA", "totalStock": 22 }
+      { "sku": "RS-CAPP-U-M-BLA-T1", "gender": "U", "size": "M", "color": "BLA", "totalStock": 22 },
+      { "sku": "RS-CAPP-U-M-ROJ-T2", "gender": "U", "size": "M", "color": "ROJ", "totalStock": 11 }
     ]
   },
   {
@@ -137,6 +141,21 @@
     "createdAt": "2026-07-25",
     "variants": [
       { "sku": "RS-SOCK-U-M-BLA-T1", "gender": "U", "size": "M", "color": "BLA", "totalStock": 3 }
+    ]
+  },
+  {
+    "id": "9",
+    "name": "RS Windbreaker",
+    "description": "Cortavientos ligero, ideal para entrenar al aire libre",
+    "category": "Jackets",
+    "price": 99.90,
+    "imageUrl": "/images/products/cjcn-jacket-black.svg",
+    "published": true,
+    "featured": false,
+    "salesCount": 5,
+    "createdAt": "2026-07-15",
+    "variants": [
+      { "sku": "RS-WIND-H-M-NEG-T2", "gender": "H", "size": "M", "color": "NEG", "totalStock": 8 }
     ]
   }
 ]

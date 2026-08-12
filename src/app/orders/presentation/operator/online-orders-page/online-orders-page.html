@@ -1,0 +1,48 @@
+<section class="online-orders">
+  <header class="page-header">
+    <div>
+      <h1>Pedidos Online</h1>
+      <p class="subtitle">{{ store.pending().length }} pedido(s) esperando ser aceptados · visible para todas las tiendas</p>
+    </div>
+  </header>
+
+  @if (store.pending().length === 0) {
+    <p class="empty-ticket">No hay pedidos pendientes por aceptar.</p>
+  } @else {
+    <div class="orders-list">
+      @for (order of store.pending(); track order.id) {
+        <article class="order-row">
+          <div class="order-main">
+            <div class="order-head">
+              <strong>{{ order.code }}</strong>
+              <span class="method-badge">{{ methodLabels[order.method] }}</span>
+            </div>
+            <p class="customer">{{ order.shipping.fullName }} · {{ order.shipping.phone }}</p>
+            <p class="destination">
+              @if (order.shipping.address) {
+                {{ order.shipping.address }}, {{ order.shipping.district }}
+              } @else {
+                {{ order.shipping.agency }}
+              }
+            </p>
+          </div>
+
+          <div class="items">
+            @for (item of order.items; track item.sku) {
+              <div class="item-row">
+                <img [src]="item.imageUrl" [alt]="item.name" />
+                <span>{{ item.quantity }}× {{ item.name }} — {{ item.size }}</span>
+              </div>
+            }
+          </div>
+
+          <span class="order-total">{{ order.total | currency:'PEN':'S/ ' }}</span>
+
+          <button type="button" class="accept-btn" (click)="accept(order.id)">
+            Aceptar pedido
+          </button>
+        </article>
+      }
+    </div>
+  }
+</section>

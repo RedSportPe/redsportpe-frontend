@@ -1,0 +1,76 @@
+<section class="label-print">
+  <h1>Imprimir stickers</h1>
+  <p class="subtitle">Selecciona las variantes y cantidad. Se imprimirán en la Brother QL-810W (29mm).</p>
+
+  <div class="layout">
+    <div class="picker">
+      <input
+        type="search"
+        placeholder="Buscar producto..."
+        [value]="search()"
+        (input)="onSearchInput($event)"
+      />
+
+      <div class="products">
+        @for (product of filteredProducts(); track product.id) {
+          <article class="product">
+            <h3>{{ product.name }}</h3>
+            <div class="variants">
+              @for (variant of product.variants; track variant.sku) {
+                <button type="button" (click)="addVariant(product.name, product.imageUrl, variant)">
+                  {{ variant.size }} · {{ colorLabel(variant.color) }}
+                  <span class="sku">{{ variant.sku }}</span>
+                </button>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    </div>
+
+    <aside class="queue">
+      <h2>Cola de impresión ({{ printQueue.totalLabels() }} stickers)</h2>
+
+      @if (printQueue.queue().length === 0) {
+        <p class="empty-ticket">Selecciona variantes para agregar a la cola.</p>
+      } @else {
+        <div class="ticket-lines">
+          @for (item of printQueue.queue(); track item.sku) {
+            <article class="line">
+              <img [src]="item.imageUrl" [alt]="item.productName" />
+              <div class="line-info">
+                <p class="line-name">{{ item.productName }}</p>
+                <p class="line-variant">Talla {{ item.size }} · {{ colorLabel(item.color) }} · {{ item.sku }}</p>
+              </div>
+
+              <label class="qty">
+                <button type="button" (click)="printQueue.changeQuantity(item.sku, -1)">−</button>
+                <input
+                  type="number"
+                  class="qty-input"
+                  min="1"
+                  [value]="item.quantity"
+                  (change)="setQuantity(item.sku, $event)"
+                  (keyup.enter)="setQuantity(item.sku, $event)"
+                />
+                <button type="button" (click)="printQueue.changeQuantity(item.sku, 1)">+</button>
+              </label>
+
+              <button type="button" class="remove" (click)="printQueue.removeFromQueue(item.sku)" aria-label="Quitar de la cola">✕</button>
+            </article>
+          }
+        </div>
+
+        <button class="print-btn" type="button" [disabled]="sending()" (click)="print()">
+          @if (sending()) {
+            Enviando a la impresora...
+          } @else if (sent()) {
+            ✓ Enviado
+          } @else {
+            Imprimir {{ printQueue.totalLabels() }} stickers
+          }
+        </button>
+      }
+    </aside>
+  </div>
+</section>

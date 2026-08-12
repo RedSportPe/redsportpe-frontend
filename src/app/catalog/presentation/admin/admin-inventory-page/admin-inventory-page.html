@@ -17,6 +17,18 @@
     />
   </header>
 
+  <div class="store-tabs">
+    @for (code of availableStores(); track code) {
+      <button
+        type="button"
+        [class.active]="selectedStore() === code"
+        (click)="selectStore(code)"
+      >
+        Tienda {{ code.replace('T', '') }}
+      </button>
+    }
+  </div>
+
   <!-- Draft mode: edits live here until the admin confirms -->
   @if (pendingCount() > 0) {
     <div class="save-bar">
@@ -34,13 +46,13 @@
     <div class="table-wrap">
       <table>
         <thead>
-          <tr>
-            <th>SKU</th>
-            <th>Producto</th>
-            <th>Talla</th>
-            <th>Color</th>
-            <th>Stock</th>
-          </tr>
+        <tr>
+          <th>SKU</th>
+          <th>Producto</th>
+          <th>Talla</th>
+          <th>Color</th>
+          <th>Stock</th>
+        </tr>
         </thead>
         <tbody>
           @for (row of rows(); track row.sku) {
@@ -65,7 +77,6 @@
                 />
 
                 @if (adjustingSku() === row.sku) {
-                  <!-- The +/- pair swapped into one wide field with the ✓ inside -->
                   <span class="adjust-field" [class.minus]="adjustSign() === -1">
                     <span class="adjust-sign">{{ adjustSign() === 1 ? '+' : '−' }}</span>
                     <input

@@ -251,3 +251,26 @@ table {
   &.out { border-color: var(--rs-red); color: var(--rs-red); font-weight: 700; }
   &.dirty { border-color: #ca8a04; box-shadow: 0 0 0 1px #ca8a04; }
 }
+.store-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+
+  button {
+    background: var(--rs-surface);
+    border: 1px solid var(--rs-border);
+    color: var(--rs-text-muted);
+    padding: 0.5rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.88rem;
+
+    &:hover { border-color: var(--rs-red); }
+
+    &.active {
+      background: var(--rs-red);
+      border-color: var(--rs-red);
+      color: #fff;
+    }
+  }
+}

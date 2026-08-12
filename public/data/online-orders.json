@@ -1,0 +1,156 @@
+[
+  {
+    "id": "order-online-1",
+    "code": "RS-7241",
+    "userId": "user-demo-1",
+    "items": [
+      {
+        "sku": "RS-CJCN-H-S-NEG-T1",
+        "productId": "1",
+        "name": "CJCN Jacket",
+        "imageUrl": "/images/products/cjcn-jacket-black.svg",
+        "size": "S",
+        "color": "NEG",
+        "catalogPrice": 129.90,
+        "unitPrice": 129.90,
+        "quantity": 1,
+        "maxStock": 12
+      }
+    ],
+    "total": 129.90,
+    "method": "motorizado",
+    "shipping": {
+      "fullName": "Rodrigo Vega",
+      "phone": "987654321",
+      "address": "Av. Los Álamos 452",
+      "district": "San Miguel"
+    },
+    "createdAt": "2026-08-09T14:20:00.000Z",
+    "qrExpiresAt": "2026-08-09T22:20:00.000Z",
+    "paidAt": "2026-08-09T14:35:00.000Z",
+    "deliveryDate": "2026-08-10",
+    "trackingStep": 0,
+    "paymentMethod": "qr"
+  },
+  {
+    "id": "order-online-2",
+    "code": "RS-7242",
+    "userId": "user-demo-2",
+    "items": [
+      {
+        "sku": "RS-PDRF-U-M-ROJ-T1",
+        "productId": "2",
+        "name": "RS Dry-Fit T-Shirt",
+        "imageUrl": "/images/products/dryfit-tshirt-red.svg",
+        "size": "M",
+        "color": "ROJ",
+        "catalogPrice": 49.90,
+        "unitPrice": 49.90,
+        "quantity": 2,
+        "maxStock": 25
+      },
+      {
+        "sku": "RS-CAPP-U-M-BLA-T1",
+        "productId": "6",
+        "name": "RS Running Cap",
+        "imageUrl": "/images/products/running-cap-red.svg",
+        "size": "M",
+        "color": "BLA",
+        "catalogPrice": 34.90,
+        "unitPrice": 34.90,
+        "quantity": 1,
+        "maxStock": 22
+      }
+    ],
+    "total": 134.70,
+    "method": "shalom",
+    "shipping": {
+      "fullName": "Camila Torres",
+      "phone": "912345678",
+      "agency": "Shalom Arequipa Centro"
+    },
+    "createdAt": "2026-08-09T10:05:00.000Z",
+    "qrExpiresAt": "2026-08-09T18:05:00.000Z",
+    "paidAt": "2026-08-09T10:12:00.000Z",
+    "deliveryDate": "2026-08-11",
+    "trackingStep": 1,
+    "paymentMethod": "qr"
+  },
+  {
+    "id": "order-online-3",
+    "code": "RS-7238",
+    "userId": "user-demo-3",
+    "items": [
+      {
+        "sku": "RS-HOOD-U-L-GRI-T1",
+        "productId": "5",
+        "name": "RS Hoodie Classic",
+        "imageUrl": "/images/products/hoodie-classic-black.svg",
+        "size": "L",
+        "color": "GRI",
+        "catalogPrice": 109.90,
+        "unitPrice": 109.90,
+        "quantity": 1,
+        "maxStock": 9
+      }
+    ],
+    "total": 109.90,
+    "method": "motorizado",
+    "shipping": {
+      "fullName": "Diego Ramírez",
+      "phone": "998877665",
+      "address": "Jr. Las Begonias 210",
+      "district": "Surco"
+    },
+    "createdAt": "2026-08-08T19:40:00.000Z",
+    "qrExpiresAt": "2026-08-09T03:40:00.000Z",
+    "paidAt": "2026-08-08T19:44:00.000Z",
+    "deliveryDate": "2026-08-09",
+    "trackingStep": 2,
+    "paymentMethod": "qr"
+  },
+  {
+    "id": "order-online-4",
+    "code": "RS-7230",
+    "userId": "user-demo-4",
+    "items": [
+      {
+        "sku": "RS-LEGG-M-M-NEG-T1",
+        "productId": "4",
+        "name": "RS Performance Leggings",
+        "imageUrl": "/images/products/leggings-red.svg",
+        "size": "M",
+        "color": "NEG",
+        "catalogPrice": 89.90,
+        "unitPrice": 89.90,
+        "quantity": 1,
+        "maxStock": 20
+      },
+      {
+        "sku": "RS-SOCK-U-M-BLA-T1",
+        "productId": "8",
+        "name": "RS Compression Socks",
+        "imageUrl": "/images/products/socks-white.svg",
+        "size": "M",
+        "color": "BLA",
+        "catalogPrice": 24.90,
+        "unitPrice": 24.90,
+        "quantity": 1,
+        "maxStock": 3
+      }
+    ],
+    "total": 114.80,
+    "method": "shalom",
+    "shipping": {
+      "fullName": "Valeria Chávez",
+      "phone": "965432187",
+      "agency": "Shalom Trujillo Centro"
+    },
+    "createdAt": "2026-08-07T09:15:00.000Z",
+    "qrExpiresAt": "2026-08-07T17:15:00.000Z",
+    "paidAt": "2026-08-07T09:20:00.000Z",
+    "deliveryDate": "2026-08-08",
+    "trackingStep": 3,
+    "paymentMethod": "qr"
+  }
+]

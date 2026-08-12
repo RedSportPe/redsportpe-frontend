@@ -1,0 +1,59 @@
+<section class="online-orders">
+  <header class="page-header">
+    <div>
+      <h1>Mis Pedidos</h1>
+      <p class="subtitle">{{ store.accepted().length }} pedido(s) aceptados por ti</p>
+    </div>
+  </header>
+
+  @if (store.accepted().length === 0) {
+    <p class="empty-ticket">Aún no has aceptado ningún pedido. Ve a "Pedidos Online".</p>
+  } @else {
+    <div class="orders-list">
+      @for (order of store.accepted(); track order.id) {
+        <article class="order-row" [class.delivered]="isDelivered(order)">
+          <div class="order-main">
+            <div class="order-head">
+              <strong>{{ order.code }}</strong>
+              <span class="method-badge">{{ methodLabels[order.method] }}</span>
+            </div>
+            <p class="customer">{{ order.shipping.fullName }} · {{ order.shipping.phone }}</p>
+            <p class="destination">
+              @if (order.shipping.address) {
+                {{ order.shipping.address }}, {{ order.shipping.district }}
+              } @else {
+                {{ order.shipping.agency }}
+              }
+            </p>
+          </div>
+
+          <div class="items">
+            @for (item of order.items; track item.sku) {
+              <div class="item-row">
+                <img [src]="item.imageUrl" [alt]="item.name" />
+                <span>{{ item.quantity }}× {{ item.name }} — {{ item.size }}</span>
+              </div>
+            }
+          </div>
+
+          <span class="order-total">{{ order.total | currency:'PEN':'S/ ' }}</span>
+
+          <div class="tracking-block">
+            <div class="tracking">
+              @for (step of trackingSteps[order.method]; track step; let i = $index) {
+                <span class="dot" [class.done]="i <= order.trackingStep">{{ step }}</span>
+              }
+            </div>
+            @if (!isDelivered(order)) {
+              <button type="button" class="advance-btn" (click)="advance(order.id)">
+                Marcar: {{ trackingSteps[order.method][order.trackingStep + 1] }}
+              </button>
+            } @else {
+              <p class="done-label">✓ Entregado</p>
+            }
+          </div>
+        </article>
+      }
+    </div>
+  }
+</section>
