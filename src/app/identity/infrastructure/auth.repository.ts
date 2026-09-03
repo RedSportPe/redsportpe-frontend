@@ -23,10 +23,19 @@ interface AuthenticatedUserResponse {
 export class AuthRepository {
   private http = inject(HttpClient);
 
-  /** The JWT of the currently authenticated user (kept for protected calls) */
-  private _token: string | null = null;
-  get token(): string | null { return this._token; }
+  private readonly TOKEN_KEY = 'redsport_token';
 
+  get token(): string | null {
+    return sessionStorage.getItem(this.TOKEN_KEY);
+  }
+
+  private setToken(token: string): void {
+    sessionStorage.setItem(this.TOKEN_KEY, token);
+  }
+
+  clearToken(): void {
+    sessionStorage.removeItem(this.TOKEN_KEY);
+  }
   /** REAL: POST /api/auth/sign-in → returns the user + JWT from PostgreSQL */
   login(email: string, password: string): Observable<User> {
     return this.http
@@ -36,7 +45,7 @@ export class AuthRepository {
       })
       .pipe(
         map(response => {
-          this._token = response.token;   // remember the JWT for later
+          this.setToken(response.token);  // remember the JWT for later
           return this.toUser(response);
         }),
         catchError(() =>
