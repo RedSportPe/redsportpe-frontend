@@ -1,83 +1,76 @@
-import { Injectable, signal, computed } from '@angular/core';
-import {
-  CommercialAgent,
-  DEFAULT_AGENTS,
-  nextStoreCode,
-  serieForStore,
-} from '../domain/commercial-agent.model';
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { Observable, tap } from 'rxjs';
+import { AgentsRepository } from '../infrastructure/agents.repository';
+import { CommercialAgent } from '../domain/commercial-agent.model';
 
-/** In-memory for now (resets on reload) — same pattern as GarmentTypesStore.
- *  Tomorrow: /api/agents through a repository. */
+/** Now backed by /api/stores. Loads on demand; commands hit the backend and
+ *  refresh the local signal on success. */
 @Injectable({ providedIn: 'root' })
 export class AgentsStore {
-  private _agents = signal<CommercialAgent[]>(DEFAULT_AGENTS);
-  readonly agents = this._agents.asReadonly();
+  private repo = inject(AgentsRepository);
 
+  private _agents = signal<CommercialAgent[]>([]);
+  readonly agents = this._agents.asReadonly();
   readonly count = computed(() => this._agents().length);
+
+  private _loading = signal(false);
+  readonly loading = this._loading.asReadonly();
 
   byCode(storeCode: string): CommercialAgent | undefined {
     return this._agents().find(agent => agent.storeCode === storeCode);
   }
 
-  /** Command: the admin opens a new tienda — code and boleta serie are assigned
-   *  automatically (T3 → B003). Returns the created agent. */
-  addAgent(data: {
-    name?: string;
-    managerName: string;
-    address: string;
-    district?: string;
-    province?: string;
-    department?: string;
-    phone?: string;
-    operatorEmail?: string;
-  }): CommercialAgent {
-    const storeCode = nextStoreCode(this._agents());
-    const agent: CommercialAgent = {
-      storeCode,
-      name: data.name?.trim() || `Tienda ${storeCode.replace(/\D/g, '')}`,
-      managerName: data.managerName.trim(),
-      address: data.address.trim(),
-      district: data.district?.trim() ?? '',
-      province: data.province?.trim() ?? '',
-      department: data.department?.trim() ?? '',
-      phone: data.phone?.trim() || undefined,
-      boletaSerie: serieForStore(storeCode),
-      operatorEmail: data.operatorEmail?.trim().toLowerCase() || undefined,
-    };
-    this._agents.update(list => [...list, agent]);
-    return agent;
+  byId(id: string): CommercialAgent | undefined {
+    return this._agents().find(agent => agent.id === id);
   }
 
-  /** Command: edit a tienda's basic info (code and serie never change) */
-  updateAgent(
-    storeCode: string,
-    changes: {
-      name?: string;
-      managerName?: string;
-      address?: string;
-      district?: string;
-      province?: string;
-      department?: string;
-      phone?: string;
-      operatorEmail?: string;
-    }
-  ): void {
-    this._agents.update(list =>
-      list.map(agent =>
-        agent.storeCode === storeCode
-          ? {
-              ...agent,
-              name: changes.name?.trim() || agent.name,
-              managerName: changes.managerName?.trim() ?? agent.managerName,
-              address: changes.address?.trim() ?? agent.address,
-              district: changes.district?.trim() ?? agent.district,
-              province: changes.province?.trim() ?? agent.province,
-              department: changes.department?.trim() ?? agent.department,
-              phone: changes.phone?.trim() || undefined,
-              operatorEmail: changes.operatorEmail?.trim().toLowerCase() || agent.operatorEmail,
-            }
-          : agent
+  /** Load the store list from the backend */
+  load(): void {
+    this._loading.set(true);
+    this.repo.getAll().subscribe({
+      next: agents => {
+        this._agents.set(agents);
+        this._loading.set(false);
+      },
+      error: () => this._loading.set(false),
+    });
+  }
+
+  /** Create a store + its operator in one backend call */
+  createStore(data: {
+    name: string;
+    address: string;
+    managerName: string;
+    district: string;
+    province: string;
+    department: string;
+    phone: string;
+    operatorEmail: string;
+    operatorPassword: string;
+  }): Observable<CommercialAgent> {
+    return this.repo.create(data).pipe(
+      tap(agent => this._agents.update(list => [...list, agent]))
+    );
+  }
+
+  /** Change the cashier credential of a store */
+  updateOperator(
+    storeId: string,
+    changes: { name?: string; email?: string; password?: string }
+  ): Observable<CommercialAgent> {
+    return this.repo.updateOperator(storeId, changes).pipe(
+      tap(updated =>
+        this._agents.update(list =>
+          list.map(a => (a.id === updated.id ? updated : a))
+        )
       )
+    );
+  }
+
+  /** Soft-delete a store (removes it from the active list) */
+  deleteStore(storeId: string): Observable<void> {
+    return this.repo.remove(storeId).pipe(
+      tap(() => this._agents.update(list => list.filter(a => a.id !== storeId)))
     );
   }
 }

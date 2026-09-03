@@ -1,27 +1,25 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AgentsStore } from '../../../application/agents.store';
-import { AuthStore } from '../../../application/auth.store';
-import { CommercialAgent, nextStoreCode } from '../../../domain/commercial-agent.model';
+import { CommercialAgent } from '../../../domain/commercial-agent.model';
 import { UnsavedChangesAware } from '../../../../layout/unsaved-changes.guard';
 
-/** "Agentes Comerciales": the admin's registry of physical stores (Tienda 1…N).
- *  Each agent's data (address, encargada, boleta serie) feeds the POS boleta. */
+/** "Agentes Comerciales": the admin's registry of physical stores, now backed
+ *  by the real /api/stores backend. */
 @Component({
   selector: 'app-admin-agents-page',
   imports: [RouterLink],
   templateUrl: './admin-agents-page.html',
   styleUrl: './admin-agents-page.scss',
 })
-export class AdminAgentsPage implements UnsavedChangesAware {
+export class AdminAgentsPage implements UnsavedChangesAware, OnInit {
   readonly store = inject(AgentsStore);
-  private authStore = inject(AuthStore);
 
-  /** Blocked-exit feedback: the form shakes and the button pulses */
   readonly blocked = signal(false);
+  readonly saving = signal(false);
 
-  // Form state — creating a new tienda, or editing an existing one
-  readonly editingCode = signal<string | null>(null);
+  // Form state
+  readonly editingId = signal<string | null>(null);
   readonly name = signal('');
   readonly managerName = signal('');
   readonly address = signal('');
@@ -29,17 +27,19 @@ export class AdminAgentsPage implements UnsavedChangesAware {
   readonly province = signal('');
   readonly department = signal('');
   readonly phone = signal('');
-  /** The cashier's login (one account per tienda — provisioned right here) */
   readonly operatorEmail = signal('');
-  /** Blank while editing = keep the current password */
   readonly operatorPassword = signal('');
   readonly accountError = signal<string | null>(null);
 
-  readonly isEditing = computed(() => this.editingCode() !== null);
+  readonly isEditing = computed(() => this.editingId() !== null);
+
+  ngOnInit(): void {
+    this.store.load();   // fetch stores from the backend on open
+  }
 
   readonly formDirty = computed(() => {
-    const code = this.editingCode();
-    if (code === null) {
+    const id = this.editingId();
+    if (id === null) {
       return (
         this.name().trim() !== '' ||
         this.managerName().trim() !== '' ||
@@ -52,7 +52,7 @@ export class AdminAgentsPage implements UnsavedChangesAware {
         this.operatorPassword() !== ''
       );
     }
-    const agent = this.store.byCode(code);
+    const agent = this.store.byId(id);
     if (!agent) return false;
     return (
       this.name().trim() !== agent.name ||
@@ -70,7 +70,7 @@ export class AdminAgentsPage implements UnsavedChangesAware {
   /** Creating a tienda REQUIRES its cashier login (email + password) */
   readonly canSave = computed(() => {
     const base = this.managerName().trim() !== '' && this.address().trim() !== '';
-    if (this.editingCode() === null) {
+    if (this.editingId() === null) {
       return base && this.operatorEmail().trim() !== '' && this.operatorPassword() !== '';
     }
     return base;
@@ -95,7 +95,7 @@ export class AdminAgentsPage implements UnsavedChangesAware {
   }
 
   startEdit(agent: CommercialAgent): void {
-    this.editingCode.set(agent.storeCode);
+    this.editingId.set(agent.id);
     this.name.set(agent.name);
     this.managerName.set(agent.managerName);
     this.address.set(agent.address);
@@ -104,63 +104,64 @@ export class AdminAgentsPage implements UnsavedChangesAware {
     this.department.set(agent.department);
     this.phone.set(agent.phone ?? '');
     this.operatorEmail.set(agent.operatorEmail ?? '');
-    this.operatorPassword.set('');   // blank = keep current password
+    this.operatorPassword.set('');
     this.accountError.set(null);
   }
 
   save(): void {
-    if (!this.canSave()) return;
+    if (!this.canSave() || this.saving()) return;
     this.accountError.set(null);
-    const code = this.editingCode();
-    const email = this.operatorEmail().trim().toLowerCase();
-    const password = this.operatorPassword();
-    const data = {
-      name: this.name(),
-      managerName: this.managerName(),
-      address: this.address(),
-      district: this.district(),
-      province: this.province(),
-      department: this.department(),
-      phone: this.phone(),
-      operatorEmail: email,
-    };
+    this.saving.set(true);
 
-    if (code === null) {
-      // New tienda: the cashier account comes first (it validates email/password);
-      // only when it succeeds does the tienda get created.
-      const newCode = nextStoreCode(this.store.agents());
-      const error = this.authStore.provisionOperator(email, password, this.managerName(), newCode);
-      if (error) {
-        this.accountError.set(error);
-        return;
-      }
-      this.store.addAgent(data);
+    const id = this.editingId();
+
+    if (id === null) {
+      // New store: one backend call creates store + operator + link
+      this.store.createStore({
+        name: this.name().trim(),
+        address: this.address().trim(),
+        managerName: this.managerName().trim(),
+        district: this.district().trim(),
+        province: this.province().trim(),
+        department: this.department().trim(),
+        phone: this.phone().trim(),
+        operatorEmail: this.operatorEmail().trim().toLowerCase(),
+        operatorPassword: this.operatorPassword(),
+      }).subscribe({
+        next: () => { this.saving.set(false); this.clearForm(); },
+        error: (err) => {
+          this.saving.set(false);
+          this.accountError.set(err?.error?.message || 'No se pudo crear la tienda.');
+        },
+      });
     } else {
-      const agent = this.store.byCode(code)!;
-      if (email) {
-        // Existing account: sync email/password/name. No account yet: create it.
-        const error = agent.operatorEmail
-          ? this.authStore.updateOperatorAccount(code, {
-              email,
-              password: password || undefined,
-              name: this.managerName(),
-            })
-          : password
-            ? this.authStore.provisionOperator(email, password, this.managerName(), code)
-            : 'Define una contraseña para crear la cuenta de esta tienda.';
-        if (error) {
-          this.accountError.set(error);
-          return;
-        }
-      }
-      this.store.updateAgent(code, data);
+      // Editing: update the operator credential of this store
+      this.store.updateOperator(id, {
+        name: this.managerName().trim(),
+        email: this.operatorEmail().trim().toLowerCase() || undefined,
+        password: this.operatorPassword() || undefined,
+      }).subscribe({
+        next: () => { this.saving.set(false); this.clearForm(); },
+        error: (err) => {
+          this.saving.set(false);
+          this.accountError.set(err?.error?.message || 'No se pudo actualizar la operadora.');
+        },
+      });
     }
-    this.clearForm();
   }
 
-  /** The explicit way out of a half-filled form (guard-friendly) */
+  /** Soft-delete the store */
+  deleteStore(agent: CommercialAgent): void {
+    if (this.saving()) return;
+    this.saving.set(true);
+    this.store.deleteStore(agent.id).subscribe({
+      next: () => this.saving.set(false),
+      error: () => this.saving.set(false),
+    });
+  }
+
   clearForm(): void {
-    this.editingCode.set(null);
+    this.editingId.set(null);
     this.name.set('');
     this.managerName.set('');
     this.address.set('');

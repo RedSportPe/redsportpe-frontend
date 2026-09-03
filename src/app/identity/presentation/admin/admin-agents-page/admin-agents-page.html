@@ -8,12 +8,12 @@
 
   <!-- Create / edit card -->
   <article class="create-card" [class.rs-shake]="blocked()">
-    <h2>{{ isEditing() ? 'Editar ' + editingCode() : 'Nueva tienda' }}</h2>
+    <h2>{{ isEditing() ? 'Editar tienda' : 'Nueva tienda' }}</h2>
 
     <div class="create-grid">
       <label class="field">
         <span>Nombre {{ isEditing() ? '' : '(opcional — por defecto "Tienda N")' }}</span>
-        <input type="text" placeholder="Tienda 3" [value]="name()" (input)="onInput('name', $event)" />
+        <input type="text" placeholder="Tienda 3" [value]="name()" (input)="onInput('name', $event)" [disabled]="isEditing()" />
       </label>
 
       <label class="field">
@@ -23,31 +23,31 @@
 
       <label class="field">
         <span>Dirección física (va en la boleta)</span>
-        <input type="text" placeholder="Jr. Ejemplo NRO 123 INT. 45" [value]="address()" (input)="onInput('address', $event)" />
+        <input type="text" placeholder="Jr. Ejemplo NRO 123 INT. 45" [value]="address()" (input)="onInput('address', $event)" [disabled]="isEditing()" />
       </label>
 
       <label class="field">
         <span>Teléfono (opcional)</span>
-        <input type="tel" placeholder="9 dígitos" [value]="phone()" (input)="onInput('phone', $event)" />
+        <input type="tel" placeholder="9 dígitos" [value]="phone()" (input)="onInput('phone', $event)" [disabled]="isEditing()" />
       </label>
 
       <label class="field">
         <span>Departamento</span>
-        <input type="text" placeholder="Lima" [value]="department()" (input)="onInput('department', $event)" />
+        <input type="text" placeholder="Lima" [value]="department()" (input)="onInput('department', $event)" [disabled]="isEditing()" />
       </label>
 
       <label class="field">
         <span>Provincia</span>
-        <input type="text" placeholder="Lima" [value]="province()" (input)="onInput('province', $event)" />
+        <input type="text" placeholder="Lima" [value]="province()" (input)="onInput('province', $event)" [disabled]="isEditing()" />
       </label>
 
       <label class="field">
         <span>Distrito</span>
-        <input type="text" placeholder="Cercado de Lima" [value]="district()" (input)="onInput('district', $event)" />
+        <input type="text" placeholder="Cercado de Lima" [value]="district()" (input)="onInput('district', $event)" [disabled]="isEditing()" />
       </label>
 
       <label class="field">
-        <span>Correo de acceso de la caja {{ isEditing() ? '' : '(con este correo se loguea la operadora)' }}</span>
+        <span>Correo de acceso de la caja {{ isEditing() ? '(cambiar operadora)' : '(con este correo se loguea la operadora)' }}</span>
         <input type="email" placeholder="tienda2@redsport.pe" [value]="operatorEmail()" (input)="onInput('operatorEmail', $event)" />
       </label>
 
@@ -66,8 +66,8 @@
     }
 
     <div class="create-actions">
-      <button type="button" class="create-btn" [class.rs-pulse]="blocked()" [disabled]="!canSave()" (click)="save()">
-        {{ isEditing() ? 'Guardar cambios' : 'Crear tienda' }}
+      <button type="button" class="create-btn" [class.rs-pulse]="blocked()" [disabled]="!canSave() || saving()" (click)="save()">
+        {{ saving() ? 'Guardando…' : (isEditing() ? 'Guardar cambios' : 'Crear tienda') }}
       </button>
       <button type="button" class="clear-btn" [class.rs-pulse]="blocked()" (click)="clearForm()">
         {{ isEditing() ? 'Cancelar' : 'Limpiar' }}
@@ -75,33 +75,29 @@
     </div>
   </article>
 
+  @if (store.loading()) {
+    <p class="loading-msg">Cargando tiendas…</p>
+  }
+
   <div class="table-wrap">
     <table>
       <thead>
-        <tr>
-          <th>Código</th>
-          <th>Nombre</th>
-          <th>Encargada/o</th>
-          <th>Correo de acceso</th>
-          <th>Dirección</th>
-          <th>Teléfono</th>
-          <th>Serie boleta</th>
-          <th></th>
-        </tr>
+      <tr>
+        <th>Código</th>
+        <th>Nombre</th>
+        <th>Encargada/o</th>
+        <th>Dirección</th>
+        <th>Teléfono</th>
+        <th>Serie boleta</th>
+        <th></th>
+      </tr>
       </thead>
       <tbody>
-        @for (agent of store.agents(); track agent.storeCode) {
+        @for (agent of store.agents(); track agent.id) {
           <tr>
             <td class="code">{{ agent.storeCode }}</td>
             <td class="name">{{ agent.name }}</td>
             <td>{{ agent.managerName || '—' }}</td>
-            <td>
-              @if (agent.operatorEmail) {
-                <span class="email">{{ agent.operatorEmail }}</span>
-              } @else {
-                <span class="missing">Sin cuenta — edita para crearla</span>
-              }
-            </td>
             <td>
               @if (agent.address) {
                 {{ agent.address }}
@@ -117,10 +113,10 @@
             <td class="actions">
               <button type="button" class="edit-btn" (click)="startEdit(agent)">Editar</button>
               <a [routerLink]="['/admin/agentes', agent.storeCode]" class="view-btn">Ver</a>
+              <button type="button" class="delete-btn" [disabled]="saving()" (click)="deleteStore(agent)">Eliminar</button>
             </td>
           </tr>
         }
       </tbody>
     </table>
   </div>
-</section>

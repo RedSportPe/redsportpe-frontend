@@ -192,3 +192,25 @@ table {
 @media (max-width: 768px) {
   .create-grid { grid-template-columns: 1fr; }
 }
+.loading-msg {
+  color: var(--rs-text-muted);
+  font-size: 0.88rem;
+  padding: 0.8rem 0;
+}
+
+.delete-btn {
+  background: transparent;
+  border: 1px solid var(--rs-border);
+  color: var(--rs-text-muted);
+  font-size: 0.78rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 6px;
+
+  &:hover:not(:disabled) { border-color: var(--rs-red); color: var(--rs-red); }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
